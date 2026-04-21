@@ -101,12 +101,14 @@
     .ms-guld { background: var(--gold-bg); color: var(--gold-text); border: 0.5px solid var(--gold); }
     .ms-silver { background: var(--silver-bg); color: var(--silver-text); border: 0.5px solid var(--silver); }
     .ms-brons { background: var(--bronze-bg); color: var(--bronze-text); border: 0.5px solid var(--bronze); }
-    .sheets-indicator { font-size: 12px; color: var(--muted); margin-top: 8px; display: flex; align-items: center; gap: 6px; min-height: 20px; }
-    .sheets-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0; }
-    .sheets-dot.ok { background: #639922; }
-    .sheets-dot.err { background: #D85A30; }
-    .sheets-dot.syncing { background: #EF9F27; animation: pulse 1s infinite; }
+    .sync-bar { display: flex; align-items: center; gap: 8px; margin-top: 8px; min-height: 20px; font-size: 12px; color: var(--muted); }
+    .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0; }
+    .sync-dot.ok { background: #639922; }
+    .sync-dot.err { background: #D85A30; }
+    .sync-dot.syncing { background: #EF9F27; animation: pulse 1s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .loading { text-align: center; padding: 2rem; color: var(--hint); font-size: 14px; }
+    .cloud-badge { font-size: 10px; padding: 2px 6px; border-radius: 8px; background: #E6F1FB; color: #0C447C; font-weight: 600; margin-left: 6px; vertical-align: middle; }
   </style>
 </head>
 <body>
@@ -160,56 +162,52 @@
       <div class="tot-item"><div class="tot-val" id="tot-sum">0 / 300</div><div class="tot-label">Totalt</div></div>
     </div>
     <button class="btn" onclick="sparaResultat()">Spara resultat</button>
-    <div class="sheets-indicator" id="sheets-status">
-      <div class="sheets-dot" id="sheets-dot"></div>
-      <span id="sheets-text"></span>
-    </div>
+    <div class="sync-bar"><div class="sync-dot" id="sync-dot"></div><span id="sync-text"></span></div>
   </div>
 
   <div id="view-historik" class="view">
-    <h2 style="margin-top:8px;">Historik</h2>
+    <h2 style="margin-top:8px;">Historik <span class="cloud-badge">Moln</span></h2>
     <div class="gren-label">Precision nationellt skytte</div>
     <div class="filter-row">
       <button class="filter-btn active" onclick="setFilter('alla',this)">Alla</button>
       <button class="filter-btn" onclick="setFilter('traning',this)">Träning</button>
       <button class="filter-btn" onclick="setFilter('tavling',this)">Tävling</button>
     </div>
-    <div id="historik-list"></div>
+    <div id="historik-list"><div class="loading">Laddar...</div></div>
   </div>
 
   <div id="view-statistik" class="view">
-    <h2 style="margin-top:8px;">Statistik</h2>
+    <h2 style="margin-top:8px;">Statistik <span class="cloud-badge">Moln</span></h2>
     <div class="gren-label">Precision nationellt skytte</div>
-    <div id="statistik-content"></div>
+    <div id="statistik-content"><div class="loading">Laddar...</div></div>
   </div>
 
   <div id="view-installningar" class="view">
     <h2 style="margin-top:8px;">Inställningar</h2>
-    <div class="gren-label">Google Sheets, export och data</div>
+    <div class="gren-label">Molnlagring och export</div>
+    <div class="export-section">
+      <h3>Supabase-molnlagring</h3>
+      <p>Alla resultat sparas automatiskt i molnet och är tillgängliga på alla dina enheter.</p>
+      <button class="btn btn-secondary" onclick="testSupabase()">Testa anslutning</button>
+      <div id="supabase-test" style="margin-top:8px;font-size:13px;"></div>
+    </div>
     <div class="export-section">
       <h3>Google Sheets-synk</h3>
-      <p>Varje resultat skickas automatiskt till ditt Google Sheet när du trycker Spara. Ändra URL:en nedan om du byter script.</p>
+      <p>Resultat skickas även till ditt Google Sheet automatiskt.</p>
       <label>Apps Script URL</label>
       <input type="url" id="sheets-url-input" placeholder="https://script.google.com/macros/s/...">
-      <button class="btn" onclick="sparaUrl()">Spara URL</button>
-      <button class="btn btn-secondary" onclick="testaSynk()">Testa anslutning</button>
-      <div id="test-result" style="margin-top:8px;font-size:13px;"></div>
+      <button class="btn btn-secondary" onclick="sparaUrl()">Spara URL</button>
     </div>
     <div class="export-section">
       <h3>Exportera data</h3>
-      <p>Ladda ner alla resultat som JSON-fil.</p>
+      <p>Ladda ner alla resultat från molnet som JSON-fil.</p>
       <button class="btn btn-secondary" onclick="exportData()">Exportera till JSON</button>
     </div>
     <div class="export-section">
       <h3>Importera data</h3>
-      <p>Läs in en tidigare exporterad JSON-fil. Data slås samman.</p>
+      <p>Läs in en tidigare exporterad JSON-fil till molnet.</p>
       <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(this)">
       <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">Välj JSON-fil</button>
-    </div>
-    <div class="export-section">
-      <h3>Rensa all data</h3>
-      <p>Ta bort alla sparade resultat lokalt.</p>
-      <button class="btn btn-secondary" style="color:#E24B4A;border-color:#E24B4A !important;" onclick="rensaData()">Rensa all data</button>
     </div>
   </div>
 </div>
@@ -234,82 +232,61 @@
 </nav>
 
 <script>
-var DEFAULT_URL = 'https://script.google.com/macros/s/AKfycbz8RCGbfprLEGDRYCBpne2mBVO4i6IaFHeB0txLkA2JUhX5rEWN1CIolzyxl1hvJ4ZMYQ/exec';
-var KRAV = {A:{brons:32,silver:38,guld:43},B:{brons:33,silver:39,guld:45},C:{brons:34,silver:40,guld:46},R:{brons:32,silver:38,guld:43}};
+var SB_URL='https://hpwkipddtgbwnaqhxulp.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhwd2tpcGRkdGdid25hcWh4dWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3NjQzNzYsImV4cCI6MjA5MjM0MDM3Nn0.lgDgZFH_212DHs4hiAoXP5LB6W7yy_uRTtcoR_dFkQk';
+var SHEETS_URL='https://script.google.com/macros/s/AKfycbz8RCGbfprLEGDRYCBpne2mBVO4i6IaFHeB0txLkA2JUhX5rEWN1CIolzyxl1hvJ4ZMYQ/exec';
+var KRAV={A:{brons:32,silver:38,guld:43},B:{brons:33,silver:39,guld:45},C:{brons:34,silver:40,guld:46},R:{brons:32,silver:38,guld:43}};
 
+function sb(path,opts){
+  var hdrs={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'};
+  if(opts&&opts.extraHeaders)Object.assign(hdrs,opts.extraHeaders);
+  return fetch(SB_URL+'/rest/v1/'+path,Object.assign({headers:hdrs},opts||{}));
+}
 function getMedal(sum,vg){var k=KRAV[vg];if(!k)return null;if(sum>=k.guld)return'guld';if(sum>=k.silver)return'silver';if(sum>=k.brons)return'brons';return null;}
 function sortVal(v){return v===null?-1:v==='X'?11:v;}
 function sortShots(arr){return[...arr].sort(function(a,b){return sortVal(b)-sortVal(a);});}
 function shotNumeric(v){return v===null?0:v==='X'?10:v;}
 function shotDisplay(v){return v===null?'':v==='X'?'X':String(v);}
-function getSheetsUrl(){return localStorage.getItem('sheets_url')||DEFAULT_URL;}
+function getSheetsUrl(){return localStorage.getItem('sheets_url')||SHEETS_URL;}
 
-var resultat=[];
 var filterTyp='alla';
 var shots=Array.from({length:6},function(){return Array(5).fill(null);});
 var activeSerie=0,activeShot=0;
 
-try{var _s=localStorage.getItem('pistol_pwa');if(_s)resultat=JSON.parse(_s);}catch(e){}
-
-function sparaStorage(){try{localStorage.setItem('pistol_pwa',JSON.stringify(resultat));}catch(e){}}
-
 document.getElementById('datum').value=new Date().toISOString().split('T')[0];
 document.getElementById('sheets-url-input').value=getSheetsUrl();
 
-function sparaUrl(){
-  var url=document.getElementById('sheets-url-input').value.trim();
-  if(url){localStorage.setItem('sheets_url',url);alert('URL sparad!');}
-}
-
+function sparaUrl(){var u=document.getElementById('sheets-url-input').value.trim();if(u){localStorage.setItem('sheets_url',u);alert('URL sparad!');}}
 function getVapengrupp(){return document.getElementById(document.getElementById('typ').value==='traning'?'vapengrupp-tr':'vapengrupp-tv').value;}
-
-function toggleFalt(){
-  var tr=document.getElementById('typ').value==='traning';
-  document.getElementById('falt-traning').style.display=tr?'':'none';
-  document.getElementById('falt-tavling').style.display=tr?'none':'';
-  renderSerier();
-}
+function toggleFalt(){var tr=document.getElementById('typ').value==='traning';document.getElementById('falt-traning').style.display=tr?'':'none';document.getElementById('falt-tavling').style.display=tr?'none':'';renderSerier();}
 
 function switchView(v,btn){
   document.querySelectorAll('.view').forEach(function(el){el.classList.remove('active');});
   document.querySelectorAll('.bottom-nav button').forEach(function(el){el.classList.remove('active');});
-  document.getElementById('view-'+v).classList.add('active');
-  btn.classList.add('active');
+  document.getElementById('view-'+v).classList.add('active');btn.classList.add('active');
   if(v==='historik')renderHistorik();
   if(v==='statistik')renderStatistik();
 }
 
-function setFilter(f,el){
-  filterTyp=f;
-  document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
-  el.classList.add('active');
-  renderHistorik();
-}
+function setFilter(f,el){filterTyp=f;document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});el.classList.add('active');renderHistorik();}
 
 function renderSerier(){
-  var con=document.getElementById('serier-container');
-  var vg=getVapengrupp();
-  var html='';
+  var con=document.getElementById('serier-container'),vg=getVapengrupp(),html='';
   for(var s=0;s<6;s++){
-    var isActive=s===activeSerie;
-    var sv=shots[s];
+    var isActive=s===activeSerie,sv=shots[s];
     var sum=sv.reduce(function(a,v){return a+shotNumeric(v);},0);
     var xs=sv.filter(function(v){return v==='X';}).length;
     var filled=sv.filter(function(v){return v!==null;}).length;
     var medal=filled===5?getMedal(sum,vg):null;
-    var blockCls='serie-block'+(medal?' '+medal:'');
     var shotsHtml='';
     for(var i=0;i<5;i++){
-      var val=sv[i];
-      var isAct=isActive&&i===activeShot;
-      var cls='shot-box';
-      if(isAct)cls+=' active-shot';
-      else if(val===null)cls+=' empty-slot';
+      var val=sv[i],isAct=isActive&&i===activeShot,cls='shot-box';
+      if(isAct)cls+=' active-shot';else if(val===null)cls+=' empty-slot';
       if(val==='X'&&!isAct)cls+=' is-x';
       shotsHtml+='<div class="'+cls+'" onclick="clickShot('+s+','+i+')">'+shotDisplay(val)+'</div>';
     }
     var medalTag=medal?'<span class="medal-tag '+medal+'">'+medal.charAt(0).toUpperCase()+medal.slice(1)+'</span>':'';
-    var summaryHtml=filled>0?'<span style="font-weight:600;">'+sum+'p'+(xs?' · '+xs+'X':'')+' '+medalTag+'</span>':'';
+    var sum2=filled>0?'<span style="font-weight:600;">'+sum+'p'+(xs?' · '+xs+'X':'')+' '+medalTag+'</span>':'';
     var valbHtml='';
     if(isActive){
       var vals=['X','10','9','8','7','6','5','4','3','2','1','0'];
@@ -318,33 +295,21 @@ function renderSerier(){
       valbHtml+='<div class="val-btn val-del" onclick="clearActiveShot()">&#9003;</div></div>';
       valbHtml+='<div class="kb-hint">- = X &nbsp;·&nbsp; + = 10 &nbsp;·&nbsp; 0–9 = valör</div>';
     }
-    html+='<div class="'+blockCls+'"><div class="serie-title"><span>Serie '+(s+1)+'</span>'+summaryHtml+'</div><div class="shots-display">'+shotsHtml+'</div>'+valbHtml+'</div>';
+    html+='<div class="serie-block'+(medal?' '+medal:'')+'"><div class="serie-title"><span>Serie '+(s+1)+'</span>'+sum2+'</div><div class="shots-display">'+shotsHtml+'</div>'+valbHtml+'</div>';
   }
-  con.innerHTML=html;
-  updateTotals();
+  con.innerHTML=html;updateTotals();
 }
 
 function clickShot(s,i){activeSerie=s;activeShot=i;renderSerier();}
-
-function insertAndSort(serie,slotIdx,val){
-  shots[serie][slotIdx]=val;
-  shots[serie]=sortShots(shots[serie]);
-  var nextNull=shots[serie].findIndex(function(v){return v===null;});
-  if(nextNull!==-1){activeShot=nextNull;}
-  else if(activeSerie<5){activeSerie++;activeShot=shots[activeSerie].findIndex(function(v){return v===null;});if(activeShot===-1)activeShot=0;}
-}
-
+function insertAndSort(serie,slot,val){shots[serie][slot]=val;shots[serie]=sortShots(shots[serie]);var nxt=shots[serie].findIndex(function(v){return v===null;});if(nxt!==-1)activeShot=nxt;else if(activeSerie<5){activeSerie++;activeShot=shots[activeSerie].findIndex(function(v){return v===null;});if(activeShot===-1)activeShot=0;}}
 function registerVal(v){insertAndSort(activeSerie,activeShot,v==='X'?'X':parseInt(v));renderSerier();}
 function clearActiveShot(){shots[activeSerie][activeShot]=null;shots[activeSerie]=sortShots(shots[activeSerie]);renderSerier();}
 
 function updateTotals(){
-  var all=shots.flat(),filled=all.filter(function(v){return v!==null;});
-  var xs=filled.filter(function(v){return v==='X';}).length;
-  var tens=filled.filter(function(v){return v==='X'||v===10;}).length;
-  var sum=filled.reduce(function(a,v){return a+shotNumeric(v);},0);
-  document.getElementById('tot-x').textContent=xs;
-  document.getElementById('tot-10').textContent=tens;
-  document.getElementById('tot-sum').textContent=sum+' / 300';
+  var all=shots.flat(),f=all.filter(function(v){return v!==null;});
+  document.getElementById('tot-x').textContent=f.filter(function(v){return v==='X';}).length;
+  document.getElementById('tot-10').textContent=f.filter(function(v){return v==='X'||v===10;}).length;
+  document.getElementById('tot-sum').textContent=f.reduce(function(a,v){return a+shotNumeric(v);},0)+' / 300';
 }
 
 document.addEventListener('keydown',function(e){
@@ -361,62 +326,31 @@ document.addEventListener('keydown',function(e){
   if(e.key==='ArrowUp'){e.preventDefault();if(activeSerie>0)activeSerie--;renderSerier();return;}
 });
 
-function setSheetsStatus(state,text){
-  document.getElementById('sheets-dot').className='sheets-dot '+state;
-  document.getElementById('sheets-text').textContent=text;
-}
-
-function skickaSheets(r){
-  setSheetsStatus('syncing','Synkar med Google Sheets...');
-  fetch(getSheetsUrl(),{method:'POST',body:JSON.stringify(r)})
-    .then(function(){setSheetsStatus('ok','Sparat i Google Sheets');})
-    .catch(function(){setSheetsStatus('err','Kunde inte nå Sheets – sparat lokalt');});
-}
+function setSync(state,text){document.getElementById('sync-dot').className='sync-dot '+state;document.getElementById('sync-text').textContent=text;}
 
 function sparaResultat(){
   var allFilled=shots.flat().filter(function(v){return v!==null;});
   if(allFilled.length===0){alert('Ange minst ett skott.');return;}
-  var typ=document.getElementById('typ').value;
-  var isTr=typ==='traning';
-  var vg=getVapengrupp();
+  var typ=document.getElementById('typ').value,isTr=typ==='traning',vg=getVapengrupp();
   var total=allFilled.reduce(function(a,v){return a+shotNumeric(v);},0);
   var xs=allFilled.filter(function(v){return v==='X';}).length;
-  var serieData=shots.map(function(s){
-    var arr=s.slice(),sum=arr.reduce(function(a,v){return a+shotNumeric(v);},0),filled=arr.filter(function(v){return v!==null;}).length;
-    return{shots:arr,sum:sum,medal:filled===5?getMedal(sum,vg):null};
-  });
-  var r={
-    id:Date.now(),typ:typ,
-    datum:document.getElementById('datum').value,
-    vapengrupp:vg,
-    vapen:isTr?document.getElementById('vapen-tr').value:document.getElementById('vapen-tv').value,
-    klass:isTr?null:document.getElementById('klass').value,
-    tavlingsnamn:isTr?'':document.getElementById('tavlingsnamn').value,
-    noter:document.getElementById('noter').value,
-    serier:serieData,total:total,xs:xs,
-    tens:allFilled.filter(function(v){return v==='X'||v===10;}).length,
-    skottCount:allFilled.length,
-    guld:serieData.filter(function(s){return s.medal==='guld';}).length,
-    silver:serieData.filter(function(s){return s.medal==='silver';}).length,
-    brons:serieData.filter(function(s){return s.medal==='brons';}).length
-  };
-  resultat.unshift(r);
-  sparaStorage();
-  skickaSheets(r);
+  var serieData=shots.map(function(s){var arr=s.slice(),sum=arr.reduce(function(a,v){return a+shotNumeric(v);},0),filled=arr.filter(function(v){return v!==null;}).length;return{shots:arr,sum:sum,medal:filled===5?getMedal(sum,vg):null};});
+  var r={id:Date.now(),typ:typ,datum:document.getElementById('datum').value,vapengrupp:vg,vapen:isTr?document.getElementById('vapen-tr').value:document.getElementById('vapen-tv').value,klass:isTr?null:document.getElementById('klass').value,tavlingsnamn:isTr?'':document.getElementById('tavlingsnamn').value,noter:document.getElementById('noter').value,serier:serieData,total:total,xs:xs,tens:allFilled.filter(function(v){return v==='X'||v===10;}).length,skott_count:allFilled.length,guld:serieData.filter(function(s){return s.medal==='guld';}).length,silver:serieData.filter(function(s){return s.medal==='silver';}).length,brons:serieData.filter(function(s){return s.medal==='brons';}).length};
+
+  setSync('syncing','Sparar i molnet...');
+  sb('resultat',{method:'POST',body:JSON.stringify(r)}).then(function(res){
+    if(res.ok){setSync('ok','Sparat i molnet');}
+    else{setSync('err','Molnfel – spara igen');res.text().then(function(t){console.error(t);});}
+  }).catch(function(err){setSync('err','Ingen anslutning');console.error(err);});
+
+  fetch(getSheetsUrl(),{method:'POST',body:JSON.stringify(r)}).catch(function(){});
+
   shots=Array.from({length:6},function(){return Array(5).fill(null);});
   activeSerie=0;activeShot=0;
   document.getElementById('noter').value='';
   if(!isTr)document.getElementById('tavlingsnamn').value='';
   renderSerier();
   alert('Sparat! '+total+' poäng ('+xs+'X)');
-}
-
-function testaSynk(){
-  var el=document.getElementById('test-result');
-  el.textContent='Testar...';el.style.color='var(--muted)';
-  fetch(getSheetsUrl())
-    .then(function(){el.textContent='Anslutning OK! Google Sheets är redo.';el.style.color='#27500A';})
-    .catch(function(){el.textContent='Kunde inte ansluta. Kontrollera URL:en.';el.style.color='#D85A30';});
 }
 
 function medalChips(r){
@@ -430,68 +364,79 @@ function medalChips(r){
 
 function renderHistorik(){
   var el=document.getElementById('historik-list');
-  var filtered=resultat.filter(function(r){return filterTyp==='alla'||r.typ===filterTyp;});
-  if(filtered.length===0){el.innerHTML='<div class="empty">Inga resultat än.</div>';return;}
-  el.innerHTML=filtered.map(function(r){
-    var badge=r.typ==='traning'?'<span class="badge badge-traning">Träning</span>':'<span class="badge badge-tavling">Tävling</span>';
-    var meta=[r.vapengrupp,r.klass,r.vapen].filter(Boolean).join(' · ')+(r.tavlingsnamn?' · '+r.tavlingsnamn:'');
-    var sh=(r.serier||[]).map(function(s,i){var xs=(s.shots||[]).filter(function(v){return v==='X';}).length;return'<span class="series-chip'+(s.medal?' '+s.medal:'')+'">S'+(i+1)+': '+s.sum+(xs?' +'+xs+'X':'')+'</span>';}).join('');
-    return'<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;">'+badge+'<button class="delete-btn" onclick="taBort('+r.id+')">ta bort</button></div><div style="display:flex;align-items:baseline;gap:10px;margin-top:8px;"><span class="score-big">'+r.total+'</span><span class="score-sub">/ 300 · '+r.xs+'X · '+r.datum+'</span></div><div style="font-size:12px;color:var(--muted);margin-top:3px;">'+meta+'</div>'+medalChips(r)+'<div class="series-row">'+sh+'</div>'+(r.noter?'<div style="font-size:13px;color:var(--muted);margin-top:8px;">'+r.noter+'</div>':'')+'</div>';
-  }).join('');
+  el.innerHTML='<div class="loading">Hämtar från molnet...</div>';
+  var q='resultat?select=*&order=datum.desc,id.desc'+(filterTyp!=='alla'?'&typ=eq.'+filterTyp:'');
+  sb(q,{extraHeaders:{'Prefer':''}}).then(function(r){return r.json();}).then(function(data){
+    if(!data||data.length===0){el.innerHTML='<div class="empty">Inga resultat än.</div>';return;}
+    el.innerHTML=data.map(function(r){
+      var badge=r.typ==='traning'?'<span class="badge badge-traning">Träning</span>':'<span class="badge badge-tavling">Tävling</span>';
+      var meta=[r.vapengrupp,r.klass,r.vapen].filter(Boolean).join(' · ')+(r.tavlingsnamn?' · '+r.tavlingsnamn:'');
+      var sh=(r.serier||[]).map(function(s,i){var xs=(s.shots||[]).filter(function(v){return v==='X';}).length;return'<span class="series-chip'+(s.medal?' '+s.medal:'')+'">S'+(i+1)+': '+s.sum+(xs?' +'+xs+'X':'')+'</span>';}).join('');
+      return'<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;">'+badge+'<button class="delete-btn" onclick="taBort('+r.id+')">ta bort</button></div><div style="display:flex;align-items:baseline;gap:10px;margin-top:8px;"><span class="score-big">'+r.total+'</span><span class="score-sub">/ 300 · '+r.xs+'X · '+r.datum+'</span></div><div style="font-size:12px;color:var(--muted);margin-top:3px;">'+meta+'</div>'+medalChips(r)+'<div class="series-row">'+sh+'</div>'+(r.noter?'<div style="font-size:13px;color:var(--muted);margin-top:8px;">'+r.noter+'</div>':'')+'</div>';
+    }).join('');
+  }).catch(function(){el.innerHTML='<div class="empty">Kunde inte hämta data.</div>';});
 }
 
-function taBort(id){if(confirm('Ta bort detta resultat?')){resultat=resultat.filter(function(r){return r.id!==id;});sparaStorage();renderHistorik();}}
+function taBort(id){if(!confirm('Ta bort?'))return;sb('resultat?id=eq.'+id,{method:'DELETE',extraHeaders:{'Prefer':''}}).then(function(){renderHistorik();});}
 
 function renderStatistik(){
   var el=document.getElementById('statistik-content');
-  if(resultat.length===0){el.innerHTML='<div class="empty">Logga resultat för att se statistik.</div>';return;}
-  var tr=resultat.filter(function(r){return r.typ==='traning';}),tv=resultat.filter(function(r){return r.typ==='tavling';});
-  function avg(arr){return arr.length?Math.round(arr.reduce(function(a,b){return a+b.total;},0)/arr.length):'-';}
-  function maxv(arr){return arr.length?Math.max.apply(null,arr.map(function(r){return r.total;})):'-';}
-  function avgX(arr){return arr.length?(arr.reduce(function(a,b){return a+(b.xs||0);},0)/arr.length).toFixed(1):'-';}
-  var tG=resultat.reduce(function(a,r){return a+(r.guld||0);},0);
-  var tS=resultat.reduce(function(a,r){return a+(r.silver||0);},0);
-  var tB=resultat.reduce(function(a,r){return a+(r.brons||0);},0);
+  el.innerHTML='<div class="loading">Hämtar statistik...</div>';
+  sb('resultat?select=*&order=datum.asc',{extraHeaders:{'Prefer':''}}).then(function(r){return r.json();}).then(function(data){
+    if(!data||data.length===0){el.innerHTML='<div class="empty">Logga resultat för att se statistik.</div>';return;}
+    var tr=data.filter(function(r){return r.typ==='traning';}),tv=data.filter(function(r){return r.typ==='tavling';});
+    function avg(a){return a.length?Math.round(a.reduce(function(x,b){return x+b.total;},0)/a.length):'-';}
+    function maxv(a){return a.length?Math.max.apply(null,a.map(function(r){return r.total;})):'-';}
+    function avgX(a){return a.length?(a.reduce(function(x,b){return x+(b.xs||0);},0)/a.length).toFixed(1):'-';}
+    var tG=data.reduce(function(a,r){return a+(r.guld||0);},0);
+    var tS=data.reduce(function(a,r){return a+(r.silver||0);},0);
+    var tB=data.reduce(function(a,r){return a+(r.brons||0);},0);
 
-  var html='<div class="stat-grid"><div class="stat-card"><div class="stat-label">Snitt träning</div><div class="stat-val">'+avg(tr)+'</div><div class="stat-sub">'+tr.length+' pass</div></div><div class="stat-card"><div class="stat-label">Bästa träning</div><div class="stat-val">'+maxv(tr)+'</div><div class="stat-sub">/ 300</div></div><div class="stat-card"><div class="stat-label">Snitt tävling</div><div class="stat-val">'+avg(tv)+'</div><div class="stat-sub">'+tv.length+' tävlingar</div></div><div class="stat-card"><div class="stat-label">Bästa tävling</div><div class="stat-val">'+maxv(tv)+'</div><div class="stat-sub">/ 300</div></div><div class="stat-card"><div class="stat-label">Snitt X träning</div><div class="stat-val">'+avgX(tr)+'</div></div><div class="stat-card"><div class="stat-label">Snitt X tävling</div><div class="stat-val">'+avgX(tv)+'</div></div></div>';
-  html+='<div style="background:var(--surface);border-radius:var(--rad-sm);padding:14px;margin-bottom:16px;display:flex;justify-content:space-around;"><div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--gold-text);">'+tG+'</div><div style="font-size:12px;color:var(--muted);">Guld-serier</div></div><div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--silver-text);">'+tS+'</div><div style="font-size:12px;color:var(--muted);">Silver-serier</div></div><div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--bronze-text);">'+tB+'</div><div style="font-size:12px;color:var(--muted);">Brons-serier</div></div></div>';
+    var html='<div class="stat-grid"><div class="stat-card"><div class="stat-label">Snitt träning</div><div class="stat-val">'+avg(tr)+'</div><div class="stat-sub">'+tr.length+' pass</div></div><div class="stat-card"><div class="stat-label">Bästa träning</div><div class="stat-val">'+maxv(tr)+'</div><div class="stat-sub">/ 300</div></div><div class="stat-card"><div class="stat-label">Snitt tävling</div><div class="stat-val">'+avg(tv)+'</div><div class="stat-sub">'+tv.length+' tävlingar</div></div><div class="stat-card"><div class="stat-label">Bästa tävling</div><div class="stat-val">'+maxv(tv)+'</div><div class="stat-sub">/ 300</div></div><div class="stat-card"><div class="stat-label">Snitt X träning</div><div class="stat-val">'+avgX(tr)+'</div></div><div class="stat-card"><div class="stat-label">Snitt X tävling</div><div class="stat-val">'+avgX(tv)+'</div></div></div>';
+    html+='<div style="background:var(--surface);border-radius:var(--rad-sm);padding:14px;margin-bottom:16px;display:flex;justify-content:space-around;"><div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--gold-text);">'+tG+'</div><div style="font-size:12px;color:var(--muted);">Guld-serier</div></div><div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--silver-text);">'+tS+'</div><div style="font-size:12px;color:var(--muted);">Silver-serier</div></div><div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--bronze-text);">'+tB+'</div><div style="font-size:12px;color:var(--muted);">Brons-serier</div></div></div>';
 
-  html+='<hr class="divider"><div class="section-title">Utveckling över tid</div>';
-  var sa=[...resultat].sort(function(a,b){return a.datum.localeCompare(b.datum);});
-  if(sa.length>=2){
-    var W=344,H=160,PL=36,PR=12,PT=14,gW=W-PL-PR,gH=H-PT-28;
-    var vs=sa.map(function(r){return r.total;});
-    var mn=Math.max(0,Math.min.apply(null,vs)-20),mx=Math.min(300,Math.max.apply(null,vs)+10);
-    var n=sa.length;
-    function tx(i){return PL+i*(gW/(n>1?n-1:1));}
-    function ty(v){return PT+gH-(((v-mn)/(mx-mn))*gH);}
-    var gv=[mn,Math.round((mn+mx)/2),mx],gh='';
-    gv.forEach(function(v){var y=ty(v);gh+='<line x1="'+PL+'" y1="'+y.toFixed(1)+'" x2="'+(W-PR)+'" y2="'+y.toFixed(1)+'" stroke="rgba(0,0,0,0.1)" stroke-width="0.5"/><text x="'+(PL-4)+'" y="'+(y+4).toFixed(1)+'" text-anchor="end" font-size="10" fill="#999">'+v+'</text>';});
-    var tp=[],tvp=[];
-    sa.forEach(function(r,i){var x=tx(i),y=ty(r.total);(r.typ==='traning'?tp:tvp).push({x:x,y:y});});
-    function mkp(pts,col){return pts.length<2?'':'<path d="'+pts.map(function(p,j){return(j===0?'M':'L')+p.x.toFixed(1)+','+p.y.toFixed(1);}).join(' ')+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round"/>';}
-    var dots=sa.map(function(r,i){var x=tx(i),y=ty(r.total),c=r.typ==='traning'?'#378ADD':'#639922';return'<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="5" fill="'+c+'" stroke="white" stroke-width="1.5"/>';}).join('');
-    var xl='<text x="'+tx(0).toFixed(1)+'" y="'+(H-4)+'" text-anchor="middle" font-size="10" fill="#999">'+sa[0].datum.slice(5)+'</text><text x="'+tx(n-1).toFixed(1)+'" y="'+(H-4)+'" text-anchor="middle" font-size="10" fill="#999">'+sa[n-1].datum.slice(5)+'</text>';
-    var lg='<circle cx="'+PL+'" cy="'+(PT-4)+'" r="5" fill="#378ADD"/><text x="'+(PL+10)+'" y="'+PT+'" font-size="10" fill="#999">Träning</text><circle cx="'+(PL+62)+'" cy="'+(PT-4)+'" r="5" fill="#639922"/><text x="'+(PL+72)+'" y="'+PT+'" font-size="10" fill="#999">Tävling</text>';
-    html+='<div style="background:var(--surface);border-radius:var(--rad-sm);padding:10px;margin-bottom:16px;"><svg viewBox="0 0 '+W+' '+H+'" width="100%">'+gh+mkp(tp,'#378ADD')+mkp(tvp,'#639922')+dots+xl+lg+'</svg></div>';
-  } else {
-    html+='<div style="font-size:13px;color:var(--hint);margin-bottom:16px;">Logga minst 2 resultat för att se kurvan.</div>';
-  }
-  if(resultat.length>=2){
-    html+='<hr class="divider"><div class="section-title">Snitt per serie</div>';
-    var avgs=[0,1,2,3,4,5].map(function(si){var v=resultat.filter(function(r){return r.serier&&r.serier[si];}).map(function(r){return r.serier[si].sum;});return v.length?Math.round(v.reduce(function(a,b){return a+b;},0)/v.length):0;});
-    var W2=344,H2=120,PL2=36,PT2=14,gW2=W2-PL2-12,gH2=H2-PT2-24,bW=Math.floor(gW2/6)-8,bh='';
-    avgs.forEach(function(v,i){var x=PL2+i*(gW2/6)+(gW2/6-bW)/2,bH=Math.round((v/50)*gH2),y=PT2+gH2-bH;bh+='<rect x="'+x.toFixed(0)+'" y="'+y+'" width="'+bW+'" height="'+Math.max(bH,2)+'" fill="#7F77DD" rx="3"/>';if(v>0)bh+='<text x="'+(x+bW/2).toFixed(0)+'" y="'+(y-4)+'" text-anchor="middle" font-size="11" fill="#7F77DD" font-weight="600">'+v+'</text>';bh+='<text x="'+(x+bW/2).toFixed(0)+'" y="'+(H2-4)+'" text-anchor="middle" font-size="11" fill="#999">S'+(i+1)+'</text>';});
-    bh+='<line x1="'+PL2+'" y1="'+PT2+'" x2="'+PL2+'" y2="'+(PT2+gH2)+'" stroke="rgba(0,0,0,0.1)" stroke-width="0.5"/><text x="'+(PL2-4)+'" y="'+(PT2+4)+'" text-anchor="end" font-size="10" fill="#999">50</text><text x="'+(PL2-4)+'" y="'+(PT2+gH2+4)+'" text-anchor="end" font-size="10" fill="#999">0</text>';
-    html+='<div style="background:var(--surface);border-radius:var(--rad-sm);padding:10px;"><svg viewBox="0 0 '+W2+' '+H2+'" width="100%">'+bh+'</svg></div>';
-  }
-  el.innerHTML=html;
+    html+='<hr class="divider"><div class="section-title">Utveckling över tid</div>';
+    if(data.length>=2){
+      var W=344,H=160,PL=36,PR=12,PT=14,gW=W-PL-PR,gH=H-PT-28;
+      var vs=data.map(function(r){return r.total;});
+      var mn=Math.max(0,Math.min.apply(null,vs)-20),mx=Math.min(300,Math.max.apply(null,vs)+10),n=data.length;
+      function tx(i){return PL+i*(gW/(n>1?n-1:1));}
+      function ty(v){return PT+gH-(((v-mn)/(mx-mn))*gH);}
+      var gv=[mn,Math.round((mn+mx)/2),mx],gh='';
+      gv.forEach(function(v){var y=ty(v);gh+='<line x1="'+PL+'" y1="'+y.toFixed(1)+'" x2="'+(W-PR)+'" y2="'+y.toFixed(1)+'" stroke="rgba(0,0,0,0.1)" stroke-width="0.5"/><text x="'+(PL-4)+'" y="'+(y+4).toFixed(1)+'" text-anchor="end" font-size="10" fill="#999">'+v+'</text>';});
+      var tp=[],tvp=[];
+      data.forEach(function(r,i){var x=tx(i),y=ty(r.total);(r.typ==='traning'?tp:tvp).push({x:x,y:y});});
+      function mkp(pts,col){return pts.length<2?'':'<path d="'+pts.map(function(p,j){return(j===0?'M':'L')+p.x.toFixed(1)+','+p.y.toFixed(1);}).join(' ')+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round"/>';}
+      var dots=data.map(function(r,i){var x=tx(i),y=ty(r.total),c=r.typ==='traning'?'#378ADD':'#639922';return'<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="5" fill="'+c+'" stroke="white" stroke-width="1.5"/>';}).join('');
+      var xl='<text x="'+tx(0).toFixed(1)+'" y="'+(H-4)+'" text-anchor="middle" font-size="10" fill="#999">'+data[0].datum.slice(5)+'</text><text x="'+tx(n-1).toFixed(1)+'" y="'+(H-4)+'" text-anchor="middle" font-size="10" fill="#999">'+data[n-1].datum.slice(5)+'</text>';
+      var lg='<circle cx="'+PL+'" cy="'+(PT-4)+'" r="5" fill="#378ADD"/><text x="'+(PL+10)+'" y="'+PT+'" font-size="10" fill="#999">Träning</text><circle cx="'+(PL+62)+'" cy="'+(PT-4)+'" r="5" fill="#639922"/><text x="'+(PL+72)+'" y="'+PT+'" font-size="10" fill="#999">Tävling</text>';
+      html+='<div style="background:var(--surface);border-radius:var(--rad-sm);padding:10px;margin-bottom:16px;"><svg viewBox="0 0 '+W+' '+H+'" width="100%">'+gh+mkp(tp,'#378ADD')+mkp(tvp,'#639922')+dots+xl+lg+'</svg></div>';
+    } else {
+      html+='<div style="font-size:13px;color:var(--hint);margin-bottom:16px;">Logga minst 2 resultat för att se kurvan.</div>';
+    }
+    if(data.length>=2){
+      html+='<hr class="divider"><div class="section-title">Snitt per serie</div>';
+      var avgs=[0,1,2,3,4,5].map(function(si){var v=data.filter(function(r){return r.serier&&r.serier[si];}).map(function(r){return r.serier[si].sum;});return v.length?Math.round(v.reduce(function(a,b){return a+b;},0)/v.length):0;});
+      var W2=344,H2=120,PL2=36,PT2=14,gW2=W2-PL2-12,gH2=H2-PT2-24,bW=Math.floor(gW2/6)-8,bh='';
+      avgs.forEach(function(v,i){var x=PL2+i*(gW2/6)+(gW2/6-bW)/2,bH=Math.round((v/50)*gH2),y=PT2+gH2-bH;bh+='<rect x="'+x.toFixed(0)+'" y="'+y+'" width="'+bW+'" height="'+Math.max(bH,2)+'" fill="#7F77DD" rx="3"/>';if(v>0)bh+='<text x="'+(x+bW/2).toFixed(0)+'" y="'+(y-4)+'" text-anchor="middle" font-size="11" fill="#7F77DD" font-weight="600">'+v+'</text>';bh+='<text x="'+(x+bW/2).toFixed(0)+'" y="'+(H2-4)+'" text-anchor="middle" font-size="11" fill="#999">S'+(i+1)+'</text>';});
+      bh+='<line x1="'+PL2+'" y1="'+PT2+'" x2="'+PL2+'" y2="'+(PT2+gH2)+'" stroke="rgba(0,0,0,0.1)" stroke-width="0.5"/><text x="'+(PL2-4)+'" y="'+(PT2+4)+'" text-anchor="end" font-size="10" fill="#999">50</text><text x="'+(PL2-4)+'" y="'+(PT2+gH2+4)+'" text-anchor="end" font-size="10" fill="#999">0</text>';
+      html+='<div style="background:var(--surface);border-radius:var(--rad-sm);padding:10px;"><svg viewBox="0 0 '+W2+' '+H2+'" width="100%">'+bh+'</svg></div>';
+    }
+    el.innerHTML=html;
+  }).catch(function(){el.innerHTML='<div class="empty">Kunde inte hämta statistik.</div>';});
+}
+
+function testSupabase(){
+  var el=document.getElementById('supabase-test');el.textContent='Testar...';el.style.color='var(--muted)';
+  sb('resultat?select=count',{extraHeaders:{'Prefer':'count=exact'}}).then(function(r){if(r.ok){el.textContent='Anslutning OK!';el.style.color='#27500A';}else{el.textContent='Fel: '+r.status;el.style.color='#D85A30';}}).catch(function(){el.textContent='Kunde inte ansluta.';el.style.color='#D85A30';});
 }
 
 function exportData(){
-  var blob=new Blob([JSON.stringify({version:1,exportDatum:new Date().toISOString(),resultat:resultat},null,2)],{type:'application/json'});
-  var url=URL.createObjectURL(blob),a=document.createElement('a');
-  a.href=url;a.download='skytte-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(url);
+  sb('resultat?select=*&order=datum.desc',{extraHeaders:{'Prefer':''}}).then(function(r){return r.json();}).then(function(data){
+    var blob=new Blob([JSON.stringify({version:2,exportDatum:new Date().toISOString(),resultat:data},null,2)],{type:'application/json'});
+    var url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download='skytte-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(url);
+  });
 }
 
 function importData(input){
@@ -500,19 +445,12 @@ function importData(input){
   reader.onload=function(e){
     try{
       var data=JSON.parse(e.target.result),imp=data.resultat||[];
-      var ids=new Set(resultat.map(function(r){return r.id;}));
-      var nya=imp.filter(function(r){return!ids.has(r.id);});
-      resultat=[...resultat,...nya].sort(function(a,b){return b.datum.localeCompare(a.datum);});
-      sparaStorage();alert('Importerat! '+nya.length+' nya resultat.');input.value='';
+      var done=0;
+      imp.forEach(function(r){sb('resultat',{method:'POST',extraHeaders:{'Prefer':'resolution=ignore-duplicates'},body:JSON.stringify(r)}).then(function(){done++;if(done===imp.length)alert('Importerat! '+imp.length+' resultat.');});});
+      input.value='';
     }catch(err){alert('Kunde inte läsa filen.');}
   };
   reader.readAsText(file);
-}
-
-function rensaData(){
-  if(confirm('Är du säker? All lokal data raderas.')){
-    if(confirm('Bekräfta: radera all data?')){resultat=[];sparaStorage();alert('Klar.');}
-  }
 }
 
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
