@@ -159,7 +159,7 @@
     @keyframes s-flash-anim { 0%{opacity:0;transform:scale(0.4)} 35%{opacity:1;transform:scale(1.4)} 100%{opacity:0;transform:scale(1)} }
     .s-bullet { opacity: 0; animation: s-bullet-fly 0.32s linear forwards 1.46s; }
     @keyframes s-bullet-fly { 0%{transform:translate(0,0);opacity:1} 80%{opacity:0.8} 100%{transform:translate(-96px,0px);opacity:0} }
-    .s-impact { fill: none; stroke: currentColor; stroke-width: 1.4; opacity: 0; transform-origin: 0px 0px; animation: s-impact-anim 0.55s ease-out forwards 1.76s; }
+    .s-impact { fill: none; stroke: currentColor; stroke-width: 1.4; opacity: 0; transform-origin: 0px 0px; animation: s-impact-anim 0.55s ease-out forwards 1.78s; }
     @keyframes s-impact-anim { 0%{transform:scale(0.1);opacity:0.9} 100%{transform:scale(5.5);opacity:0} }
     .splash-name { font-size: 18px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--ink); opacity: 0; animation: sfade-up 0.5s ease forwards 2.5s; margin-bottom: 8px; order: -1; }
     @keyframes sfade-up { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:translateY(0)} }
@@ -262,7 +262,7 @@
   </div>
   <div class="gren-card" onclick="valjGren('snabb')">
     <div class="gren-icon">⚡</div>
-    <div><div class="gren-card-title">Militär snabbmatch</div><div class="gren-card-sub">12 serier × 6 skott · 720p · 25m</div></div>
+    <div><div class="gren-card-title">Militär snabbmatch</div><div class="gren-card-sub">12 serier × 6 skott · 600p · 25m</div></div>
   </div>
   <div class="gren-card" onclick="valjGren('helmatch')">
     <div class="gren-icon">🏆</div>
@@ -432,7 +432,7 @@ var GRENKONFIG = {
   },
   snabb: {
     namn: 'Militär snabbmatch', sub: 'Snabbmatch · 25m · 72 skott',
-    maxPerSerie: 60, skottPerSerie: 6, antalSerier: 12, maxTotal: 720, harX: true,
+    maxPerSerie: 60, skottPerSerie: 6, antalSerier: 12, maxTotal: 600, harX: true,
     harMedalj: 'total',
     krav: {A:{brons:377,silver:454,guld:515},B:{brons:391,silver:472,guld:543},C:{brons:404,silver:481,guld:550},R:{brons:388,silver:467,guld:532}},
     moment: [
@@ -704,7 +704,7 @@ function updateTotals(){
   }
   document.getElementById('tot-x').textContent=xs;
   document.getElementById('tot-10').textContent=tens;
-  document.getElementById('tot-sum').textContent=total+' / '+k.maxTotal;
+  document.getElementById('tot-sum').textContent=total+'p / '+k.maxTotal+'p';
 }
 
 document.addEventListener('keydown',function(e){
@@ -824,7 +824,7 @@ function renderHistorik(){
         var xs=(s.shots||[]).filter(function(v){return v==='X';}).length;
         var isPerfekt=s.sum===k.maxPerSerie&&s.shots&&s.shots.filter(function(v){return v!==null;}).length===k.skottPerSerie;
         var cls='series-chip'+(isPerfekt?' perfekt':(s.medal&&s.medal!=='perfekt'?' '+s.medal:''));
-        return'<span class="'+cls+'">S'+(i+1)+': '+s.sum+(xs?' +'+xs+'X':'')+(isPerfekt?' ★':'')+'</span>';
+        return'<span class="'+cls+'">S'+(i+1)+': '+s.sum+'p'+(xs?' +'+xs+'X':'')+(isPerfekt?' ★':'')+'</span>';
       }).join('');
       return'<div class="swipe-wrap" data-id="'+r.id+'"><div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">'+badge+gb+'<span class="hist-date">'+r.datum+'</span></div><div style="display:flex;align-items:baseline;gap:2px;margin-top:10px;"><span class="hist-score">'+r.total+'</span><span class="hist-denom">/ '+k.maxTotal+'</span></div><div style="display:flex;gap:10px;align-items:center;margin-top:4px;"><span class="hist-xs">'+r.xs+'X</span><span class="hist-meta">'+meta+'</span></div>'+medalChips(r)+'<div class="series-row" style="margin-top:10px;">'+sh+'</div>'+(r.noter?'<div style="font-size:13px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border);">'+r.noter+'</div>':'')+'</div><div class="del-reveal"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></div></div>';
     }).join('');
@@ -927,11 +927,11 @@ function renderStatistik(){
           if(!s2){serierTd+='<td>—</td>';continue;}
           var isPerfektCell=s2.sum===k.maxPerSerie;
           var mc=isPerfektCell?'c-perfekt':(s2.medal==='guld'?'c-guld':(s2.medal==='silver'?'c-silver':(s2.medal==='brons'?'c-brons':'')));
-          serierTd+='<td class="'+mc+'">'+(s2.sum>0?s2.sum:'—')+'</td>';
+          serierTd+='<td class="'+mc+'">'+(s2.sum>0?s2.sum+'p':'—')+'</td>';
         }
         var xCell=k.harX?'<td class="c-x">'+(r.xs||0)+'</td>':'';
         var medalCell=r.total_medal?'<td class="ms-'+r.total_medal+'" style="font-weight:700;">'+r.total_medal.charAt(0).toUpperCase()+'</td>':'';
-        return'<tr><td>'+dateFmt+'</td><td class="vg">'+vg2+'</td>'+serierTd+xCell+'<td class="c-sum">'+r.total+'</td>'+medalCell+'</tr>';
+        return'<tr><td>'+dateFmt+'</td><td class="vg">'+vg2+'</td>'+serierTd+xCell+'<td class="c-sum">'+r.total+'p</td>'+medalCell+'</tr>';
       }).join('');
       var sHeaders='';for(var si2=0;si2<k.antalSerier;si2++)sHeaders+='<th>S'+(si2+1)+'</th>';
       var xHeader=k.harX?'<th>X</th>':'';
@@ -980,7 +980,7 @@ function importData(input){
     [1.40,1.49,{tx:185,ty:0,s:0.24,op:1},{tx:189,ty:0,s:0.24,op:1}],
     [1.49,1.58,{tx:189,ty:0,s:0.24,op:1},{tx:185,ty:0,s:0.24,op:1}],
     [1.58,2.45,{tx:185,ty:0,s:0.24,op:1},{tx:-5,ty:-8,s:0.55,op:1}],
-    [2.45,3.60,{tx:-5,ty:-8,s:0.55,op:1},{tx:-5,ty:-8,s:0.55,op:1}]
+    [2.45,4.60,{tx:-5,ty:-8,s:0.55,op:1},{tx:-5,ty:-8,s:0.55,op:1}]
   ];
   function ease(t){return t<0.5?2*t*t:-1+(4-2*t)*t;}
   var start=null;
@@ -991,7 +991,7 @@ function importData(input){
     var f=cur[2],to=cur[3];
     gun.setAttribute('transform','translate('+(f.tx+(to.tx-f.tx)*p).toFixed(2)+','+(f.ty+(to.ty-f.ty)*p).toFixed(2)+') scale('+(f.s+(to.s-f.s)*p).toFixed(4)+')');
     gun.style.opacity=f.op+(to.op-f.op)*p;
-    if(t<3.7)requestAnimationFrame(frame);
+    if(t<4.7)requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
 })();
@@ -1003,7 +1003,7 @@ setTimeout(function(){
     s.style.display='none';
     document.getElementById('gren-valj').style.display='flex';
   },650);
-},4200);
+},5400);
 </script>
 </body>
 </html>
