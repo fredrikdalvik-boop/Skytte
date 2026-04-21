@@ -1,7 +1,7 @@
 {
-  "name": "Precision nationellt skytte",
-  "short_name": "Skytte",
-  "description": "Loggning och statistik för precision nationellt skytte 25m",
+  "name": "Pistolskytteappen",
+  "short_name": "Pistolskytte",
+  "description": "Loggning och statistik f\u00f6r precision nationellt skytte 25m",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
