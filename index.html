@@ -22,25 +22,16 @@
       --bronze: #D85A30; --bronze-bg: #FAECE7; --bronze-text: #4A1B0C;
     }
     @media (prefers-color-scheme: dark) {
-      :root {
-        --ink: #f0f0f0; --muted: #999; --hint: #666;
-        --surface: #1c1c1e; --raised: #2c2c2e;
-        --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.2);
-      }
+      :root { --ink: #f0f0f0; --muted: #999; --hint: #666; --surface: #1c1c1e; --raised: #2c2c2e; --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.2); }
     }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--raised); color: var(--ink); min-height: 100vh; }
     #app { max-width: 480px; margin: 0 auto; padding: 0 0 80px 0; background: var(--raised); min-height: 100vh; }
-
-    /* Bottom nav */
     .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: var(--surface); border-top: 0.5px solid var(--border); display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
     .bottom-nav button { flex: 1; padding: 12px 4px 10px; font-size: 10px; font-weight: 500; border: none; background: transparent; cursor: pointer; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 3px; }
     .bottom-nav button.active { color: #378ADD; }
     .bottom-nav button svg { width: 22px; height: 22px; }
-
     .view { display: none; padding: 16px; }
     .view.active { display: block; }
-
-    h1 { font-size: 22px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
     h2 { font-size: 17px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
     .gren-label { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
     label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 5px; margin-top: 12px; font-weight: 500; }
@@ -48,11 +39,8 @@
     select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
     .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-
     .btn { width: 100%; margin-top: 14px; padding: 14px; font-size: 16px; font-weight: 600; cursor: pointer; border-radius: var(--rad-sm); border: none; background: var(--ink); color: var(--surface); }
-    .btn-secondary { background: var(--raised); color: var(--ink); border: 0.5px solid var(--border2); margin-top: 8px; }
-
-    /* Cards */
+    .btn-secondary { background: var(--raised); color: var(--ink); border: 0.5px solid var(--border2) !important; margin-top: 8px; }
     .card { background: var(--surface); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
     .badge { font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 600; }
     .badge-traning { background: #E6F1FB; color: #0C447C; }
@@ -64,8 +52,22 @@
     .series-chip.guld { background: var(--gold-bg); color: var(--gold-text); border-color: var(--gold); }
     .series-chip.silver { background: var(--silver-bg); color: var(--silver-text); border-color: var(--silver); }
     .series-chip.brons { background: var(--bronze-bg); color: var(--bronze-text); border-color: var(--bronze); }
-
-    /* Serier */
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .stat-card { background: var(--surface); border-radius: var(--rad-sm); padding: 14px; }
+    .stat-label { font-size: 12px; color: var(--muted); font-weight: 500; }
+    .stat-val { font-size: 26px; font-weight: 700; color: var(--ink); margin-top: 2px; }
+    .stat-sub { font-size: 11px; color: var(--hint); margin-top: 2px; }
+    .filter-row { display: flex; gap: 8px; margin-bottom: 14px; }
+    .filter-btn { font-size: 13px; padding: 6px 14px; border-radius: 20px; border: 0.5px solid var(--border2); background: transparent; cursor: pointer; color: var(--muted); font-weight: 500; }
+    .filter-btn.active { background: var(--ink); color: var(--surface); border-color: transparent; }
+    .delete-btn { font-size: 12px; color: var(--hint); border: none; background: none; cursor: pointer; padding: 4px 8px; }
+    .divider { border: none; border-top: 0.5px solid var(--border); margin: 16px 0; }
+    .empty { text-align: center; padding: 3rem 1rem; color: var(--hint); font-size: 15px; }
+    .kb-hint { font-size: 11px; color: var(--hint); margin-top: 8px; text-align: center; }
+    .export-section { background: var(--surface); border-radius: var(--radius); padding: 16px; margin-top: 14px; border: 0.5px solid var(--border); }
+    .export-section h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .export-section p { font-size: 13px; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
+    .section-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
     .serie-block { background: var(--surface); border-radius: var(--rad-sm); padding: 12px; margin-bottom: 10px; border: 0.5px solid var(--border); }
     .serie-block.guld { border-color: var(--gold); background: var(--gold-bg); }
     .serie-block.silver { border-color: var(--silver); background: var(--silver-bg); }
@@ -90,49 +92,25 @@
     .val-btn.val-10 { background: #EAF3DE; color: #27500A; border-color: #C0DD97; }
     .val-btn.val-low { color: var(--muted); }
     .val-btn.val-del { background: var(--raised); color: var(--muted); font-size: 18px; }
-
-    /* Totals */
     .totals-bar { background: var(--surface); border-radius: var(--rad-sm); padding: 12px 16px; margin-top: 12px; display: flex; justify-content: space-around; border: 0.5px solid var(--border); }
     .tot-item { text-align: center; }
     .tot-val { font-size: 24px; font-weight: 700; color: var(--ink); }
     .tot-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-    /* Medal summary */
     .medal-summary { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
     .ms-chip { font-size: 12px; padding: 3px 10px; border-radius: 10px; font-weight: 600; }
     .ms-guld { background: var(--gold-bg); color: var(--gold-text); border: 0.5px solid var(--gold); }
     .ms-silver { background: var(--silver-bg); color: var(--silver-text); border: 0.5px solid var(--silver); }
     .ms-brons { background: var(--bronze-bg); color: var(--bronze-text); border: 0.5px solid var(--bronze); }
-
-    /* Statistik */
-    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-    .stat-card { background: var(--surface); border-radius: var(--rad-sm); padding: 14px; }
-    .stat-label { font-size: 12px; color: var(--muted); font-weight: 500; }
-    .stat-val { font-size: 26px; font-weight: 700; color: var(--ink); margin-top: 2px; }
-    .stat-sub { font-size: 11px; color: var(--hint); margin-top: 2px; }
-
-    .filter-row { display: flex; gap: 8px; margin-bottom: 14px; }
-    .filter-btn { font-size: 13px; padding: 6px 14px; border-radius: 20px; border: 0.5px solid var(--border2); background: transparent; cursor: pointer; color: var(--muted); font-weight: 500; }
-    .filter-btn.active { background: var(--ink); color: var(--surface); border-color: transparent; }
-
-    .delete-btn { font-size: 12px; color: var(--hint); border: none; background: none; cursor: pointer; padding: 4px 8px; }
-    .divider { border: none; border-top: 0.5px solid var(--border); margin: 16px 0; }
-    .empty { text-align: center; padding: 3rem 1rem; color: var(--hint); font-size: 15px; }
-
-    .kb-hint { font-size: 11px; color: var(--hint); margin-top: 8px; text-align: center; }
-
-    /* Export/import */
-    .export-section { background: var(--surface); border-radius: var(--radius); padding: 16px; margin-top: 16px; border: 0.5px solid var(--border); }
-    .export-section h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
-    .export-section p { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
-
-    /* Section headers in statistik */
-    .section-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
+    .sheets-indicator { font-size: 12px; color: var(--muted); margin-top: 8px; display: flex; align-items: center; gap: 6px; min-height: 20px; }
+    .sheets-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0; }
+    .sheets-dot.ok { background: #639922; }
+    .sheets-dot.err { background: #D85A30; }
+    .sheets-dot.syncing { background: #EF9F27; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
   </style>
 </head>
 <body>
 <div id="app">
-  <!-- Logga -->
   <div id="view-logga" class="view active">
     <h2 style="margin-top:8px;">Nytt resultat</h2>
     <div class="gren-label">Precision nationellt skytte · 25m · 30 skott</div>
@@ -145,27 +123,21 @@
       </div>
       <div><label>Datum</label><input type="date" id="datum"></div>
     </div>
-
     <div id="falt-traning">
       <div class="row2">
         <div><label>Vapengrupp</label>
           <select id="vapengrupp-tr" onchange="renderSerier()">
-            <option value="A">A</option><option value="B">B</option>
-            <option value="C">C</option><option value="R">R</option>
+            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="R">R</option>
           </select>
         </div>
-        <div><label>Vapen</label>
-          <input type="text" id="vapen-tr" placeholder="t.ex. CZ 75">
-        </div>
+        <div><label>Vapen</label><input type="text" id="vapen-tr" placeholder="t.ex. CZ 75"></div>
       </div>
     </div>
-
     <div id="falt-tavling" style="display:none;">
       <div class="row3">
         <div><label>Vapengrupp</label>
           <select id="vapengrupp-tv" onchange="renderSerier()">
-            <option value="A">A</option><option value="B">B</option>
-            <option value="C">C</option><option value="R">R</option>
+            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="R">R</option>
           </select>
         </div>
         <div><label>Klass</label>
@@ -174,28 +146,26 @@
             <option>Junior</option><option>Senior</option><option>Dam</option><option>Veteran</option>
           </select>
         </div>
-        <div><label>Vapen</label>
-          <input type="text" id="vapen-tv" placeholder="t.ex. CZ 75">
-        </div>
+        <div><label>Vapen</label><input type="text" id="vapen-tv" placeholder="t.ex. CZ 75"></div>
       </div>
       <label>Tävlingsnamn</label>
       <input type="text" id="tavlingsnamn" placeholder="t.ex. DM Precision">
     </div>
-
     <label>Noteringar</label>
     <input type="text" id="noter" placeholder="Valfria anteckningar...">
-
     <div style="margin-top:16px;" id="serier-container"></div>
-
     <div class="totals-bar">
       <div class="tot-item"><div class="tot-val" id="tot-x">0</div><div class="tot-label">Innetior (X)</div></div>
       <div class="tot-item"><div class="tot-val" id="tot-10">0</div><div class="tot-label">Tior (10+X)</div></div>
       <div class="tot-item"><div class="tot-val" id="tot-sum">0 / 300</div><div class="tot-label">Totalt</div></div>
     </div>
     <button class="btn" onclick="sparaResultat()">Spara resultat</button>
+    <div class="sheets-indicator" id="sheets-status">
+      <div class="sheets-dot" id="sheets-dot"></div>
+      <span id="sheets-text"></span>
+    </div>
   </div>
 
-  <!-- Historik -->
   <div id="view-historik" class="view">
     <h2 style="margin-top:8px;">Historik</h2>
     <div class="gren-label">Precision nationellt skytte</div>
@@ -207,45 +177,43 @@
     <div id="historik-list"></div>
   </div>
 
-  <!-- Statistik -->
   <div id="view-statistik" class="view">
     <h2 style="margin-top:8px;">Statistik</h2>
     <div class="gren-label">Precision nationellt skytte</div>
     <div id="statistik-content"></div>
   </div>
 
-  <!-- Inställningar -->
   <div id="view-installningar" class="view">
     <h2 style="margin-top:8px;">Inställningar</h2>
-    <div class="gren-label">Export, import och data</div>
-
+    <div class="gren-label">Google Sheets, export och data</div>
+    <div class="export-section">
+      <h3>Google Sheets-synk</h3>
+      <p>Varje resultat skickas automatiskt till ditt Google Sheet när du trycker Spara. Ändra URL:en nedan om du byter script.</p>
+      <label>Apps Script URL</label>
+      <input type="url" id="sheets-url-input" placeholder="https://script.google.com/macros/s/...">
+      <button class="btn" onclick="sparaUrl()">Spara URL</button>
+      <button class="btn btn-secondary" onclick="testaSynk()">Testa anslutning</button>
+      <div id="test-result" style="margin-top:8px;font-size:13px;"></div>
+    </div>
     <div class="export-section">
       <h3>Exportera data</h3>
-      <p>Spara alla dina resultat som en JSON-fil. Använd för säkerhetskopiering eller för att flytta data till en ny enhet.</p>
-      <button class="btn" onclick="exportData()">Exportera till JSON</button>
+      <p>Ladda ner alla resultat som JSON-fil.</p>
+      <button class="btn btn-secondary" onclick="exportData()">Exportera till JSON</button>
     </div>
-
     <div class="export-section">
       <h3>Importera data</h3>
-      <p>Läs in en tidigare exporterad JSON-fil. Befintlig data slås samman med importerad data.</p>
+      <p>Läs in en tidigare exporterad JSON-fil. Data slås samman.</p>
       <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(this)">
-      <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">Välj JSON-fil att importera</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">Välj JSON-fil</button>
     </div>
-
     <div class="export-section">
       <h3>Rensa all data</h3>
-      <p>Ta bort alla sparade resultat. Detta går inte att ångra.</p>
-      <button class="btn btn-secondary" style="color:#E24B4A;border-color:#E24B4A;" onclick="rensaData()">Rensa all data</button>
-    </div>
-
-    <div class="export-section" style="margin-top:16px;">
-      <h3>Om appen</h3>
-      <p>Precision nationellt skytte · 25m · 30 skott<br>Vapengrupper A, B, C, R med guld/silver/bronskrav per serie.</p>
+      <p>Ta bort alla sparade resultat lokalt.</p>
+      <button class="btn btn-secondary" style="color:#E24B4A;border-color:#E24B4A !important;" onclick="rensaData()">Rensa all data</button>
     </div>
   </div>
 </div>
 
-<!-- Bottom nav -->
 <nav class="bottom-nav">
   <button class="active" onclick="switchView('logga',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
@@ -266,35 +234,45 @@
 </nav>
 
 <script>
-const KRAV={A:{brons:32,silver:38,guld:43},B:{brons:33,silver:39,guld:45},C:{brons:34,silver:40,guld:46},R:{brons:32,silver:38,guld:43}};
-function getMedal(sum,vg){const k=KRAV[vg];if(!k)return null;if(sum>=k.guld)return 'guld';if(sum>=k.silver)return 'silver';if(sum>=k.brons)return 'brons';return null;}
+var DEFAULT_URL = 'https://script.google.com/macros/s/AKfycbzdHdPNXFqRzFLQlc9JyD9uRxqP-hzYJ97Dvh1fcLMWA2jnWrfiANdiAIHxbZQRFp93yg/exec';
+var KRAV = {A:{brons:32,silver:38,guld:43},B:{brons:33,silver:39,guld:45},C:{brons:34,silver:40,guld:46},R:{brons:32,silver:38,guld:43}};
+
+function getMedal(sum,vg){var k=KRAV[vg];if(!k)return null;if(sum>=k.guld)return'guld';if(sum>=k.silver)return'silver';if(sum>=k.brons)return'brons';return null;}
 function sortVal(v){return v===null?-1:v==='X'?11:v;}
-function sortShots(arr){return[...arr].sort((a,b)=>sortVal(b)-sortVal(a));}
+function sortShots(arr){return[...arr].sort(function(a,b){return sortVal(b)-sortVal(a);});}
 function shotNumeric(v){return v===null?0:v==='X'?10:v;}
 function shotDisplay(v){return v===null?'':v==='X'?'X':String(v);}
+function getSheetsUrl(){return localStorage.getItem('sheets_url')||DEFAULT_URL;}
 
-let resultat=[];
-let filterTyp='alla';
-let shots=Array.from({length:6},()=>Array(5).fill(null));
-let activeSerie=0,activeShot=0;
+var resultat=[];
+var filterTyp='alla';
+var shots=Array.from({length:6},function(){return Array(5).fill(null);});
+var activeSerie=0,activeShot=0;
 
-try{const s=localStorage.getItem('pistol_pwa');if(s)resultat=JSON.parse(s);}catch(e){}
+try{var _s=localStorage.getItem('pistol_pwa');if(_s)resultat=JSON.parse(_s);}catch(e){}
+
 function sparaStorage(){try{localStorage.setItem('pistol_pwa',JSON.stringify(resultat));}catch(e){}}
 
 document.getElementById('datum').value=new Date().toISOString().split('T')[0];
+document.getElementById('sheets-url-input').value=getSheetsUrl();
+
+function sparaUrl(){
+  var url=document.getElementById('sheets-url-input').value.trim();
+  if(url){localStorage.setItem('sheets_url',url);alert('URL sparad!');}
+}
 
 function getVapengrupp(){return document.getElementById(document.getElementById('typ').value==='traning'?'vapengrupp-tr':'vapengrupp-tv').value;}
 
 function toggleFalt(){
-  const tr=document.getElementById('typ').value==='traning';
+  var tr=document.getElementById('typ').value==='traning';
   document.getElementById('falt-traning').style.display=tr?'':'none';
   document.getElementById('falt-tavling').style.display=tr?'none':'';
   renderSerier();
 }
 
 function switchView(v,btn){
-  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.bottom-nav button').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.bottom-nav button').forEach(function(el){el.classList.remove('active');});
   document.getElementById('view-'+v).classList.add('active');
   btn.classList.add('active');
   if(v==='historik')renderHistorik();
@@ -303,44 +281,44 @@ function switchView(v,btn){
 
 function setFilter(f,el){
   filterTyp=f;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
   el.classList.add('active');
   renderHistorik();
 }
 
 function renderSerier(){
-  const con=document.getElementById('serier-container');
-  const vg=getVapengrupp();
-  let html='';
-  for(let s=0;s<6;s++){
-    const isActive=s===activeSerie;
-    const sv=shots[s];
-    const sum=sv.reduce((a,v)=>a+shotNumeric(v),0);
-    const xs=sv.filter(v=>v==='X').length;
-    const filled=sv.filter(v=>v!==null).length;
-    const medal=filled===5?getMedal(sum,vg):null;
-    const blockCls='serie-block'+(medal?' '+medal:'');
-    let shotsHtml='';
-    for(let i=0;i<5;i++){
-      const val=sv[i];
-      const isAct=isActive&&i===activeShot;
-      let cls='shot-box';
+  var con=document.getElementById('serier-container');
+  var vg=getVapengrupp();
+  var html='';
+  for(var s=0;s<6;s++){
+    var isActive=s===activeSerie;
+    var sv=shots[s];
+    var sum=sv.reduce(function(a,v){return a+shotNumeric(v);},0);
+    var xs=sv.filter(function(v){return v==='X';}).length;
+    var filled=sv.filter(function(v){return v!==null;}).length;
+    var medal=filled===5?getMedal(sum,vg):null;
+    var blockCls='serie-block'+(medal?' '+medal:'');
+    var shotsHtml='';
+    for(var i=0;i<5;i++){
+      var val=sv[i];
+      var isAct=isActive&&i===activeShot;
+      var cls='shot-box';
       if(isAct)cls+=' active-shot';
       else if(val===null)cls+=' empty-slot';
       if(val==='X'&&!isAct)cls+=' is-x';
-      shotsHtml+=`<div class="${cls}" onclick="clickShot(${s},${i})">${shotDisplay(val)}</div>`;
+      shotsHtml+='<div class="'+cls+'" onclick="clickShot('+s+','+i+')">'+shotDisplay(val)+'</div>';
     }
-    const medalTag=medal?`<span class="medal-tag ${medal}">${medal.charAt(0).toUpperCase()+medal.slice(1)}</span>`:'';
-    const summaryHtml=filled>0?`<span style="font-weight:600;">${sum}p${xs?' · '+xs+'X':''} ${medalTag}</span>`:'';
-    let valbHtml='';
+    var medalTag=medal?'<span class="medal-tag '+medal+'">'+medal.charAt(0).toUpperCase()+medal.slice(1)+'</span>':'';
+    var summaryHtml=filled>0?'<span style="font-weight:600;">'+sum+'p'+(xs?' · '+xs+'X':'')+' '+medalTag+'</span>':'';
+    var valbHtml='';
     if(isActive){
-      const vals=['X','10','9','8','7','6','5','4','3','2','1','0'];
+      var vals=['X','10','9','8','7','6','5','4','3','2','1','0'];
       valbHtml='<div class="val-buttons" style="margin-top:10px;">';
-      vals.forEach(v=>{let cls='val-btn';if(v==='X')cls+=' val-x';else if(v==='10')cls+=' val-10';else if(parseInt(v)<5)cls+=' val-low';valbHtml+=`<div class="${cls}" onclick="registerVal('${v}')">${v}</div>`;});
-      valbHtml+=`<div class="val-btn val-del" onclick="clearActiveShot()">⌫</div></div>`;
-      valbHtml+=`<div class="kb-hint">- = X · + = 10 · 0–9 = valör</div>`;
+      vals.forEach(function(v){var c='val-btn';if(v==='X')c+=' val-x';else if(v==='10')c+=' val-10';else if(parseInt(v)<5)c+=' val-low';valbHtml+='<div class="'+c+'" onclick="registerVal(\''+v+'\')">'+v+'</div>';});
+      valbHtml+='<div class="val-btn val-del" onclick="clearActiveShot()">&#9003;</div></div>';
+      valbHtml+='<div class="kb-hint">- = X &nbsp;·&nbsp; + = 10 &nbsp;·&nbsp; 0–9 = valör</div>';
     }
-    html+=`<div class="${blockCls}"><div class="serie-title"><span>Serie ${s+1}</span>${summaryHtml}</div><div class="shots-display">${shotsHtml}</div>${valbHtml}</div>`;
+    html+='<div class="'+blockCls+'"><div class="serie-title"><span>Serie '+(s+1)+'</span>'+summaryHtml+'</div><div class="shots-display">'+shotsHtml+'</div>'+valbHtml+'</div>';
   }
   con.innerHTML=html;
   updateTotals();
@@ -351,52 +329,81 @@ function clickShot(s,i){activeSerie=s;activeShot=i;renderSerier();}
 function insertAndSort(serie,slotIdx,val){
   shots[serie][slotIdx]=val;
   shots[serie]=sortShots(shots[serie]);
-  const nextNull=shots[serie].findIndex(v=>v===null);
-  if(nextNull!==-1)activeShot=nextNull;
-  else if(activeSerie<5){activeSerie++;activeShot=shots[activeSerie].findIndex(v=>v===null);if(activeShot===-1)activeShot=0;}
+  var nextNull=shots[serie].findIndex(function(v){return v===null;});
+  if(nextNull!==-1){activeShot=nextNull;}
+  else if(activeSerie<5){activeSerie++;activeShot=shots[activeSerie].findIndex(function(v){return v===null;});if(activeShot===-1)activeShot=0;}
 }
 
 function registerVal(v){insertAndSort(activeSerie,activeShot,v==='X'?'X':parseInt(v));renderSerier();}
 function clearActiveShot(){shots[activeSerie][activeShot]=null;shots[activeSerie]=sortShots(shots[activeSerie]);renderSerier();}
 
 function updateTotals(){
-  const all=shots.flat(),filled=all.filter(v=>v!==null);
-  const xs=filled.filter(v=>v==='X').length;
-  const tens=filled.filter(v=>v==='X'||v===10).length;
-  const sum=filled.reduce((a,v)=>a+shotNumeric(v),0);
+  var all=shots.flat(),filled=all.filter(function(v){return v!==null;});
+  var xs=filled.filter(function(v){return v==='X';}).length;
+  var tens=filled.filter(function(v){return v==='X'||v===10;}).length;
+  var sum=filled.reduce(function(a,v){return a+shotNumeric(v);},0);
   document.getElementById('tot-x').textContent=xs;
   document.getElementById('tot-10').textContent=tens;
   document.getElementById('tot-sum').textContent=sum+' / 300';
 }
 
 document.addEventListener('keydown',function(e){
-  if(document.getElementById('view-logga').classList.contains('active')){
-    const tag=document.activeElement.tagName.toLowerCase();
-    if(tag==='input'||tag==='select')return;
-    if(e.key==='-'){e.preventDefault();registerVal('X');return;}
-    if(e.key==='+'||e.key==='='){e.preventDefault();registerVal('10');return;}
-    if(e.key==='Backspace'){e.preventDefault();clearActiveShot();return;}
-    if(e.key>='0'&&e.key<='9'){e.preventDefault();registerVal(e.key);return;}
-    if(e.key==='ArrowRight'){e.preventDefault();if(activeShot<4)activeShot++;renderSerier();return;}
-    if(e.key==='ArrowLeft'){e.preventDefault();if(activeShot>0)activeShot--;renderSerier();return;}
-    if(e.key==='ArrowDown'){e.preventDefault();if(activeSerie<5)activeSerie++;renderSerier();return;}
-    if(e.key==='ArrowUp'){e.preventDefault();if(activeSerie>0)activeSerie--;renderSerier();return;}
-  }
+  if(!document.getElementById('view-logga').classList.contains('active'))return;
+  var tag=document.activeElement.tagName.toLowerCase();
+  if(tag==='input'||tag==='select')return;
+  if(e.key==='-'){e.preventDefault();registerVal('X');return;}
+  if(e.key==='+'||e.key==='='){e.preventDefault();registerVal('10');return;}
+  if(e.key==='Backspace'){e.preventDefault();clearActiveShot();return;}
+  if(e.key>='0'&&e.key<='9'){e.preventDefault();registerVal(e.key);return;}
+  if(e.key==='ArrowRight'){e.preventDefault();if(activeShot<4)activeShot++;renderSerier();return;}
+  if(e.key==='ArrowLeft'){e.preventDefault();if(activeShot>0)activeShot--;renderSerier();return;}
+  if(e.key==='ArrowDown'){e.preventDefault();if(activeSerie<5)activeSerie++;renderSerier();return;}
+  if(e.key==='ArrowUp'){e.preventDefault();if(activeSerie>0)activeSerie--;renderSerier();return;}
 });
 
+function setSheetsStatus(state,text){
+  document.getElementById('sheets-dot').className='sheets-dot '+state;
+  document.getElementById('sheets-text').textContent=text;
+}
+
+function skickaSheets(r){
+  setSheetsStatus('syncing','Synkar med Google Sheets...');
+  fetch(getSheetsUrl(),{method:'POST',body:JSON.stringify(r)})
+    .then(function(){setSheetsStatus('ok','Sparat i Google Sheets');})
+    .catch(function(){setSheetsStatus('err','Kunde inte nå Sheets – sparat lokalt');});
+}
+
 function sparaResultat(){
-  const allFilled=shots.flat().filter(v=>v!==null);
+  var allFilled=shots.flat().filter(function(v){return v!==null;});
   if(allFilled.length===0){alert('Ange minst ett skott.');return;}
-  const typ=document.getElementById('typ').value;
-  const isTr=typ==='traning';
-  const vg=getVapengrupp();
-  const total=allFilled.reduce((a,v)=>a+shotNumeric(v),0);
-  const xs=allFilled.filter(v=>v==='X').length;
-  const serieData=shots.map(s=>{const arr=[...s],sum=arr.reduce((a,v)=>a+shotNumeric(v),0),filled=arr.filter(v=>v!==null).length;return{shots:arr,sum,medal:filled===5?getMedal(sum,vg):null};});
-  const r={id:Date.now(),typ,datum:document.getElementById('datum').value,vapengrupp:vg,vapen:isTr?document.getElementById('vapen-tr').value:document.getElementById('vapen-tv').value,klass:isTr?null:document.getElementById('klass').value,tavlingsnamn:isTr?'':document.getElementById('tavlingsnamn').value,noter:document.getElementById('noter').value,serier:serieData,total,xs,tens:allFilled.filter(v=>v==='X'||v===10).length,skottCount:allFilled.length,guld:serieData.filter(s=>s.medal==='guld').length,silver:serieData.filter(s=>s.medal==='silver').length,brons:serieData.filter(s=>s.medal==='brons').length};
+  var typ=document.getElementById('typ').value;
+  var isTr=typ==='traning';
+  var vg=getVapengrupp();
+  var total=allFilled.reduce(function(a,v){return a+shotNumeric(v);},0);
+  var xs=allFilled.filter(function(v){return v==='X';}).length;
+  var serieData=shots.map(function(s){
+    var arr=s.slice(),sum=arr.reduce(function(a,v){return a+shotNumeric(v);},0),filled=arr.filter(function(v){return v!==null;}).length;
+    return{shots:arr,sum:sum,medal:filled===5?getMedal(sum,vg):null};
+  });
+  var r={
+    id:Date.now(),typ:typ,
+    datum:document.getElementById('datum').value,
+    vapengrupp:vg,
+    vapen:isTr?document.getElementById('vapen-tr').value:document.getElementById('vapen-tv').value,
+    klass:isTr?null:document.getElementById('klass').value,
+    tavlingsnamn:isTr?'':document.getElementById('tavlingsnamn').value,
+    noter:document.getElementById('noter').value,
+    serier:serieData,total:total,xs:xs,
+    tens:allFilled.filter(function(v){return v==='X'||v===10;}).length,
+    skottCount:allFilled.length,
+    guld:serieData.filter(function(s){return s.medal==='guld';}).length,
+    silver:serieData.filter(function(s){return s.medal==='silver';}).length,
+    brons:serieData.filter(function(s){return s.medal==='brons';}).length
+  };
   resultat.unshift(r);
   sparaStorage();
-  shots=Array.from({length:6},()=>Array(5).fill(null));
+  skickaSheets(r);
+  shots=Array.from({length:6},function(){return Array(5).fill(null);});
   activeSerie=0;activeShot=0;
   document.getElementById('noter').value='';
   if(!isTr)document.getElementById('tavlingsnamn').value='';
@@ -404,126 +411,111 @@ function sparaResultat(){
   alert('Sparat! '+total+' poäng ('+xs+'X)');
 }
 
+function testaSynk(){
+  var el=document.getElementById('test-result');
+  el.textContent='Testar...';el.style.color='var(--muted)';
+  fetch(getSheetsUrl())
+    .then(function(){el.textContent='Anslutning OK! Google Sheets är redo.';el.style.color='#27500A';})
+    .catch(function(){el.textContent='Kunde inte ansluta. Kontrollera URL:en.';el.style.color='#D85A30';});
+}
+
 function medalChips(r){
   if(!r.guld&&!r.silver&&!r.brons)return'';
-  let html='<div class="medal-summary">';
-  if(r.guld)html+=`<span class="ms-chip ms-guld">${r.guld} Guld</span>`;
-  if(r.silver)html+=`<span class="ms-chip ms-silver">${r.silver} Silver</span>`;
-  if(r.brons)html+=`<span class="ms-chip ms-brons">${r.brons} Brons</span>`;
-  return html+'</div>';
+  var h='<div class="medal-summary">';
+  if(r.guld)h+='<span class="ms-chip ms-guld">'+r.guld+' Guld</span>';
+  if(r.silver)h+='<span class="ms-chip ms-silver">'+r.silver+' Silver</span>';
+  if(r.brons)h+='<span class="ms-chip ms-brons">'+r.brons+' Brons</span>';
+  return h+'</div>';
 }
 
 function renderHistorik(){
-  const el=document.getElementById('historik-list');
-  const filtered=resultat.filter(r=>filterTyp==='alla'||r.typ===filterTyp);
+  var el=document.getElementById('historik-list');
+  var filtered=resultat.filter(function(r){return filterTyp==='alla'||r.typ===filterTyp;});
   if(filtered.length===0){el.innerHTML='<div class="empty">Inga resultat än.</div>';return;}
-  el.innerHTML=filtered.map(r=>{
-    const badge=r.typ==='traning'?'<span class="badge badge-traning">Träning</span>':'<span class="badge badge-tavling">Tävling</span>';
-    const meta=[r.vapengrupp,r.klass,r.vapen].filter(Boolean).join(' · ')+(r.tavlingsnamn?' · '+r.tavlingsnamn:'');
-    const seriesHtml=(r.serier||[]).map((s,i)=>{const xs=(s.shots||[]).filter(v=>v==='X').length;return`<span class="series-chip${s.medal?' '+s.medal:''}">S${i+1}: ${s.sum}${xs?' +'+xs+'X':''}</span>`;}).join('');
-    return`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;">${badge}<button class="delete-btn" onclick="taBort(${r.id})">ta bort</button></div><div style="display:flex;align-items:baseline;gap:10px;margin-top:8px;"><span class="score-big">${r.total}</span><span class="score-sub">/ 300 · ${r.xs}X · ${r.datum}</span></div><div style="font-size:12px;color:var(--muted);margin-top:3px;">${meta}</div>${medalChips(r)}<div class="series-row">${seriesHtml}</div>${r.noter?'<div style="font-size:13px;color:var(--muted);margin-top:8px;">'+r.noter+'</div>':''}</div>`;
+  el.innerHTML=filtered.map(function(r){
+    var badge=r.typ==='traning'?'<span class="badge badge-traning">Träning</span>':'<span class="badge badge-tavling">Tävling</span>';
+    var meta=[r.vapengrupp,r.klass,r.vapen].filter(Boolean).join(' · ')+(r.tavlingsnamn?' · '+r.tavlingsnamn:'');
+    var sh=(r.serier||[]).map(function(s,i){var xs=(s.shots||[]).filter(function(v){return v==='X';}).length;return'<span class="series-chip'+(s.medal?' '+s.medal:'')+'">S'+(i+1)+': '+s.sum+(xs?' +'+xs+'X':'')+'</span>';}).join('');
+    return'<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;">'+badge+'<button class="delete-btn" onclick="taBort('+r.id+')">ta bort</button></div><div style="display:flex;align-items:baseline;gap:10px;margin-top:8px;"><span class="score-big">'+r.total+'</span><span class="score-sub">/ 300 · '+r.xs+'X · '+r.datum+'</span></div><div style="font-size:12px;color:var(--muted);margin-top:3px;">'+meta+'</div>'+medalChips(r)+'<div class="series-row">'+sh+'</div>'+(r.noter?'<div style="font-size:13px;color:var(--muted);margin-top:8px;">'+r.noter+'</div>':'')+'</div>';
   }).join('');
 }
 
-function taBort(id){if(confirm('Ta bort detta resultat?')){resultat=resultat.filter(r=>r.id!==id);sparaStorage();renderHistorik();}}
+function taBort(id){if(confirm('Ta bort detta resultat?')){resultat=resultat.filter(function(r){return r.id!==id;});sparaStorage();renderHistorik();}}
 
 function renderStatistik(){
-  const el=document.getElementById('statistik-content');
+  var el=document.getElementById('statistik-content');
   if(resultat.length===0){el.innerHTML='<div class="empty">Logga resultat för att se statistik.</div>';return;}
-  const tr=resultat.filter(r=>r.typ==='traning'),tv=resultat.filter(r=>r.typ==='tavling');
-  const avg=arr=>arr.length?Math.round(arr.reduce((a,b)=>a+b.total,0)/arr.length):'-';
-  const maxv=arr=>arr.length?Math.max(...arr.map(r=>r.total)):'-';
-  const avgX=arr=>arr.length?(arr.reduce((a,b)=>a+(b.xs||0),0)/arr.length).toFixed(1):'-';
-  const totalGuld=resultat.reduce((a,r)=>a+(r.guld||0),0);
-  const totalSilver=resultat.reduce((a,r)=>a+(r.silver||0),0);
-  const totalBrons=resultat.reduce((a,r)=>a+(r.brons||0),0);
+  var tr=resultat.filter(function(r){return r.typ==='traning';}),tv=resultat.filter(function(r){return r.typ==='tavling';});
+  function avg(arr){return arr.length?Math.round(arr.reduce(function(a,b){return a+b.total;},0)/arr.length):'-';}
+  function maxv(arr){return arr.length?Math.max.apply(null,arr.map(function(r){return r.total;})):'-';}
+  function avgX(arr){return arr.length?(arr.reduce(function(a,b){return a+(b.xs||0);},0)/arr.length).toFixed(1):'-';}
+  var tG=resultat.reduce(function(a,r){return a+(r.guld||0);},0);
+  var tS=resultat.reduce(function(a,r){return a+(r.silver||0);},0);
+  var tB=resultat.reduce(function(a,r){return a+(r.brons||0);},0);
 
-  let html=`<div class="stat-grid"><div class="stat-card"><div class="stat-label">Snitt träning</div><div class="stat-val">${avg(tr)}</div><div class="stat-sub">${tr.length} pass</div></div><div class="stat-card"><div class="stat-label">Bästa träning</div><div class="stat-val">${maxv(tr)}</div><div class="stat-sub">/ 300</div></div><div class="stat-card"><div class="stat-label">Snitt tävling</div><div class="stat-val">${avg(tv)}</div><div class="stat-sub">${tv.length} tävlingar</div></div><div class="stat-card"><div class="stat-label">Bästa tävling</div><div class="stat-val">${maxv(tv)}</div><div class="stat-sub">/ 300</div></div><div class="stat-card"><div class="stat-label">Snitt X träning</div><div class="stat-val">${avgX(tr)}</div></div><div class="stat-card"><div class="stat-label">Snitt X tävling</div><div class="stat-val">${avgX(tv)}</div></div></div>`;
-
-  html+=`<div style="background:var(--surface);border-radius:var(--rad-sm);padding:14px 16px;margin-bottom:16px;display:flex;justify-content:space-around;"><div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--gold-text);">${totalGuld}</div><div style="font-size:12px;color:var(--muted);">Guld-serier</div></div><div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--silver-text);">${totalSilver}</div><div style="font-size:12px;color:var(--muted);">Silver-serier</div></div><div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--bronze-text);">${totalBrons}</div><div style="font-size:12px;color:var(--muted);">Brons-serier</div></div></div>`;
+  var html='<div class="stat-grid"><div class="stat-card"><div class="stat-label">Snitt träning</div><div class="stat-val">'+avg(tr)+'</div><div class="stat-sub">'+tr.length+' pass</div></div><div class="stat-card"><div class="stat-label">Bästa träning</div><div class="stat-val">'+maxv(tr)+'</div><div class="stat-sub">/ 300</div></div><div class="stat-card"><div class="stat-label">Snitt tävling</div><div class="stat-val">'+avg(tv)+'</div><div class="stat-sub">'+tv.length+' tävlingar</div></div><div class="stat-card"><div class="stat-label">Bästa tävling</div><div class="stat-val">'+maxv(tv)+'</div><div class="stat-sub">/ 300</div></div><div class="stat-card"><div class="stat-label">Snitt X träning</div><div class="stat-val">'+avgX(tr)+'</div></div><div class="stat-card"><div class="stat-label">Snitt X tävling</div><div class="stat-val">'+avgX(tv)+'</div></div></div>';
+  html+='<div style="background:var(--surface);border-radius:var(--rad-sm);padding:14px;margin-bottom:16px;display:flex;justify-content:space-around;"><div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--gold-text);">'+tG+'</div><div style="font-size:12px;color:var(--muted);">Guld-serier</div></div><div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--silver-text);">'+tS+'</div><div style="font-size:12px;color:var(--muted);">Silver-serier</div></div><div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--bronze-text);">'+tB+'</div><div style="font-size:12px;color:var(--muted);">Brons-serier</div></div></div>';
 
   html+='<hr class="divider"><div class="section-title">Utveckling över tid</div>';
-  const sortedAll=[...resultat].sort((a,b)=>a.datum.localeCompare(b.datum));
-  if(sortedAll.length>=2){
-    const W=344,H=160,PL=36,PR=12,PT=14,PB=28,gW=W-PL-PR,gH=H-PT-PB;
-    const vals=sortedAll.map(r=>r.total);
-    const minV=Math.max(0,Math.min(...vals)-20),maxV=Math.min(300,Math.max(...vals)+10);
-    const n=sortedAll.length,toX=i=>PL+i*(gW/(n>1?n-1:1)),toY=v=>PT+gH-(((v-minV)/(maxV-minV))*gH);
-    const gridVals=[minV,Math.round((minV+maxV)/2),maxV];
-    let gridHtml='';
-    gridVals.forEach(gv=>{const y=toY(gv);gridHtml+=`<line x1="${PL}" y1="${y.toFixed(1)}" x2="${W-PR}" y2="${y.toFixed(1)}" stroke="rgba(0,0,0,0.1)" stroke-width="0.5"/><text x="${PL-4}" y="${(y+4).toFixed(1)}" text-anchor="end" font-size="10" fill="#999">${gv}</text>`;});
-    const trPts=[],tvPts=[];
-    sortedAll.forEach((r,i)=>{const x=toX(i),y=toY(r.total);(r.typ==='traning'?trPts:tvPts).push({x,y});});
-    const mkPath=(pts,col)=>pts.length<2?'':`<path d="${pts.map((p,j)=>(j===0?'M':'L')+p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ')}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/>`;
-    const dots=sortedAll.map((r,i)=>{const x=toX(i),y=toY(r.total),col=r.typ==='traning'?'#378ADD':'#639922';return`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${col}" stroke="white" stroke-width="1.5"/>`;}).join('');
-    const xlbl=`<text x="${toX(0).toFixed(1)}" y="${H-4}" text-anchor="middle" font-size="10" fill="#999">${sortedAll[0].datum.slice(5)}</text><text x="${toX(n-1).toFixed(1)}" y="${H-4}" text-anchor="middle" font-size="10" fill="#999">${sortedAll[n-1].datum.slice(5)}</text>`;
-    const legend=`<circle cx="${PL}" cy="${PT-4}" r="5" fill="#378ADD"/><text x="${PL+10}" y="${PT}" font-size="10" fill="#999">Träning</text><circle cx="${PL+62}" cy="${PT-4}" r="5" fill="#639922"/><text x="${PL+72}" y="${PT}" font-size="10" fill="#999">Tävling</text>`;
-    html+=`<div style="background:var(--surface);border-radius:var(--rad-sm);padding:10px;margin-bottom:16px;"><svg viewBox="0 0 ${W} ${H}" width="100%">${gridHtml}${mkPath(trPts,'#378ADD')}${mkPath(tvPts,'#639922')}${dots}${xlbl}${legend}</svg></div>`;
+  var sa=[...resultat].sort(function(a,b){return a.datum.localeCompare(b.datum);});
+  if(sa.length>=2){
+    var W=344,H=160,PL=36,PR=12,PT=14,gW=W-PL-PR,gH=H-PT-28;
+    var vs=sa.map(function(r){return r.total;});
+    var mn=Math.max(0,Math.min.apply(null,vs)-20),mx=Math.min(300,Math.max.apply(null,vs)+10);
+    var n=sa.length;
+    function tx(i){return PL+i*(gW/(n>1?n-1:1));}
+    function ty(v){return PT+gH-(((v-mn)/(mx-mn))*gH);}
+    var gv=[mn,Math.round((mn+mx)/2),mx],gh='';
+    gv.forEach(function(v){var y=ty(v);gh+='<line x1="'+PL+'" y1="'+y.toFixed(1)+'" x2="'+(W-PR)+'" y2="'+y.toFixed(1)+'" stroke="rgba(0,0,0,0.1)" stroke-width="0.5"/><text x="'+(PL-4)+'" y="'+(y+4).toFixed(1)+'" text-anchor="end" font-size="10" fill="#999">'+v+'</text>';});
+    var tp=[],tvp=[];
+    sa.forEach(function(r,i){var x=tx(i),y=ty(r.total);(r.typ==='traning'?tp:tvp).push({x:x,y:y});});
+    function mkp(pts,col){return pts.length<2?'':'<path d="'+pts.map(function(p,j){return(j===0?'M':'L')+p.x.toFixed(1)+','+p.y.toFixed(1);}).join(' ')+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round"/>';}
+    var dots=sa.map(function(r,i){var x=tx(i),y=ty(r.total),c=r.typ==='traning'?'#378ADD':'#639922';return'<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="5" fill="'+c+'" stroke="white" stroke-width="1.5"/>';}).join('');
+    var xl='<text x="'+tx(0).toFixed(1)+'" y="'+(H-4)+'" text-anchor="middle" font-size="10" fill="#999">'+sa[0].datum.slice(5)+'</text><text x="'+tx(n-1).toFixed(1)+'" y="'+(H-4)+'" text-anchor="middle" font-size="10" fill="#999">'+sa[n-1].datum.slice(5)+'</text>';
+    var lg='<circle cx="'+PL+'" cy="'+(PT-4)+'" r="5" fill="#378ADD"/><text x="'+(PL+10)+'" y="'+PT+'" font-size="10" fill="#999">Träning</text><circle cx="'+(PL+62)+'" cy="'+(PT-4)+'" r="5" fill="#639922"/><text x="'+(PL+72)+'" y="'+PT+'" font-size="10" fill="#999">Tävling</text>';
+    html+='<div style="background:var(--surface);border-radius:var(--rad-sm);padding:10px;margin-bottom:16px;"><svg viewBox="0 0 '+W+' '+H+'" width="100%">'+gh+mkp(tp,'#378ADD')+mkp(tvp,'#639922')+dots+xl+lg+'</svg></div>';
   } else {
     html+='<div style="font-size:13px;color:var(--hint);margin-bottom:16px;">Logga minst 2 resultat för att se kurvan.</div>';
   }
-
   if(resultat.length>=2){
     html+='<hr class="divider"><div class="section-title">Snitt per serie</div>';
-    const serieAvgs=[0,1,2,3,4,5].map(si=>{const vals=resultat.filter(r=>r.serier&&r.serier[si]).map(r=>r.serier[si].sum);return vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;});
-    const W2=344,H2=120,PL2=36,PR2=12,PT2=14,gW2=W2-PL2-PR2,gH2=H2-PT2-24,barW=Math.floor(gW2/6)-8;
-    let barsHtml='';
-    serieAvgs.forEach((v,i)=>{const x=PL2+i*(gW2/6)+(gW2/6-barW)/2,barH=Math.round((v/50)*gH2),y=PT2+gH2-barH;barsHtml+=`<rect x="${x.toFixed(0)}" y="${y}" width="${barW}" height="${Math.max(barH,2)}" fill="#7F77DD" rx="3"/>`;if(v>0)barsHtml+=`<text x="${(x+barW/2).toFixed(0)}" y="${y-4}" text-anchor="middle" font-size="11" fill="#7F77DD" font-weight="600">${v}</text>`;barsHtml+=`<text x="${(x+barW/2).toFixed(0)}" y="${H2-4}" text-anchor="middle" font-size="11" fill="#999">S${i+1}</text>`;});
-    barsHtml+=`<line x1="${PL2}" y1="${PT2}" x2="${PL2}" y2="${PT2+gH2}" stroke="rgba(0,0,0,0.1)" stroke-width="0.5"/><text x="${PL2-4}" y="${PT2+4}" text-anchor="end" font-size="10" fill="#999">50</text><text x="${PL2-4}" y="${PT2+gH2+4}" text-anchor="end" font-size="10" fill="#999">0</text>`;
-    html+=`<div style="background:var(--surface);border-radius:var(--rad-sm);padding:10px;"><svg viewBox="0 0 ${W2} ${H2}" width="100%">${barsHtml}</svg></div>`;
+    var avgs=[0,1,2,3,4,5].map(function(si){var v=resultat.filter(function(r){return r.serier&&r.serier[si];}).map(function(r){return r.serier[si].sum;});return v.length?Math.round(v.reduce(function(a,b){return a+b;},0)/v.length):0;});
+    var W2=344,H2=120,PL2=36,PT2=14,gW2=W2-PL2-12,gH2=H2-PT2-24,bW=Math.floor(gW2/6)-8,bh='';
+    avgs.forEach(function(v,i){var x=PL2+i*(gW2/6)+(gW2/6-bW)/2,bH=Math.round((v/50)*gH2),y=PT2+gH2-bH;bh+='<rect x="'+x.toFixed(0)+'" y="'+y+'" width="'+bW+'" height="'+Math.max(bH,2)+'" fill="#7F77DD" rx="3"/>';if(v>0)bh+='<text x="'+(x+bW/2).toFixed(0)+'" y="'+(y-4)+'" text-anchor="middle" font-size="11" fill="#7F77DD" font-weight="600">'+v+'</text>';bh+='<text x="'+(x+bW/2).toFixed(0)+'" y="'+(H2-4)+'" text-anchor="middle" font-size="11" fill="#999">S'+(i+1)+'</text>';});
+    bh+='<line x1="'+PL2+'" y1="'+PT2+'" x2="'+PL2+'" y2="'+(PT2+gH2)+'" stroke="rgba(0,0,0,0.1)" stroke-width="0.5"/><text x="'+(PL2-4)+'" y="'+(PT2+4)+'" text-anchor="end" font-size="10" fill="#999">50</text><text x="'+(PL2-4)+'" y="'+(PT2+gH2+4)+'" text-anchor="end" font-size="10" fill="#999">0</text>';
+    html+='<div style="background:var(--surface);border-radius:var(--rad-sm);padding:10px;"><svg viewBox="0 0 '+W2+' '+H2+'" width="100%">'+bh+'</svg></div>';
   }
   el.innerHTML=html;
 }
 
-// Export
 function exportData(){
-  const data={version:1,exportDatum:new Date().toISOString(),resultat};
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download='skytte-resultat-'+new Date().toISOString().slice(0,10)+'.json';
-  a.click();
-  URL.revokeObjectURL(url);
+  var blob=new Blob([JSON.stringify({version:1,exportDatum:new Date().toISOString(),resultat:resultat},null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='skytte-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(url);
 }
 
-// Import
 function importData(input){
-  const file=input.files[0];
-  if(!file)return;
-  const reader=new FileReader();
+  var file=input.files[0];if(!file)return;
+  var reader=new FileReader();
   reader.onload=function(e){
     try{
-      const data=JSON.parse(e.target.result);
-      const importerade=data.resultat||[];
-      const befintligaIds=new Set(resultat.map(r=>r.id));
-      const nya=importerade.filter(r=>!befintligaIds.has(r.id));
-      resultat=[...resultat,...nya].sort((a,b)=>b.datum.localeCompare(a.datum));
-      sparaStorage();
-      alert('Importerat! '+nya.length+' nya resultat lades till.');
-      input.value='';
-    }catch(err){
-      alert('Kunde inte läsa filen. Kontrollera att det är en giltig JSON-exportfil.');
-    }
+      var data=JSON.parse(e.target.result),imp=data.resultat||[];
+      var ids=new Set(resultat.map(function(r){return r.id;}));
+      var nya=imp.filter(function(r){return!ids.has(r.id);});
+      resultat=[...resultat,...nya].sort(function(a,b){return b.datum.localeCompare(a.datum);});
+      sparaStorage();alert('Importerat! '+nya.length+' nya resultat.');input.value='';
+    }catch(err){alert('Kunde inte läsa filen.');}
   };
   reader.readAsText(file);
 }
 
 function rensaData(){
-  if(confirm('Är du säker? All data raderas permanent.')){
-    if(confirm('Bekräfta: radera all data?')){
-      resultat=[];
-      sparaStorage();
-      alert('All data är raderad.');
-    }
+  if(confirm('Är du säker? All lokal data raderas.')){
+    if(confirm('Bekräfta: radera all data?')){resultat=[];sparaStorage();alert('Klar.');}
   }
 }
 
-// Service worker registration
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js').catch(()=>{});
-}
-
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
 renderSerier();
 </script>
 </body>
