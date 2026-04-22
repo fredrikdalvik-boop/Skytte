@@ -1,24 +1,14 @@
-const CACHE = 'skytte-v1';
-const FILES = ['/', '/index.html', '/manifest.json'];
-
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)));
-  self.skipWaiting();
-});
-
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys =>
-    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-  ));
-  self.clients.claim();
-});
-
-self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).then(res => {
-      const clone = res.clone();
-      caches.open(CACHE).then(c => c.put(e.request, clone));
-      return res;
-    })).catch(() => caches.match('/index.html'))
-  );
-});
+{
+  "name": "Pistolskytteappen",
+  "short_name": "Pistolskytte",
+  "description": "Logga dina skytteresultat",
+  "start_url": "/Skytte/",
+  "scope": "/Skytte/",
+  "display": "standalone",
+  "background_color": "#f5f5f3",
+  "theme_color": "#1a1a1a",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}
