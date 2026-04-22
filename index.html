@@ -510,11 +510,10 @@
     <h2 style="margin-top:8px;">Historik <span class="cloud-badge">Moln</span></h2>
     <div class="filter-row">
       <button class="filter-btn active" onclick="setFilter('alla',this)">Alla</button>
-      <button class="filter-btn" onclick="setFilter('traning',this)">Träning</button>
-      <button class="filter-btn" onclick="setFilter('tavling',this)">Tävling</button>
       <button class="filter-btn" onclick="setFilter('precision',this)">Precision</button>
-      <button class="filter-btn" onclick="setFilter('snabb',this)">Snabb</button>
+      <button class="filter-btn" onclick="setFilter('snabb',this)">Milsnabb</button>
       <button class="filter-btn" onclick="setFilter('helmatch',this)">Helmatch</button>
+      <button class="filter-btn" onclick="setFilter('gast',this)">👥 Gäster</button>
     </div>
     <div id="historik-list"><div class="loading">Laddar...</div></div>
   </div>
@@ -522,6 +521,12 @@
   <!-- STATISTIK -->
   <div id="view-statistik" class="view">
     <h2 style="margin-top:8px;">Statistik <span class="cloud-badge">Moln</span></h2>
+    <div class="filter-row" style="margin-bottom:12px;">
+      <button class="filter-btn active" id="stat-btn-alla" onclick="setStatFilter('alla',this)">Alla</button>
+      <button class="filter-btn" id="stat-btn-precision" onclick="setStatFilter('precision',this)">Precision</button>
+      <button class="filter-btn" id="stat-btn-snabb" onclick="setStatFilter('snabb',this)">Milsnabb</button>
+      <button class="filter-btn" id="stat-btn-helmatch" onclick="setStatFilter('helmatch',this)">Helmatch</button>
+    </div>
     <div id="statistik-content"><div class="loading">Laddar...</div></div>
   </div>
 
@@ -1091,7 +1096,30 @@ function sparaResultat(){
   }).catch(function(err){setSync('err','Ingen anslutning');console.error(err);});
 
   var sparaBtn=document.getElementById('spara-btn');if(sparaBtn)sparaBtn.classList.remove('redo-att-spara');
+
+  // GÄSTLÄGE: Om aktiv session är en gäst (index > 0), spara separat som typ='gast'
+  if(sessions.length > 1 && aktivSessIdx > 0){
+    var gs = sessions[aktivSessIdx];
+    var rGast = JSON.parse(JSON.stringify(r));
+    rGast.typ = 'gast';
+    rGast.vapen = gs.namn;
+    rGast.noter = 'Gäst: ' + gs.namn;
+    sb('resultat',{method:'POST',body:JSON.stringify(rGast)}).then(function(res){
+      if(res.ok) setSync('ok','Gästresultat sparat');
+      else res.text().then(function(t){ setSync('err','Molnfel: '+t.slice(0,60)); });
+    }).catch(function(){ setSync('err','Ingen anslutning'); });
+    gs.sparat = true;
+    gs.shots = shots.map(function(a){ return a.slice(); });
+    renderTabbbar();
+    var allaSparat = sessions.every(function(s){ return s.sparat; });
+    if(allaSparat) setTimeout(visaGastExport, 400);
+    else toast('Sparat! ' + total + 'p · ' + xs + 'X', 'ok');
+  } else {
+    toast('Sparat! ' + total + ' p · ' + xs + 'X', 'ok');
+  }
+
   initShots();
+  sumVals = Array(GRENKONFIG[aktGren].antalSerier).fill(null);
   document.getElementById('noter').value='';
   var xInp2=document.getElementById('summa-x-inp');if(xInp2)xInp2.value='';
   if(!isTr)document.getElementById('tavlingsnamn').value='';
@@ -1122,7 +1150,7 @@ function medalChips(r){
 }
 
 function grenBadge(gren){
-  var m={precision:'Precision',snabb:'Snabbmatch',helmatch:'Helmatch'};
+  var m={precision:'Precision',snabb:'Milsnabb',helmatch:'Helmatch'};
   return '<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:rgba(55,138,221,0.15);color:var(--blue);font-weight:600;">'+( m[gren]||gren)+'</span>';
 }
 
@@ -1130,22 +1158,46 @@ function renderHistorik(){
   var el=document.getElementById('historik-list');
   el.innerHTML='<div class="loading">Hämtar från molnet...</div>';
   var q='resultat?select=*&order=datum.desc,id.desc';
-  if(filterTyp==='traning'||filterTyp==='tavling')q+='&typ=eq.'+filterTyp;
-  else if(filterTyp==='precision'||filterTyp==='snabb'||filterTyp==='helmatch')q+='&gren=eq.'+filterTyp;
+  if(filterTyp==='gast'){
+    q+='&typ=eq.gast';
+  } else if(filterTyp==='traning'){
+    q+='&typ=eq.traning';
+  } else if(filterTyp==='tavling'){
+    q+='&typ=eq.tavling';
+  } else if(filterTyp==='precision'||filterTyp==='snabb'||filterTyp==='helmatch'){
+    q+='&gren=eq.'+filterTyp+'&typ=neq.gast';
+  } else {
+    // Alla — exkludera gäster
+    q+='&typ=neq.gast';
+  }
   sb(q,{extraHeaders:{'Prefer':''}}).then(function(r){return r.json();}).then(function(data){
     if(!data||data.length===0){el.innerHTML='<div class="empty">Inga resultat än.</div>';return;}
     el.innerHTML=data.map(function(r){
-      var badge=r.typ==='traning'?'<span class="badge badge-traning">Träning</span>':'<span class="badge badge-tavling">Tävling</span>';
+      var gastNamnDisplay=r.typ==='gast'?r.vapen:'';
+if(r.typ==='gast') gastResultatCache[r.id]=r;
+var badge=r.typ==='gast'?'<span class="badge" style="background:rgba(147,51,234,0.15);color:#9333EA;">👥 '+r.vapen+'</span>':(r.typ==='traning'?'<span class="badge badge-traning">Träning</span>':'<span class="badge badge-tavling">Tävling</span>');
       var gb=grenBadge(r.gren||'precision');
       var k=GRENKONFIG[r.gren||'precision']||GRENKONFIG.precision;
       var meta=[r.vapengrupp,r.klass,r.vapen].filter(Boolean).join(' · ')+(r.tavlingsnamn?' · '+r.tavlingsnamn:'');
-      var sh=(r.serier||[]).map(function(s,i){
+      var snabbTabell=r.gren==='snabb'&&(r.serier||[]).length>0?byggSnabbTabell(r.serier):null;
+var sh=(r.serier||[]).map(function(s,i){
         var xs=(s.shots||[]).filter(function(v){return v==='X';}).length;
         var isPerfekt=s.sum===k.maxPerSerie&&s.shots&&s.shots.filter(function(v){return v!==null;}).length===k.skottPerSerie;
         var cls='series-chip'+(isPerfekt?' perfekt':(s.medal&&s.medal!=='perfekt'?' '+s.medal:''));
         return'<span class="'+cls+'">S'+(i+1)+': '+s.sum+'p'+(xs?' +'+xs+'X':'')+(isPerfekt?' ★':'')+'</span>';
       }).join('');
-      return'<div class="card" style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">'+badge+gb+'<div style="display:flex;align-items:center;gap:6px;"><span class="hist-date">'+r.datum+'</span><button onclick="taBortKort('+r.id+',event)" style="background:none;border:0.5px solid var(--border2);border-radius:6px;cursor:pointer;color:var(--muted);font-size:16px;padding:3px 7px;opacity:0.8;line-height:1;">🗑</button></div></div><div style="display:flex;align-items:baseline;gap:2px;margin-top:10px;"><span class="hist-score">'+r.total+'</span><span class="hist-denom">/ '+k.maxTotal+'</span></div><div style="display:flex;gap:10px;align-items:center;margin-top:4px;"><span class="hist-xs">'+r.xs+'X</span><span class="hist-meta">'+meta+'</span></div>'+medalChips(r)+'<div class="series-row" style="margin-top:10px;">'+sh+'</div>'+(r.noter?'<div style="font-size:13px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border);">'+r.noter+'</div>':'')+'</div>';
+      var seriesHtml = snabbTabell || ('<div class="series-row" style="margin-top:10px;">'+sh+'</div>');
+      var noterHtml = (r.noter&&r.typ!=='gast') ? '<div style="font-size:13px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border);">'+r.noter+'</div>' : '';
+      var gastHtml = r.typ==='gast' ? '<div style="display:flex;gap:8px;margin-top:10px;"><button data-rid="'+r.id+'" data-k="mail" onclick="handleGastExp(this)" style="flex:1;padding:8px;font-size:13px;font-weight:600;background:#378ADD;color:#fff;border:none;border-radius:var(--rad-sm);cursor:pointer;">✉️ Mail</button><button data-rid="'+r.id+'" data-k="wa" onclick="handleGastExp(this)" style="flex:1;padding:8px;font-size:13px;font-weight:600;background:#25D366;color:#fff;border:none;border-radius:var(--rad-sm);cursor:pointer;">💬 WhatsApp</button></div>' : '';
+      return '<div class="card" style="margin-bottom:10px;">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">'+badge+gb+'<div style="display:flex;align-items:center;gap:6px;"><span class="hist-date">'+r.datum+'</span><button onclick="taBortKort('+r.id+',event)" style="background:none;border:0.5px solid var(--border2);border-radius:6px;cursor:pointer;color:var(--muted);font-size:16px;padding:3px 7px;opacity:0.8;line-height:1;">🗑</button></div></div>'
+        + '<div style="display:flex;align-items:baseline;gap:2px;margin-top:10px;"><span class="hist-score">'+r.total+'p</span><span class="hist-denom">/ '+k.maxTotal+'p</span></div>'
+        + '<div style="display:flex;gap:10px;align-items:center;margin-top:4px;"><span class="hist-xs">'+r.xs+'X</span><span class="hist-meta">'+meta+'</span></div>'
+        + medalChips(r)
+        + seriesHtml
+        + noterHtml
+        + gastHtml
+        + '</div>';
     }).join('');
   }).catch(function(){el.innerHTML='<div class="empty">Kunde inte hämta data.</div>';});
 }
@@ -1160,6 +1212,79 @@ function editStdPoang(id,current,e){
     if(res.ok){toast(p!==null?'Std-poäng '+p+'p sparad.':'Std-poäng borttagen.','ok');renderHistorik();}
     else{toast('Kunde inte spara.','err');}
   }).catch(function(){toast('Ingen anslutning.','err');});
+}
+
+
+function byggSnabbTabell(serier){
+  // serier = array av {shots, sum, medal} från r.serier
+  // Moment: 10sek (0-3), 8sek (4-7), 6sek (8-11)
+  var moment = [
+    {namn:'10 Sekunder', idx:[0,1,2,3]},
+    {namn:'8 Sekunder',  idx:[4,5,6,7]},
+    {namn:'6 Sekunder',  idx:[8,9,10,11]}
+  ];
+  var tbl = '<div class="excel-wrap" style="margin-top:10px;"><table class="excel-table"><thead><tr>';
+
+  // Header: moment-block
+  moment.forEach(function(m){
+    tbl += '<th colspan="'+(m.idx.length*2+1)+'" style="text-align:left;padding:4px 6px;">'+m.namn+'</th>';
+  });
+  tbl += '<th>Total</th><th>X</th></tr>';
+
+  // Sub-header: S1 X S2 X ... Tot
+  tbl += '<tr>';
+  moment.forEach(function(m){
+    m.idx.forEach(function(si){
+      tbl += '<th>'+(si+1)+'</th><th style="color:var(--blue)">X</th>';
+    });
+    tbl += '<th>Tot</th>';
+  });
+  tbl += '<th>Tot</th><th style="color:var(--blue)">X</th></tr></thead><tbody><tr>';
+
+  var grandTotal = 0, grandX = 0;
+  moment.forEach(function(m){
+    var momTot = 0, momX = 0;
+    m.idx.forEach(function(si){
+      var s = serier[si] || {sum:0, shots:[]};
+      var xs = (s.shots||[]).filter(function(v){return v==='X';}).length;
+      var sum = s.sum || 0;
+      momTot += sum; momX += xs; grandTotal += sum; grandX += xs;
+      tbl += '<td class="c-sum">'+sum+'</td><td class="c-x">'+(xs||'')+'</td>';
+    });
+    tbl += '<td class="c-sum" style="font-weight:800;">'+momTot+'p</td>';
+  });
+  tbl += '<td class="c-sum" style="font-weight:800;font-size:13px;">'+grandTotal+'p</td>';
+  tbl += '<td class="c-x" style="font-weight:700;">'+grandX+'</td>';
+  tbl += '</tr></tbody></table></div>';
+  return tbl;
+}
+
+// Cache för gäst-resultat (fylls på i renderHistorik)
+var gastResultatCache = {};
+
+function handleGastExp(btn){
+  var rid = btn.getAttribute('data-rid');
+  var kanal = btn.getAttribute('data-k');
+  var r = gastResultatCache[rid];
+  if(!r){ toast('Kunde inte hitta resultat','err'); return; }
+  exportGastResultat(r, kanal);
+}
+
+function exportGastResultat(r, kanal){
+  var k = GRENKONFIG[r.gren||'precision'] || GRENKONFIG.precision;
+  var serier = r.serier||[];
+  var rader = serier.map(function(s,i){
+    return 'S'+(i+1)+': '+s.sum+'p'+(s.medal==='perfekt'?' ★':'');
+  }).filter(function(s){ return s.indexOf('0p')===-1||true; });
+  var txt = '🎯 Skyttresultat\n'
+    + 'Namn: ' + r.vapen + '\n'
+    + k.namn + ' · ' + (r.vapengrupp||'') + '\n'
+    + 'Datum: ' + (r.datum||'') + '\n\n'
+    + rader.join('\n')
+    + '\n\nTotalt: ' + r.total + 'p · ' + (r.xs||0) + 'X';
+  var enc = encodeURIComponent(txt);
+  if(kanal==='mail') window.open('mailto:?subject=Skyttresultat '+r.vapen+'&body='+enc);
+  else window.open('https://wa.me/?text='+enc);
 }
 
 function taBortKort(id,e){
@@ -1181,17 +1306,27 @@ function setupSwipeDelete(){
   });
 }
 
+var statFilter = 'alla';
+
+function setStatFilter(f, btn){
+  statFilter = f;
+  document.querySelectorAll('[id^="stat-btn-"]').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderStatistik();
+}
+
 function renderStatistik(){
   var el=document.getElementById('statistik-content');
   el.innerHTML='<div class="loading">Hämtar statistik...</div>';
-  sb('resultat?select=*&order=datum.asc',{extraHeaders:{'Prefer':''}}).then(function(r){return r.json();}).then(function(data){
+  sb('resultat?select=*&order=datum.asc&typ=neq.gast',{extraHeaders:{'Prefer':''}}).then(function(r){return r.json();}).then(function(data){
     if(!data||data.length===0){el.innerHTML='<div class="empty">Logga resultat för att se statistik.</div>';return;}
 
-    // Gruppera per gren
+    // Filtrera per vald gren
     var grenNamn={precision:'Precision nationellt',snabb:'Militär snabbmatch',helmatch:'Nationell helmatch'};
     var html='';
+    var visaGrenar = statFilter==='alla' ? ['precision','snabb','helmatch'] : [statFilter];
 
-    ['precision','snabb','helmatch'].forEach(function(gren){
+    visaGrenar.forEach(function(gren){
       var gdata=data.filter(function(r){return(r.gren||'precision')===gren;});
       if(gdata.length===0)return;
       var k=GRENKONFIG[gren];
