@@ -260,6 +260,65 @@
       .medal-tag.guld { box-shadow: 0 0 6px rgba(240,168,0,0.5); }
       .medal-tag.perfekt { box-shadow: 0 0 8px rgba(147,51,234,0.6); }
     }
+
+    /* Gästläge */
+    #gast-setup { position: fixed; inset: 0; z-index: 9997; background: var(--raised); display: none; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; gap: 14px; }
+    #gast-setup.active { display: flex; }
+    .gast-title { font-size: 20px; font-weight: 800; color: var(--ink); margin-bottom: 4px; }
+    .gast-sub { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    .gast-name-row { display: flex; align-items: center; gap: 10px; width: 100%; max-width: 380px; }
+    .gast-name-row label { font-size: 13px; color: var(--muted); font-weight: 600; min-width: 60px; }
+    .gast-name-row input { flex: 1; }
+    .gast-antal { display: flex; gap: 8px; margin-bottom: 4px; }
+    .gast-antal-btn { flex: 1; max-width: 70px; padding: 10px; font-size: 18px; font-weight: 700; border: 1.5px solid var(--border2); border-radius: var(--rad-sm); background: var(--card); color: var(--ink); cursor: pointer; text-align: center; }
+    .gast-antal-btn.active { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+
+    /* Gäst-status bar i loggvyn */
+    .gast-bar { background: var(--card); border-radius: var(--rad-sm); padding: 10px 14px; margin-bottom: 12px; border: 1.5px solid var(--blue); display: flex; align-items: center; justify-content: space-between; }
+    .gast-bar-name { font-size: 15px; font-weight: 700; color: var(--ink); }
+    .gast-bar-info { font-size: 12px; color: var(--muted); }
+    .gast-dots { display: flex; gap: 6px; }
+    .gast-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border2); }
+    .gast-dot.done { background: var(--green); }
+    .gast-dot.active { background: var(--blue); }
+
+    /* Export-skärm */
+    #gast-export { position: fixed; inset: 0; z-index: 9997; background: var(--raised); display: none; flex-direction: column; padding: 32px 24px; gap: 12px; overflow-y: auto; }
+    #gast-export.active { display: flex; }
+    .gast-result-card { background: var(--card); border-radius: var(--radius); padding: 16px; border: 0.5px solid var(--border); }
+    .gast-result-name { font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+    .gast-result-score { font-size: 32px; font-weight: 800; color: var(--ink); }
+    .gast-export-btns { display: flex; gap: 8px; margin-top: 10px; }
+    .gast-export-btn { flex: 1; padding: 10px; font-size: 13px; font-weight: 600; border-radius: var(--rad-sm); border: none; cursor: pointer; }
+    .gast-export-mail { background: #378ADD; color: #fff; }
+    .gast-export-wa { background: #25D366; color: #fff; }
+
+
+    /* Användartabbar */
+    #anvandare-bar { display: none; padding: 8px 16px 0; gap: 6px; flex-wrap: wrap; }
+    #anvandare-bar.synlig { display: flex; }
+    .anvandare-tab { padding: 6px 14px; font-size: 13px; font-weight: 600; border: 1.5px solid var(--border2); border-radius: 20px; background: transparent; color: var(--muted); cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+    .anvandare-tab.aktiv { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+    .anvandare-tab.sparat { border-color: var(--green); color: var(--green); }
+    .anvandare-tab.sparat.aktiv { background: var(--green); color: #fff; border-color: var(--green); }
+    .anvandare-tab.lagg-till { border-color: var(--blue); color: var(--blue); background: transparent; }
+
+    /* Gäst-modal */
+    #gast-modal { position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,0.5); display: none; align-items: flex-end; }
+    #gast-modal.open { display: flex; }
+    #gast-modal-inner { background: var(--surface); border-radius: 20px 20px 0 0; padding: 24px; width: 100%; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+    #gast-modal h3 { font-size: 17px; font-weight: 700; color: var(--ink); }
+
+    /* Export-skärm */
+    #gast-export { position: fixed; inset: 0; z-index: 9500; background: var(--raised); display: none; flex-direction: column; padding: 24px; gap: 12px; overflow-y: auto; }
+    #gast-export.open { display: flex; }
+    .gast-res-card { background: var(--card); border-radius: var(--radius); padding: 16px; border: 0.5px solid var(--border); }
+    .gast-res-namn { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .gast-res-score { font-size: 36px; font-weight: 800; color: var(--ink); line-height: 1; }
+    .gast-exp-btns { display: flex; gap: 8px; margin-top: 10px; }
+    .gast-exp-btn { flex: 1; padding: 10px; font-size: 13px; font-weight: 600; border-radius: var(--rad-sm); border: none; cursor: pointer; }
+    .btn-mail { background: #378ADD; color: #fff; }
+    .btn-wa   { background: #25D366; color: #fff; }
   </style>
 </head>
 <body>
@@ -309,6 +368,60 @@
     <div class="gren-icon">🏆</div>
     <div><div class="gren-card-title">Nationell helmatch</div><div class="gren-card-sub">12 serier × 5 skott · 600p · 25m</div></div>
   </div>
+
+</div>
+
+  <div id="gast-export-lista"></div>
+</div>
+</div>
+
+<!-- Gäst-modal -->
+<div id="gast-modal" onclick="stangGastModal(event)">
+  <div id="gast-modal-inner">
+    <h3>👥 Lägg till gäst</h3>
+    <div><label style="margin-top:0;">Namn</label>
+      <input type="text" id="gast-modal-namn" placeholder="Gästens namn..." maxlength="20">
+    </div>
+    <div class="row2">
+      <div><label style="margin-top:0;">Typ</label>
+        <select id="gast-modal-typ">
+          <option value="traning">Träning</option>
+          <option value="tavling">Tävling</option>
+        </select>
+      </div>
+      <div><label style="margin-top:0;">Vapengrupp</label>
+        <select id="gast-modal-vg">
+          <option value="A">A</option><option value="A-optics">A optics</option>
+          <option value="B">B</option><option value="C">C</option><option value="R">R</option>
+        </select>
+      </div>
+    </div>
+    <div id="gast-modal-tavling-falt" style="display:none;">
+      <div class="row2">
+        <div><label style="margin-top:0;">Klass</label>
+          <select id="gast-modal-klass">
+            <option>Öppen</option><option>Klass 1</option><option>Klass 2</option><option>Klass 3</option>
+            <option>Junior</option><option>Senior</option><option>Dam</option><option>Veteran Y</option><option>Veteran Ä</option>
+          </select>
+        </div>
+        <div><label style="margin-top:0;">Vapen</label>
+          <input type="text" id="gast-modal-vapen" placeholder="t.ex. CZ 75">
+        </div>
+      </div>
+      <label style="margin-top:8px;">Tävlingsnamn</label>
+      <input type="text" id="gast-modal-tavlingsnamn" placeholder="t.ex. DM Precision">
+    </div>
+    <button class="btn" onclick="laggTillGast()">Lägg till →</button>
+    <button class="btn btn-secondary" style="margin-top:6px;" onclick="stangGastModal()">Avbryt</button>
+  </div>
+</div>
+
+<!-- Gäst-export -->
+<div id="gast-export">
+  <h2 style="margin-bottom:4px;">Alla resultat 🎯</h2>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:8px;">Exportera varje persons resultat</p>
+  <div id="gast-export-lista"></div>
+  <button class="btn btn-secondary" style="margin-top:8px;" onclick="stangGastExport()">Stäng</button>
 </div>
 
 <!-- Toast -->
@@ -328,6 +441,7 @@
       </div>
       <button onclick="byttGren()" style="margin-left:auto;font-size:11px;color:var(--blue);background:none;border:none;cursor:pointer;padding:4px 8px;">Byt gren</button>
     </div>
+    <div id="anvandare-bar"></div>
     <div class="row2">
       <div><label>Typ</label>
         <select id="typ" onchange="toggleFalt()">
@@ -540,8 +654,18 @@ function valjGren(gren){
   document.getElementById('gren-sub-label').textContent=k.sub;
   document.getElementById('tot-sum').textContent='0 / '+k.maxTotal;
   initShots();
+  // Initialisera session för "mig" om sessions är tomma
+  if(sessions.length===0){
+    sessions=[nySess('Mig','A','traning','','','')];
+    aktivSessIdx=0;
+  } else {
+    // Återställ shots-state för aktiv session vid grenbyte
+    sessions[aktivSessIdx].shots=null;
+    sessions[aktivSessIdx].sumVals=null;
+  }
   document.getElementById('datum').value=new Date().toISOString().split('T')[0];
   document.getElementById('sheets-url-input').value=getSheetsUrl();
+  renderTabbbar();
   renderSerier();
 }
 
@@ -649,6 +773,7 @@ function renderSerier(){
   }
   con.innerHTML=html;
   updateTotals();
+  renderTabbbar();
   if(globalMode==='skott'){
     setTimeout(function(){
       var el=document.getElementById('serie-'+activeSerie);
@@ -880,15 +1005,22 @@ function applyAppTheme(t){
   var style = document.getElementById('app-theme-override');
   if(!style){ style=document.createElement('style'); style.id='app-theme-override'; document.head.appendChild(style); }
 
+  // Set color-scheme on html element — this overrides @media (prefers-color-scheme)
+  var htmlEl = document.documentElement;
+
   if(t==='light'){
-    style.textContent = ':root{--ink:#1a1a1a;--muted:#6b6b6b;--hint:#aaaaaa;--surface:#ffffff;--raised:#f5f5f3;--card:#ffffff;--border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.22);--gold:#C8900A;--gold-bg:#FFF0B0;--gold-text:#5A3500;--silver:#686870;--silver-bg:#E0E0E8;--silver-text:#1A1A28;--bronze:#A83500;--bronze-bg:#FFE0D0;--bronze-text:#4A1000;--blue:#378ADD;--green:#639922;--input-bg:#ffffff;}';
-    document.body.style.colorScheme='light';
+    htmlEl.style.colorScheme = 'light';
+    document.body.style.colorScheme = 'light';
+    style.textContent = ':root{--ink:#1a1a1a!important;--muted:#6b6b6b!important;--hint:#aaaaaa!important;--surface:#ffffff!important;--raised:#f5f5f3!important;--card:#ffffff!important;--border:rgba(0,0,0,0.1)!important;--border2:rgba(0,0,0,0.22)!important;--gold:#C8900A!important;--gold-bg:#FFF0B0!important;--gold-text:#5A3500!important;--silver:#686870!important;--silver-bg:#E0E0E8!important;--silver-text:#1A1A28!important;--bronze:#A83500!important;--bronze-bg:#FFE0D0!important;--bronze-text:#4A1000!important;--blue:#378ADD!important;--green:#639922!important;--input-bg:#ffffff!important;}'
+      + '@media (prefers-color-scheme: dark){:root{--ink:#1a1a1a!important;--muted:#6b6b6b!important;--hint:#aaaaaa!important;--surface:#ffffff!important;--raised:#f5f5f3!important;--card:#ffffff!important;--border:rgba(0,0,0,0.1)!important;--border2:rgba(0,0,0,0.22)!important;--gold:#C8900A!important;--gold-bg:#FFF0B0!important;--gold-text:#5A3500!important;--silver:#686870!important;--silver-bg:#E0E0E8!important;--silver-text:#1A1A28!important;--bronze:#A83500!important;--bronze-bg:#FFE0D0!important;--bronze-text:#4A1000!important;--blue:#378ADD!important;--green:#639922!important;--input-bg:#ffffff!important;}}';
   } else if(t==='dark'){
-    style.textContent = ':root{--ink:#ffffff;--muted:#aeaeb2;--hint:#7a7a80;--surface:#1c1c1e;--raised:#0a0a0a;--card:#1e1e20;--border:rgba(255,255,255,0.12);--border2:rgba(255,255,255,0.28);--gold:#F0A800;--gold-bg:#2e1f00;--gold-text:#FFD000;--silver:#a0a0aa;--silver-bg:#1a1a26;--silver-text:#e0e0f0;--bronze:#cc4a18;--bronze-bg:#2e0e00;--bronze-text:#FF8055;--blue:#5aafff;--green:#7ab830;--input-bg:#252528;}';
-    document.body.style.colorScheme='dark';
+    htmlEl.style.colorScheme = 'dark';
+    document.body.style.colorScheme = 'dark';
+    style.textContent = ':root{--ink:#ffffff!important;--muted:#aeaeb2!important;--hint:#7a7a80!important;--surface:#1c1c1e!important;--raised:#0a0a0a!important;--card:#1e1e20!important;--border:rgba(255,255,255,0.12)!important;--border2:rgba(255,255,255,0.28)!important;--gold:#F0A800!important;--gold-bg:#2e1f00!important;--gold-text:#FFD000!important;--silver:#a0a0aa!important;--silver-bg:#1a1a26!important;--silver-text:#e0e0f0!important;--bronze:#cc4a18!important;--bronze-bg:#2e0e00!important;--bronze-text:#FF8055!important;--blue:#5aafff!important;--green:#7ab830!important;--input-bg:#252528!important;}';
   } else {
-    style.textContent = '';
+    htmlEl.style.colorScheme = '';
     document.body.style.colorScheme = '';
+    style.textContent = '';
   }
   // Apply gun filters
   var gunImg = document.getElementById('splash-gun-img');
@@ -1192,6 +1324,257 @@ function importData(input){
     }catch(err){toast('Kunde inte läsa filen.','err');}
   };
   reader.readAsText(file);
+}
+
+
+
+
+
+
+// ══════════════════════════════════
+// GÄSTLÄGE
+// ══════════════════════════════════
+
+// Session per användare
+function nySess(namn, vg, typ, klass, vapen, tavlingsnamn){
+  return {
+    namn: namn,
+    typ: typ||'traning',
+    vapengrupp: vg||'A',
+    klass: klass||'Öppen',
+    vapen: vapen||'',
+    tavlingsnamn: tavlingsnamn||'',
+    noter: '',
+    shots: null,   // null = inte initierat ännu
+    sumVals: null,
+    activeSerie: 0,
+    activeShot: 0,
+    perfektaCelebrerade: {},
+    globalMode: 'skott',
+    sparat: false
+  };
+}
+
+// sessions[0] = "mig", sessions[1..] = gäster
+var sessions = [];
+var aktivSessIdx = 0;
+
+function initSessions(){
+  // Skapa session för "mig" baserat på nuvarande UI
+  var vg = getVapengrupp();
+  var typ = document.getElementById('typ').value;
+  sessions = [nySess('Mig', vg, typ, '', '', '')];
+  aktivSessIdx = 0;
+}
+
+function sparaAktivSess(){
+  var s = sessions[aktivSessIdx];
+  if(!s) return;
+  s.shots = shots.map(function(a){ return a.slice(); });
+  s.sumVals = sumVals.slice();
+  s.activeSerie = activeSerie;
+  s.activeShot = activeShot;
+  s.perfektaCelebrerade = JSON.parse(JSON.stringify(perfektaCelebrerade));
+  s.globalMode = globalMode;
+  s.typ = document.getElementById('typ').value;
+  s.vapengrupp = getVapengrupp();
+  var k = document.getElementById('klass'); s.klass = k?k.value:'';
+  var vTr = document.getElementById('vapen-tr'); s.vapen = vTr?vTr.value:'';
+  var tv = document.getElementById('tavlingsnamn'); s.tavlingsnamn = tv?tv.value:'';
+  var not = document.getElementById('noter'); s.noter = not?not.value:'';
+}
+
+function laddaSess(idx){
+  var s = sessions[idx];
+  if(!s) return;
+  aktivSessIdx = idx;
+  var k = GRENKONFIG[aktGren];
+
+  // Återställ skott-state
+  if(s.shots === null){
+    // Ny gäst — initiera tomma skott
+    shots = Array.from({length:k.antalSerier}, function(){ return Array(k.skottPerSerie).fill(null); });
+    sumVals = Array(k.antalSerier).fill(null);
+    activeSerie = 0; activeShot = 0; perfektaCelebrerade = {};
+    globalMode = 'skott';
+    s.shots = shots.map(function(a){return a.slice();});
+    s.sumVals = sumVals.slice();
+  } else {
+    shots = s.shots.map(function(a){return a.slice();});
+    sumVals = s.sumVals.slice();
+    activeSerie = s.activeSerie;
+    activeShot = s.activeShot;
+    perfektaCelebrerade = JSON.parse(JSON.stringify(s.perfektaCelebrerade));
+    globalMode = s.globalMode;
+  }
+
+  // Uppdatera UI-fält
+  var typEl = document.getElementById('typ');
+  if(typEl){ typEl.value = s.typ; toggleFalt(); }
+  var vgTr = document.getElementById('vapengrupp-tr');
+  var vgTv = document.getElementById('vapengrupp-tv');
+  if(vgTr) vgTr.value = s.vapengrupp;
+  if(vgTv) vgTv.value = s.vapengrupp;
+  var klassEl = document.getElementById('klass');
+  if(klassEl && s.klass) klassEl.value = s.klass;
+  var vapenTr = document.getElementById('vapen-tr');
+  var vapenTv = document.getElementById('vapen-tv');
+  if(vapenTr) vapenTr.value = s.vapen;
+  if(vapenTv) vapenTv.value = s.vapen;
+  var tavEl = document.getElementById('tavlingsnamn');
+  if(tavEl) tavEl.value = s.tavlingsnamn;
+  var notEl = document.getElementById('noter');
+  if(notEl) notEl.value = s.noter;
+
+  // Synka mode-toggle
+  document.getElementById('btn-skott').className='mode-toggle-btn'+(globalMode==='skott'?' active':'');
+  document.getElementById('btn-summa').className='mode-toggle-btn'+(globalMode==='summa'?' active':'');
+  var k2=GRENKONFIG[aktGren];
+  var harX=k2.harX||(k2.moment&&k2.moment.some(function(m){return m.harX!==false;}));
+  document.getElementById('summa-x-wrap').style.display=(globalMode==='summa'&&harX)?'block':'none';
+
+  renderTabbbar();
+  renderSerier();
+}
+
+function renderTabbbar(){
+  var bar = document.getElementById('anvandare-bar');
+  bar.className = 'anvandare-bar synlig';
+  var h = '';
+  // Visa "Mig" + gäster om det finns gäster
+  if(sessions.length > 1){
+    h += sessions.map(function(s,i){
+      var cls = 'anvandare-tab'+(i===aktivSessIdx?' aktiv':'')+(s.sparat?' sparat':'');
+      return '<button class="'+cls+'" onclick="byttSess('+i+')">'+s.namn+(s.sparat?' ✓':'')+'</button>';
+    }).join('');
+  }
+  h += '<button class="anvandare-tab lagg-till" onclick="oppnaGastModal()">+ Gäst</button>';
+  bar.innerHTML = h;
+}
+
+function byttSess(idx){
+  if(idx === aktivSessIdx) return;
+  sparaAktivSess();
+  laddaSess(idx);
+}
+
+// Modal
+function oppnaGastModal(){
+  document.getElementById('gast-modal').classList.add('open');
+  document.getElementById('gast-modal-namn').value='';
+  document.getElementById('gast-modal-typ').value='traning';
+  gastModalTypChange();
+}
+
+function stangGastModal(e){
+  if(e && e.target !== document.getElementById('gast-modal')) return;
+  document.getElementById('gast-modal').classList.remove('open');
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  var typSel = document.getElementById('gast-modal-typ');
+  if(typSel) typSel.addEventListener('change', gastModalTypChange);
+});
+
+function gastModalTypChange(){
+  var typ = document.getElementById('gast-modal-typ').value;
+  document.getElementById('gast-modal-tavling-falt').style.display = typ==='tavling'?'block':'none';
+}
+
+function laggTillGast(){
+  var namn = (document.getElementById('gast-modal-namn').value||'').trim();
+  if(!namn){ toast('Ange gästens namn','err'); return; }
+  var typ = document.getElementById('gast-modal-typ').value;
+  var vg  = document.getElementById('gast-modal-vg').value;
+  var klass = (document.getElementById('gast-modal-klass')||{}).value||'';
+  var vapen = (document.getElementById('gast-modal-vapen')||{}).value||'';
+  var tavl  = (document.getElementById('gast-modal-tavlingsnamn')||{}).value||'';
+
+  // Om sessions inte initierats ännu, gör det nu
+  if(sessions.length === 0) initSessions();
+
+  var s = nySess(namn, vg, typ, klass, vapen, tavl);
+  sessions.push(s);
+  document.getElementById('gast-modal').classList.remove('open');
+  // Byt till den nya gästen direkt
+  sparaAktivSess();
+  laddaSess(sessions.length-1);
+  toast(namn+' tillagd!','ok');
+}
+
+// Ta bort gäst
+function taBortGast(idx){
+  if(!confirm('Ta bort '+sessions[idx].namn+'?')) return;
+  sessions.splice(idx,1);
+  if(aktivSessIdx >= sessions.length) aktivSessIdx=sessions.length-1;
+  laddaSess(aktivSessIdx);
+}
+
+// Export
+function visaGastExport(){
+  var lista = document.getElementById('gast-export-lista');
+  lista.innerHTML='';
+  sessions.forEach(function(s,i){
+    var k=GRENKONFIG[aktGren]||GRENKONFIG.precision;
+    var total=0,xs=0,rader=[];
+    var sh=s.shots||[];
+    var sv=s.sumVals||[];
+    for(var si=0;si<k.antalSerier;si++){
+      if(sv[si]!==null&&sv[si]!==undefined){
+        total+=sv[si]; rader.push('S'+(si+1)+': '+sv[si]+'p');
+      } else if(sh[si]){
+        var filled=sh[si].filter(function(v){return v!==null;});
+        if(filled.length){
+          var sum=filled.reduce(function(a,v){return a+shotNumeric(v);},0);
+          total+=sum;
+          xs+=filled.filter(function(v){return v==='X';}).length;
+          rader.push('S'+(si+1)+': '+sum+'p');
+        }
+      }
+    }
+    var div=document.createElement('div');
+    div.className='gast-res-card';
+    div.innerHTML='<div class="gast-res-namn">'+s.namn+'</div>'
+      +'<div class="gast-res-score">'+total+'p</div>'
+      +'<div style="font-size:12px;color:var(--muted);margin:2px 0 8px;">'+xs+'X · '+k.namn+' · '+s.vapengrupp+'</div>'
+      +'<div style="font-size:12px;color:var(--muted);">'+rader.join(' · ')+'</div>'
+      +'<div class="gast-exp-btns">'
+        +'<button class="gast-exp-btn btn-mail" data-idx="'+i+'" data-k="mail" onclick="exporteraGast(this)">✉️ Mail</button>'
+        +'<button class="gast-exp-btn btn-wa"   data-idx="'+i+'" data-k="wa"   onclick="exporteraGast(this)">💬 WhatsApp</button>'
+      +'</div>';
+    lista.appendChild(div);
+  });
+  document.getElementById('gast-export').classList.add('open');
+}
+
+function exporteraGast(btn){
+  var idx=parseInt(btn.getAttribute('data-idx'));
+  var kanal=btn.getAttribute('data-k');
+  var s=sessions[idx];
+  var k=GRENKONFIG[aktGren]||GRENKONFIG.precision;
+  var total=0,xs=0,rader=[];
+  var sh=s.shots||[]; var sv=s.sumVals||[];
+  for(var si=0;si<k.antalSerier;si++){
+    if(sv[si]!==null&&sv[si]!==undefined){ total+=sv[si]; rader.push('S'+(si+1)+': '+sv[si]+'p'); }
+    else if(sh[si]){
+      var filled=sh[si].filter(function(v){return v!==null;});
+      if(filled.length){
+        var sum=filled.reduce(function(a,v){return a+shotNumeric(v);},0);
+        total+=sum; xs+=filled.filter(function(v){return v==='X';}).length;
+        rader.push('S'+(si+1)+': '+sum+'p');
+      }
+    }
+  }
+  var datum=new Date().toISOString().split('T')[0];
+  var txt='🎯 '+s.namn+'\n'+k.namn+' · '+s.vapengrupp+'\n'+'Datum: '+datum+'\n\n'
+    +rader.join('\n')+'\n\nTotalt: '+total+'p'+(xs?' · '+xs+'X':'');
+  var enc=encodeURIComponent(txt);
+  if(kanal==='mail') window.open('mailto:?subject=Skyttresultat '+s.namn+'&body='+enc);
+  else window.open('https://wa.me/?text='+enc);
+}
+
+function stangGastExport(){
+  document.getElementById('gast-export').classList.remove('open');
 }
 
 // Splash gun animation
