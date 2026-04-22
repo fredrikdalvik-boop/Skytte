@@ -1,24 +1,14 @@
 {
   "name": "Pistolskytteappen",
   "short_name": "Pistolskytte",
-  "description": "Loggning och statistik f\u00f6r precision nationellt skytte 25m",
-  "start_url": "/",
+  "description": "Logga dina skytteresultat",
+  "start_url": "/Skytte/",
+  "scope": "/Skytte/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
-  "orientation": "portrait",
+  "background_color": "#f5f5f3",
+  "theme_color": "#1a1a1a",
   "icons": [
-    {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png"}
   ]
 }
