@@ -939,7 +939,7 @@ function sparaResultat(){
   if(k.harMedalj==='total'){totalMedal=getMedalj(total,vg,aktGren);}
 
   var r={
-    typ:typ,gren:aktGren,
+    id:Date.now(),typ:typ,gren:aktGren,
     datum:document.getElementById('datum').value,
     vapengrupp:vg,
     vapen:isTr?document.getElementById('vapen-tr').value:document.getElementById('vapen-tv').value,
