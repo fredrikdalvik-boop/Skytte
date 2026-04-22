@@ -52,7 +52,7 @@
     .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
     .btn { width: 100%; margin-top: 14px; padding: 14px; font-size: 16px; font-weight: 600; cursor: pointer; border-radius: var(--rad-sm); border: none; background: var(--ink); color: var(--surface); transition: opacity 0.15s, box-shadow 0.3s, transform 0.3s; }
-    .btn.redo-att-spara { background: var(--green); box-shadow: 0 0 0 4px rgba(99,153,34,0.3), 0 4px 16px rgba(99,153,34,0.4); transform: scale(1.02); animation: spara-pulse 1.2s ease-in-out infinite; }
+    .btn.redo-att-spara { background: #639922 !important; color: #fff !important; box-shadow: 0 0 0 4px rgba(99,153,34,0.3), 0 4px 16px rgba(99,153,34,0.4); transform: scale(1.02); animation: spara-pulse 1.2s ease-in-out infinite; }
     @keyframes spara-pulse { 0%,100%{box-shadow:0 0 0 4px rgba(99,153,34,0.3),0 4px 16px rgba(99,153,34,0.4)} 50%{box-shadow:0 0 0 8px rgba(99,153,34,0.15),0 4px 24px rgba(99,153,34,0.5)} }
     .btn:active { opacity: 0.8; }
     .btn-secondary { background: var(--card); color: var(--ink); border: 0.5px solid var(--border2) !important; margin-top: 8px; }
@@ -210,10 +210,7 @@
     .excel-table tr:hover td { filter: brightness(0.97); }
     @keyframes shot-bounce { 0%{transform:scale(1)} 30%{transform:scale(0.82)} 65%{transform:scale(1.12)} 100%{transform:scale(1)} }
     .shot-box.bounce { animation: shot-bounce 0.28s ease; }
-    .swipe-wrap { position: relative; overflow: hidden; border-radius: var(--radius); margin-bottom: 10px; }
-    .swipe-wrap .card { margin-bottom: 0; border-radius: var(--radius); transition: transform 0.2s ease; will-change: transform; }
-    .del-reveal { position: absolute; right: 0; top: 0; bottom: 0; width: 60px; background: #C0392B; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-    .del-reveal svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; }
+
     .hist-score { font-size: 42px; font-weight: 800; color: var(--ink); letter-spacing: -1px; line-height: 1; }
     .hist-denom { font-size: 16px; font-weight: 500; color: var(--muted); margin-left: 4px; }
     .hist-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
@@ -961,7 +958,7 @@ function sparaResultat(){
     else{res.text().then(function(t){console.error('Supabase error:',t);setSync('err','Molnfel: '+t.slice(0,80));});}
   }).catch(function(err){setSync('err','Ingen anslutning');console.error(err);});
 
-  var sb2=document.getElementById('spara-btn');if(sb2)sb2.classList.remove('redo-att-spara');
+  var sparaBtn=document.getElementById('spara-btn');if(sparaBtn)sparaBtn.classList.remove('redo-att-spara');
   initShots();
   document.getElementById('noter').value='';
   var xInp2=document.getElementById('summa-x-inp');if(xInp2)xInp2.value='';
@@ -1016,9 +1013,8 @@ function renderHistorik(){
         var cls='series-chip'+(isPerfekt?' perfekt':(s.medal&&s.medal!=='perfekt'?' '+s.medal:''));
         return'<span class="'+cls+'">S'+(i+1)+': '+s.sum+'p'+(xs?' +'+xs+'X':'')+(isPerfekt?' ★':'')+'</span>';
       }).join('');
-      return'<div class="swipe-wrap" data-id="'+r.id+'"><div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">'+badge+gb+'<span class="hist-date">'+r.datum+'</span></div><div style="display:flex;align-items:baseline;gap:2px;margin-top:10px;"><span class="hist-score">'+r.total+'</span><span class="hist-denom">/ '+k.maxTotal+'</span></div><div style="display:flex;gap:10px;align-items:center;margin-top:4px;"><span class="hist-xs">'+r.xs+'X</span><span class="hist-meta">'+meta+'</span></div>'+medalChips(r)+'<div class="series-row" style="margin-top:10px;">'+sh+'</div>'+(r.noter?'<div style="font-size:13px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border);">'+r.noter+'</div>':'')+'</div><div class="del-reveal"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></div></div>';
+      return'<div class="card" style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">'+badge+gb+'<div style="display:flex;align-items:center;gap:6px;"><span class="hist-date">'+r.datum+'</span><button onclick="taBortKort('+r.id+',event)" style="background:none;border:0.5px solid var(--border2);border-radius:6px;cursor:pointer;color:var(--muted);font-size:16px;padding:3px 7px;opacity:0.8;line-height:1;">🗑</button></div></div><div style="display:flex;align-items:baseline;gap:2px;margin-top:10px;"><span class="hist-score">'+r.total+'</span><span class="hist-denom">/ '+k.maxTotal+'</span></div><div style="display:flex;gap:10px;align-items:center;margin-top:4px;"><span class="hist-xs">'+r.xs+'X</span><span class="hist-meta">'+meta+'</span></div>'+medalChips(r)+'<div class="series-row" style="margin-top:10px;">'+sh+'</div>'+(r.noter?'<div style="font-size:13px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border);">'+r.noter+'</div>':'')+'</div>';
     }).join('');
-    setupSwipeDelete();
   }).catch(function(){el.innerHTML='<div class="empty">Kunde inte hämta data.</div>';});
 }
 
