@@ -1,14 +1,2388 @@
-{
-  "name": "Pistolskytteappen",
-  "short_name": "Pistolskytte",
-  "description": "Logga dina skytteresultat",
-  "start_url": "/Skytte/",
-  "scope": "/Skytte/",
-  "display": "standalone",
-  "background_color": "#f5f5f3",
-  "theme_color": "#1a1a1a",
-  "icons": [
-    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
-    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png"}
-  ]
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1c1c1e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Skytte">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>Pistolskytteappen</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    :root {
+      --ink: #1a1a1a; --muted: #6b6b6b; --hint: #aaaaaa;
+      --surface: #ffffff; --raised: #f5f5f3; --card: #ffffff;
+      --border: rgba(0,0,0,0.1); --border2: rgba(0,0,0,0.22);
+      --radius: 12px; --rad-sm: 8px;
+      --gold: #C8900A; --gold-bg: #FFF0B0; --gold-text: #5A3500;
+      --silver: #686870; --silver-bg: #E0E0E8; --silver-text: #1A1A28;
+      --bronze: #A83500; --bronze-bg: #FFE0D0; --bronze-text: #4A1000;
+      --blue: #378ADD; --green: #639922;
+      --input-bg: #ffffff;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #ffffff; --muted: #aeaeb2; --hint: #7a7a80;
+        --surface: #1c1c1e; --raised: #0a0a0a; --card: #1e1e20;
+        --border: rgba(255,255,255,0.12); --border2: rgba(255,255,255,0.28);
+        --gold: #F0A800; --gold-bg: #2e1f00; --gold-text: #FFD000;
+        --silver: #a0a0aa; --silver-bg: #1a1a26; --silver-text: #e0e0f0;
+        --bronze: #cc4a18; --bronze-bg: #2e0e00; --bronze-text: #FF8055;
+        --blue: #5aafff; --green: #7ab830;
+        --input-bg: #252528;
+      }
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--raised); color: var(--ink); min-height: 100vh; }
+    #app { max-width: 480px; margin: 0 auto; padding: 0 0 80px 0; background: var(--raised); min-height: 100vh; }
+    .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: var(--surface); border-top: 1px solid var(--border2); display: flex; z-index: 10000; padding-bottom: env(safe-area-inset-bottom); }
+    .bottom-nav button { flex: 1; padding: 12px 4px 10px; font-size: 10px; font-weight: 500; border: none; background: transparent; cursor: pointer; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 3px; transition: color 0.15s; }
+    .bottom-nav button.active { color: var(--blue); }
+    .bottom-nav button svg { width: 22px; height: 22px; }
+    .view { display: none; padding: 16px; }
+    .view.active { display: block; }
+    h2 { font-size: 17px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+    .gren-label { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+    label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 5px; margin-top: 12px; font-weight: 500; }
+    input, select { width: 100%; font-size: 16px; padding: 10px 12px; border: 0.5px solid var(--border2); border-radius: var(--rad-sm); background: var(--input-bg); color: var(--ink); appearance: none; -webkit-appearance: none; }
+    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .btn { width: 100%; margin-top: 14px; padding: 14px; font-size: 16px; font-weight: 600; cursor: pointer; border-radius: var(--rad-sm); border: none; background: var(--ink); color: var(--surface); transition: opacity 0.15s, box-shadow 0.3s, transform 0.3s; }
+    .btn.redo-att-spara { background: #639922 !important; color: #fff !important; box-shadow: 0 0 0 4px rgba(99,153,34,0.3), 0 4px 16px rgba(99,153,34,0.4); transform: scale(1.02); animation: spara-pulse 1.2s ease-in-out infinite; }
+    @keyframes spara-pulse { 0%,100%{box-shadow:0 0 0 4px rgba(99,153,34,0.3),0 4px 16px rgba(99,153,34,0.4)} 50%{box-shadow:0 0 0 8px rgba(99,153,34,0.15),0 4px 24px rgba(99,153,34,0.5)} }
+    .btn:active { opacity: 0.8; }
+    .btn-secondary { background: var(--card); color: var(--ink); border: 0.5px solid var(--border2) !important; margin-top: 8px; }
+    .card { background: var(--card); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 0.5px solid var(--border); }
+    .badge { font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 600; }
+    .badge-traning { background: #1a4a7a; color: #7ab8f5; }
+    .badge-tavling { background: #1a3a10; color: #7ab830; }
+    @media (prefers-color-scheme: light) {
+      .badge-traning { background: #E6F1FB; color: #0C447C; }
+      .badge-tavling { background: #EAF3DE; color: #27500A; }
+    }
+    .score-big { font-size: 32px; font-weight: 700; color: var(--ink); }
+    .score-sub { font-size: 13px; color: var(--muted); }
+    .series-row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .series-chip { font-size: 12px; border-radius: 6px; padding: 4px 9px; color: var(--muted); background: var(--raised); border: 0.5px solid var(--border); font-weight: 500; }
+    .series-chip.guld { background: var(--gold-bg); color: var(--gold-text); border-color: var(--gold); }
+    .series-chip.silver { background: var(--silver-bg); color: var(--silver-text); border-color: var(--silver); }
+    .series-chip.brons { background: var(--bronze-bg); color: var(--bronze-text); border-color: var(--bronze); }
+    .series-chip.perfekt { background: #9333EA; color: #fff; border: none; font-weight: 700; }
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .stat-card { background: var(--card); border-radius: var(--rad-sm); padding: 14px; }
+    .stat-label { font-size: 12px; color: var(--muted); font-weight: 500; }
+    .stat-val { font-size: 26px; font-weight: 700; color: var(--ink); margin-top: 2px; }
+    .stat-sub { font-size: 11px; color: var(--hint); margin-top: 2px; }
+    .filter-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .filter-btn { font-size: 13px; padding: 6px 14px; border-radius: 20px; border: 0.5px solid var(--border2); background: transparent; cursor: pointer; color: var(--muted); font-weight: 500; }
+    .filter-btn.active { background: var(--ink); color: var(--surface); border-color: transparent; }
+    .delete-btn { font-size: 12px; color: var(--hint); border: none; background: none; cursor: pointer; padding: 4px 8px; }
+    .divider { border: none; border-top: 0.5px solid var(--border); margin: 16px 0; }
+    .empty { text-align: center; padding: 3rem 1rem; color: var(--hint); font-size: 15px; }
+    .kb-hint { font-size: 11px; color: var(--hint); margin-top: 8px; text-align: center; }
+    .export-section { background: var(--card); border-radius: var(--radius); padding: 16px; margin-top: 14px; border: 0.5px solid var(--border); }
+    .export-section h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .export-section p { font-size: 13px; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
+    .section-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
+    .serie-block { background: var(--card); border-radius: var(--rad-sm); padding: 12px; margin-bottom: 10px; border: 0.5px solid var(--border); transition: border-color 0.2s; scroll-margin-top: 80px; }
+    .serie-block.active-serie { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(55,138,221,0.15); }
+    .serie-block.guld { border: 1.5px solid var(--gold); background: var(--gold-bg); }
+    .serie-block.silver { border: 1.5px solid var(--silver); background: var(--silver-bg); }
+    .serie-block.brons { border: 1.5px solid var(--bronze); background: var(--bronze-bg); }
+    .serie-block.perfekt {
+      border: 2px solid #9333EA;
+      background: linear-gradient(135deg, rgba(147,51,234,0.12), rgba(192,38,211,0.08));
+      box-shadow: 0 0 18px rgba(147,51,234,0.45);
+      animation: glow-lila 1.8s ease-in-out infinite;
+    }
+    @keyframes glow-lila { 0%,100%{box-shadow:0 0 18px rgba(147,51,234,0.45)} 50%{box-shadow:0 0 32px rgba(192,38,211,0.75)} }
+    .serie-title { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .serie-block.guld .serie-title { color: var(--gold-text); }
+    .serie-block.silver .serie-title { color: var(--silver-text); }
+    .serie-block.brons .serie-title { color: var(--bronze-text); }
+    .serie-block.perfekt .serie-title { color: #7C3AED; }
+    @media (prefers-color-scheme: dark) { .serie-block.perfekt .serie-title { color: #C084FC; } }
+    .medal-tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 700; }
+    .medal-tag.guld { background: #C8900A; color: #fff; }
+    .medal-tag.silver { background: #686870; color: #fff; }
+    .medal-tag.brons { background: #A83500; color: #fff; }
+    .medal-tag.perfekt { background: linear-gradient(90deg,#9333EA,#C026D3); color: #fff; letter-spacing: 0.5px; }
+    .shots-display { display: flex; gap: 6px; margin-bottom: 10px; }
+    .shot-box { flex: 1; height: 52px; border-radius: var(--rad-sm); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--ink); background: var(--card); cursor: pointer; transition: border-color 0.1s, background 0.1s; }
+    .shot-box.active-shot { border: 2px solid var(--blue); background: rgba(55,138,221,0.18); color: var(--blue); box-shadow: 0 0 0 3px rgba(55,138,221,0.15); }
+    .shot-box.is-x { color: var(--blue); font-weight: 800; }
+    .shot-box.empty-slot { border: 0.5px dashed var(--border2); color: var(--hint); }
+    .shot-box.is-perfect { color: #9333EA; font-weight: 800; }
+    .val-buttons { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+    .val-btn { padding: 15px 2px; font-size: 16px; font-weight: 600; border: 1px solid var(--border2); border-radius: var(--rad-sm); background: var(--card); color: var(--ink); cursor: pointer; text-align: center; transition: transform 0.1s, opacity 0.1s; }
+    .val-btn:active { transform: scale(0.88); opacity: 0.7; }
+    .val-btn.val-x { background: rgba(55,138,221,0.15); color: var(--blue); border-color: var(--blue); }
+    .val-btn.val-10 { background: rgba(99,153,34,0.15); color: var(--green); border-color: var(--green); }
+    .val-btn.val-low { color: var(--hint); }
+    .val-btn.val-del { background: var(--raised); color: var(--muted); font-size: 18px; }
+    .totals-bar { background: var(--card); border-radius: var(--rad-sm); padding: 12px 16px; margin-top: 12px; display: flex; justify-content: space-around; border: 0.5px solid var(--border); }
+    .tot-item { text-align: center; }
+    .tot-val { font-size: 24px; font-weight: 700; color: var(--ink); }
+    .tot-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .medal-summary { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+    .ms-chip { font-size: 12px; padding: 3px 10px; border-radius: 10px; font-weight: 600; }
+    .ms-guld { background: var(--gold-bg); color: var(--gold-text); border: 0.5px solid var(--gold); }
+    .ms-silver { background: var(--silver-bg); color: var(--silver-text); border: 0.5px solid var(--silver); }
+    .ms-brons { background: var(--bronze-bg); color: var(--bronze-text); border: 0.5px solid var(--bronze); }
+    .sync-bar { display: flex; align-items: center; gap: 8px; margin-top: 8px; min-height: 20px; font-size: 12px; color: var(--muted); }
+    .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hint); flex-shrink: 0; }
+    .sync-dot.ok { background: var(--green); }
+    .sync-dot.err { background: #D85A30; }
+    .sync-dot.syncing { background: var(--gold); animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .loading { text-align: center; padding: 2rem; color: var(--hint); font-size: 14px; }
+    .cloud-badge { font-size: 10px; padding: 2px 6px; border-radius: 8px; background: rgba(55,138,221,0.15); color: var(--blue); font-weight: 600; margin-left: 6px; vertical-align: middle; }
+    #konfetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; display: none; }
+    .konfetti-bit { position: absolute; width: 8px; height: 8px; border-radius: 2px; animation: fall linear forwards; }
+    @keyframes fall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
+    /* Splash */
+    #splash { position: fixed; top: 0; left: 0; right: 0; bottom: 60px; z-index: 9998; background: var(--raised); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; transition: opacity 0.6s ease; }
+    #splash.splash-out { opacity: 0; pointer-events: none; }
+    #splash-anim { color: var(--ink); overflow: visible; display: block; }
+    .t-ring { fill: none; stroke: currentColor; }
+    .t-r5 { stroke-width: 0.8; stroke-dasharray: 578; stroke-dashoffset: 578; animation: draw-ring 0.68s ease forwards 0s; }
+    .t-r4 { stroke-width: 1; stroke-dasharray: 440; stroke-dashoffset: 440; animation: draw-ring 0.62s ease forwards 0.12s; }
+    .t-r3 { stroke-width: 1.4; stroke-dasharray: 314; stroke-dashoffset: 314; animation: draw-ring 0.56s ease forwards 0.22s; }
+    .t-r2 { stroke-width: 1.9; stroke-dasharray: 201; stroke-dashoffset: 201; animation: draw-ring 0.48s ease forwards 0.30s; }
+    .t-r1 { stroke-width: 2.4; stroke-dasharray: 101; stroke-dashoffset: 101; animation: draw-ring 0.38s ease forwards 0.36s; }
+    .t-bull { fill: currentColor; opacity: 0; animation: sfade 0.3s ease forwards 0.58s; }
+    @keyframes draw-ring { to { stroke-dashoffset: 0; } }
+    @keyframes sfade { to { opacity: 1; } }
+    .s-flash { display: none; }
+    .s-bullet { opacity: 0; animation: s-bullet-fly 0.32s linear forwards 1.46s; }
+    @keyframes s-bullet-fly { 0%{transform:translate(0,0);opacity:1} 80%{opacity:0.8} 100%{transform:translate(-148px,0px);opacity:0} }
+    .s-impact { fill: none; stroke: currentColor; stroke-width: 1.4; opacity: 0; transform-origin: 0px 0px; animation: s-impact-anim 0.55s ease-out forwards 1.78s; }
+    @keyframes s-impact-anim { 0%{transform:scale(0.1);opacity:0.9} 100%{transform:scale(5.5);opacity:0} }
+    .splash-name { font-size: 18px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--ink); opacity: 0; animation: sfade-up 0.5s ease forwards 2.6s; margin-bottom: 8px; order: -1; }
+    @keyframes sfade-up { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:translateY(0)} }
+    .gun-img { }
+    .gun-splash-g image { mix-blend-mode: multiply; }
+    @media (prefers-color-scheme: dark) { .gun-splash-g image { filter: invert(1) brightness(2); mix-blend-mode: screen; } }
+    .app-gun-logo { }
+    @media (prefers-color-scheme: dark) {
+      .gun-img { filter: invert(1) brightness(2); mix-blend-mode: screen; }
+      .app-gun-logo { filter: invert(1) brightness(1.5); mix-blend-mode: screen; }
+    }
+    .app-logo-header { display: flex; align-items: center; gap: 10px; margin-top: 8px; margin-bottom: 4px; }
+    .app-logo-header .logo-name { font-size: 16px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--ink); }
+    .app-logo-header .logo-sub { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; }
+    #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #222; color: #fff; font-size: 14px; font-weight: 500; padding: 12px 22px; border-radius: 40px; z-index: 2000; transition: transform 0.35s cubic-bezier(0.175,0.885,0.32,1.275); white-space: nowrap; pointer-events: none; box-shadow: 0 4px 16px rgba(0,0,0,0.25); }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    #toast.toast-ok { background: #1a3d1a; }
+    #toast.toast-err { background: #3d1a1a; }
+    .mode-toggle-wrap { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+    .mode-toggle { display: flex; border: 0.5px solid var(--border2); border-radius: 20px; overflow: hidden; background: var(--card); }
+    .mode-toggle-btn { padding: 5px 14px; font-size: 12px; font-weight: 600; border: none; background: transparent; cursor: pointer; color: var(--muted); transition: all 0.15s; }
+    .mode-toggle-btn.active { background: var(--ink); color: var(--surface); border-radius: 20px; }
+    .sum-input { width: 100%; font-size: 32px; font-weight: 600; text-align: center; padding: 12px 8px; border: 0.5px solid var(--border2); border-radius: var(--rad-sm); background: var(--raised); color: var(--ink); appearance: none; -webkit-appearance: none; }
+    .sum-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(55,138,221,0.15); }
+    .serie-block.guld .sum-input { border-color: var(--gold); color: var(--gold-text); }
+    .serie-block.silver .sum-input { border-color: var(--silver); color: var(--silver-text); }
+    .serie-block.brons .sum-input { border-color: var(--bronze); color: var(--bronze-text); }
+    .sum-x-block { background: var(--card); border-radius: var(--rad-sm); padding: 12px 16px; border: 0.5px solid var(--border); margin-top: 4px; display: flex; align-items: center; gap: 12px; }
+    .sum-x-label { font-size: 14px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+    .sum-x-input { flex: 1; font-size: 24px; font-weight: 600; text-align: center; padding: 10px; border: 0.5px solid var(--border2); border-radius: var(--rad-sm); background: var(--raised); color: var(--ink); appearance: none; -webkit-appearance: none; }
+    .sum-x-input:focus { outline: none; border-color: var(--blue); }
+    .excel-wrap { overflow-x: auto; margin-top: 4px; border-radius: var(--rad-sm); border: 0.5px solid var(--border2); }
+    .excel-table { border-collapse: collapse; width: 100%; min-width: 340px; font-size: 11px; }
+    .excel-table th { background: var(--raised); color: var(--muted); font-weight: 600; padding: 6px; text-align: center; border-bottom: 1px solid var(--border2); border-right: 0.5px solid var(--border); white-space: nowrap; }
+    .excel-table th:first-child { text-align: left; }
+    .excel-table td { padding: 5px 6px; text-align: center; border-bottom: 0.5px solid var(--border); border-right: 0.5px solid var(--border); color: var(--ink); font-size: 11px; }
+    .excel-table td:first-child { text-align: left; color: var(--muted); font-size: 10px; white-space: nowrap; }
+    .excel-table td.vg { font-weight: 600; color: var(--ink); }
+    .excel-table tr:last-child td { border-bottom: none; }
+    .excel-table td.c-guld { background: var(--gold-bg); color: var(--gold-text); font-weight: 700; border-color: var(--gold); }
+    .excel-table td.c-silver { background: var(--silver-bg); color: var(--silver-text); font-weight: 700; border-color: var(--silver); }
+    .excel-table td.c-brons { background: var(--bronze-bg); color: var(--bronze-text); font-weight: 700; border-color: var(--bronze); }
+    .excel-table td.c-perfekt { background: #9333EA; color: #fff; font-weight: 700; }
+    .excel-table td.c-sum { font-weight: 700; font-size: 12px; }
+    .excel-table td.c-x { color: var(--blue); font-weight: 600; }
+    .excel-table tr:hover td { filter: brightness(0.97); }
+    @keyframes shot-bounce { 0%{transform:scale(1)} 30%{transform:scale(0.82)} 65%{transform:scale(1.12)} 100%{transform:scale(1)} }
+    .shot-box.bounce { animation: shot-bounce 0.28s ease; }
+
+    .hist-score { font-size: 42px; font-weight: 800; color: var(--ink); letter-spacing: -1px; line-height: 1; }
+    .hist-denom { font-size: 16px; font-weight: 500; color: var(--muted); margin-left: 4px; }
+    .hist-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .hist-xs { font-size: 13px; font-weight: 600; color: var(--blue); }
+    .hist-date { font-size: 12px; color: var(--hint); }
+    #firande-banner { position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-120px); background: linear-gradient(135deg,#9333EA,#C026D3); color: #fff; font-size: 18px; font-weight: 800; padding: 14px 28px; border-radius: 40px; box-shadow: 0 4px 24px rgba(147,51,234,0.6); z-index: 1000; transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275); white-space: nowrap; letter-spacing: 0.5px; }
+    #firande-banner.visas { transform: translateX(-50%) translateY(0); }
+    /* Grenväljare */
+    #gren-valj { position: fixed; inset: 0; z-index: 9998; background: var(--raised); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; gap: 16px; }
+    .gren-card { width: 100%; max-width: 380px; background: var(--card); border-radius: var(--radius); padding: 20px 22px; border: 1.5px solid var(--border); cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; display: flex; align-items: center; gap: 16px; }
+    .gren-card:active { opacity: 0.8; }
+    .gren-card:hover { border-color: var(--blue); box-shadow: 0 2px 12px rgba(55,138,221,0.15); }
+    .gren-icon { font-size: 32px; flex-shrink: 0; }
+    .gren-card-title { font-size: 16px; font-weight: 700; color: var(--ink); }
+    .gren-card-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .gren-valj-title { font-size: 22px; font-weight: 800; color: var(--ink); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; display: none; }
+    .gren-valj-sub { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    /* Sektion-rubrik i loggavyn */
+    .moment-header { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; padding: 8px 0 4px; border-bottom: 0.5px solid var(--border); margin-bottom: 8px; margin-top: 8px; }
+
+    @media (prefers-color-scheme: dark) {
+      /* Glow on cards */
+      .card { box-shadow: 0 0 0 0.5px rgba(255,255,255,0.08), 0 2px 12px rgba(0,0,0,0.4) !important; }
+      /* Glow on serie-blocks */
+      .serie-block { box-shadow: 0 0 0 0.5px rgba(255,255,255,0.1); }
+      .serie-block.active-serie { box-shadow: 0 0 0 2px rgba(90,175,255,0.5), 0 0 16px rgba(90,175,255,0.2) !important; }
+      .serie-block.guld { box-shadow: 0 0 12px rgba(240,168,0,0.4) !important; }
+      .serie-block.silver { box-shadow: 0 0 10px rgba(160,160,170,0.3) !important; }
+      .serie-block.brons { box-shadow: 0 0 10px rgba(204,74,24,0.35) !important; }
+      .serie-block.perfekt { box-shadow: 0 0 24px rgba(147,51,234,0.7), 0 0 48px rgba(147,51,234,0.3) !important; }
+      /* Glow on active shot */
+      .shot-box.active-shot { box-shadow: 0 0 0 2px rgba(90,175,255,0.6), 0 0 12px rgba(90,175,255,0.3) !important; }
+      /* Glow on inputs */
+      input:focus, select:focus { box-shadow: 0 0 0 2px rgba(90,175,255,0.4), 0 0 10px rgba(90,175,255,0.2) !important; outline: none; }
+      /* Glow on val-buttons when hovered */
+      .val-btn.val-x { box-shadow: 0 0 8px rgba(90,175,255,0.3); }
+      .val-btn.val-10 { box-shadow: 0 0 8px rgba(122,184,48,0.3); }
+      /* Glow on spara-btn */
+      .btn.redo-att-spara { box-shadow: 0 0 0 4px rgba(99,153,34,0.4), 0 0 24px rgba(99,153,34,0.5) !important; }
+      /* Bottom nav active glow */
+      .bottom-nav button.active { color: var(--blue); text-shadow: 0 0 8px rgba(90,175,255,0.6); }
+      /* Totals bar */
+      .totals-bar { box-shadow: 0 0 0 0.5px rgba(255,255,255,0.1); }
+      /* Gren-cards */
+      .gren-card:hover { box-shadow: 0 0 16px rgba(90,175,255,0.25), 0 0 0 1.5px rgba(90,175,255,0.5) !important; }
+      /* Medals in tags */
+      .medal-tag.guld { box-shadow: 0 0 6px rgba(240,168,0,0.5); }
+      .medal-tag.perfekt { box-shadow: 0 0 8px rgba(147,51,234,0.6); }
+    }
+
+    /* Gästläge */
+    #gast-setup { position: fixed; inset: 0; z-index: 9997; background: var(--raised); display: none; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; gap: 14px; }
+    #gast-setup.active { display: flex; }
+    .gast-title { font-size: 20px; font-weight: 800; color: var(--ink); margin-bottom: 4px; }
+    .gast-sub { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    .gast-name-row { display: flex; align-items: center; gap: 10px; width: 100%; max-width: 380px; }
+    .gast-name-row label { font-size: 13px; color: var(--muted); font-weight: 600; min-width: 60px; }
+    .gast-name-row input { flex: 1; }
+    .gast-antal { display: flex; gap: 8px; margin-bottom: 4px; }
+    .gast-antal-btn { flex: 1; max-width: 70px; padding: 10px; font-size: 18px; font-weight: 700; border: 1.5px solid var(--border2); border-radius: var(--rad-sm); background: var(--card); color: var(--ink); cursor: pointer; text-align: center; }
+    .gast-antal-btn.active { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+
+    /* Gäst-status bar i loggvyn */
+    .gast-bar { background: var(--card); border-radius: var(--rad-sm); padding: 10px 14px; margin-bottom: 12px; border: 1.5px solid var(--blue); display: flex; align-items: center; justify-content: space-between; }
+    .gast-bar-name { font-size: 15px; font-weight: 700; color: var(--ink); }
+    .gast-bar-info { font-size: 12px; color: var(--muted); }
+    .gast-dots { display: flex; gap: 6px; }
+    .gast-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border2); }
+    .gast-dot.done { background: var(--green); }
+    .gast-dot.active { background: var(--blue); }
+
+    /* Export-skärm */
+    #gast-export { position: fixed; inset: 0; z-index: 9997; background: var(--raised); display: none; flex-direction: column; padding: 32px 24px; gap: 12px; overflow-y: auto; }
+    #gast-export.active { display: flex; }
+    .gast-result-card { background: var(--card); border-radius: var(--radius); padding: 16px; border: 0.5px solid var(--border); }
+    .gast-result-name { font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+    .gast-result-score { font-size: 32px; font-weight: 800; color: var(--ink); }
+    .gast-export-btns { display: flex; gap: 8px; margin-top: 10px; }
+    .gast-export-btn { flex: 1; padding: 10px; font-size: 13px; font-weight: 600; border-radius: var(--rad-sm); border: none; cursor: pointer; }
+    .gast-export-mail { background: #378ADD; color: #fff; }
+    .gast-export-wa { background: #25D366; color: #fff; }
+
+
+    /* Användartabbar */
+    #anvandare-bar { display: none; padding: 8px 16px 0; gap: 6px; flex-wrap: wrap; }
+    #anvandare-bar.synlig { display: flex; }
+    .anvandare-tab { padding: 6px 14px; font-size: 13px; font-weight: 600; border: 1.5px solid var(--border2); border-radius: 20px; background: transparent; color: var(--muted); cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+    .anvandare-tab.aktiv { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+    .anvandare-tab.sparat { border-color: var(--green); color: var(--green); }
+    .anvandare-tab.sparat.aktiv { background: var(--green); color: #fff; border-color: var(--green); }
+    .anvandare-tab.lagg-till { border-color: var(--blue); color: var(--blue); background: transparent; }
+
+    /* Gäst-modal */
+    #gast-modal { position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,0.5); display: none; align-items: flex-end; }
+    #gast-modal.open { display: flex; }
+    #gast-modal-inner { background: var(--surface); border-radius: 20px 20px 0 0; padding: 24px; width: 100%; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+    #gast-modal h3 { font-size: 17px; font-weight: 700; color: var(--ink); }
+
+    /* Export-skärm */
+    #gast-export { position: fixed; inset: 0; z-index: 9500; background: var(--raised); display: none; flex-direction: column; padding: 24px; gap: 12px; overflow-y: auto; }
+    #gast-export.open { display: flex; }
+    .gast-res-card { background: var(--card); border-radius: var(--radius); padding: 16px; border: 0.5px solid var(--border); }
+    .gast-res-namn { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .gast-res-score { font-size: 36px; font-weight: 800; color: var(--ink); line-height: 1; }
+    .gast-exp-btns { display: flex; gap: 8px; margin-top: 10px; }
+    .gast-exp-btn { flex: 1; padding: 10px; font-size: 13px; font-weight: 600; border-radius: var(--rad-sm); border: none; cursor: pointer; }
+    .btn-mail { background: #378ADD; color: #fff; }
+    .btn-wa   { background: #25D366; color: #fff; }
+
+
+    /* Namnval-skärm */
+    #namn-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 60px; z-index: 9998; background: var(--raised); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; gap: 16px; }
+    #namn-screen.dold { display: none; }
+    .namn-titel { font-size: 22px; font-weight: 800; letter-spacing: 1px; color: var(--ink); text-align: center; }
+    .namn-sub { font-size: 13px; color: var(--muted); text-align: center; max-width: 300px; line-height: 1.5; }
+    .namn-status { font-size: 13px; text-align: center; min-height: 18px; }
+    .namn-status.ok { color: var(--green); }
+    .namn-status.err { color: #C0392B; }
+    /* Användarchip i header */
+    #anvandare-chip { font-size: 11px; color: var(--muted); padding: 2px 8px; border: 0.5px solid var(--border2); border-radius: 20px; display: none; margin-left: auto; }
+
+    /* Admin-panel */
+    #admin-panel { position: fixed; inset: 0; z-index: 9998; background: var(--raised); display: none; flex-direction: column; overflow-y: auto; }
+    #admin-panel.open { display: flex; }
+    .admin-header { padding: 20px 16px 12px; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; gap: 12px; }
+    .admin-header h2 { font-size: 18px; font-weight: 700; color: var(--ink); margin: 0; flex: 1; }
+    .admin-user-card { background: var(--card); border-radius: var(--rad-sm); padding: 12px 16px; margin: 8px 16px 0; border: 0.5px solid var(--border); display: flex; align-items: center; gap: 12px; }
+    .admin-user-namn { font-size: 15px; font-weight: 600; color: var(--ink); flex: 1; }
+    .admin-user-info { font-size: 12px; color: var(--muted); }
+    .admin-del-btn { background: none; border: 0.5px solid #C0392B; border-radius: 6px; color: #C0392B; font-size: 12px; padding: 4px 10px; cursor: pointer; }
+
+    /* Multi-select historik */
+    .hist-card-wrap { position: relative; margin-bottom: 10px; }
+    .hist-card-wrap .card { margin-bottom: 0; cursor: pointer; transition: box-shadow 0.15s; }
+    .hist-card-wrap.markerad .card { border: 2px solid var(--blue) !important; background: rgba(55,138,221,0.06) !important; box-shadow: none !important; }
+    .hist-checkmark { position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border2); background: var(--surface); display: none; align-items: center; justify-content: center; font-size: 13px; z-index: 10; }
+    .hist-select-lage .hist-checkmark { display: flex; }
+    .hist-card-wrap.markerad .hist-checkmark { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .hist-cb-btn:hover { border-color: var(--blue) !important; }
+
+    /* Action-bar */
+    #hist-action-bar { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 448px; background: var(--ink); color: var(--surface); border-radius: 16px; padding: 10px 16px; display: none; align-items: center; gap: 8px; z-index: 200; box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+    #hist-action-bar.synlig { display: flex; }
+    .hist-action-count { font-size: 14px; font-weight: 700; flex: 1; }
+    .hist-action-btn { background: rgba(255,255,255,0.15); border: none; color: #fff; border-radius: 10px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .hist-action-btn.red { background: rgba(192,57,43,0.8); }
+
+    /* Select-läge-knapp */
+    .hist-select-toggle { font-size: 12px; color: var(--blue); background: none; border: none; cursor: pointer; padding: 0; font-weight: 600; }
+
+    /* Redigera-modal */
+    #redigera-modal { position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,0.5); display: none; align-items: flex-end; }
+    #redigera-modal.open { display: flex; }
+    #redigera-inner { background: var(--surface); border-radius: 20px 20px 0 0; padding: 20px 20px 40px; width: 100%; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; height: 85vh; overflow-y: scroll; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; }
+  </style>
+</head>
+<body>
+
+<!-- Splash screen -->
+<div id="splash">
+  <div class="splash-name" id="splash-title">Pistolskytteappen</div>
+  <svg id="splash-anim" viewBox="-155 -115 310 235" width="290" height="220" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <circle r="92" class="t-ring t-r5"/>
+    <circle r="70" class="t-ring t-r4"/>
+    <circle r="50" class="t-ring t-r3"/>
+    <circle r="32" class="t-ring t-r2"/>
+    <circle r="16" class="t-ring t-r1"/>
+    <circle r="5"  class="t-bull"/>
+    <circle class="s-impact" cx="0" cy="0" r="8"/>
+    <ellipse class="s-bullet" cx="148" cy="0" rx="7" ry="2.5" fill="currentColor"/>
+    <g class="s-flash" transform="translate(148,0)">
+      <path d="M0,-11 L2.5,-3 L11,0 L2.5,3 L0,11 L-2.5,3 L-11,0 L-2.5,-3 Z" fill="#FFD700"/>
+      <circle r="5" fill="white" opacity="0.9"/>
+    </g>
+    <g id="splash-gun-g" class="gun-splash-g" style="opacity:0">
+      <foreignObject x="-223" y="-55" width="446" height="304">
+        <img id="splash-gun-img" xmlns="http://www.w3.org/1999/xhtml"
+          src="data:image/png;base64,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"
+          style="width:446px;height:304px;display:block;"/>
+      </foreignObject>
+    </g>
+  </svg>
+</div>
+
+<!-- Grenväljare -->
+<div id="gren-valj" style="display:none;">
+  <div class="app-logo-header" style="margin-bottom:4px;">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAb4AAAEwCAYAAADINxRBAAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAAAS7klEQVR42u3dfbBcZX0H8O9NQgAhvApjUShYKlrHKQpaR0er1mFsEVJSgiBErTKoMKKCL3UQqyh1ZBBFRKUqLyIoKopCi6DAFEcKBZQK1TEYIGKQyFtMohIQ0j92KZf0bu7uvXv3nuc8n8/MM4S7e/c853fOPt/7nD3nbAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABTtXUluUwYA2uiEJD9Nsn6CBgCt8MEkD/QIO8EHQLEOTXJ1N8TuSnJKH2H3WHtE+QBouo8nWTFAuG2srVDO3uYpAcDIHZhkjyQvSLJPks2G/PpLlbhchyW5rvsXzL3KARTs/UluGdKMbrJ2unKPxtpxRb94Gq/zniRXxoe1QLmOTHL5iEJuonaUTTCz3pj+P2x9eJobE6BpliT5apL7ZjHojJUDGMZnfPv3+bw53QZQqoVJ9kryt0n2Vo56LRvRXzDfVWpgFhyc5IYGzebM+Bow49tqRH29zOYCRkyItNAwDj0+eUR9fcDmAoTepH5h08188I3KNjYXMCIlXw7wfZtvZoNv8Qj7upnNBYzIkQX3/ac238ZN9zO+N42wr3vYXMAMODjJDklWJXlukqcUvj6/tkk3bmyavz/Tx8A/keSXSZ6Z5Oa4GwH0Y79x7+/54/49ls5Rnsfe93OSbN39/7nj2pxxz9tyg8fnjPv3WJLNu//eJMmm49r87s837f7OJhs8Nv7xyf44H4vLoUY5rpvxbcS7RtC/ZyU5psJBa2zczvukcYPURIPXkyYYuOZt8LyxcYPTvA0Gt2zw+/PGPWdsg+fOHffY3AkG1jkT9G+7DZbTq/8b9vWx39lsgscBZuUvg2VJnq6EAP/Psel8ldBTkvx5kj3z+CHUrZNsP0PLvTTJ303xd49LcmL33yckuSPJmYLviVzfAjCxh9L5Lr3VSbZIskuSP0myLsmDSf50hpe/Psmnkryjx+MLk7w0na8vekWSfXs8b2laeH7FVIPvkCTn27cBGj/zXJvkjFmaILUq+JZ3/4IBoN3em+SkNq3QVM+SEnoAdXhR21bI6cEAbMyfCb7kaPsBQDUerDn4vpbkuiQfsx8AFGVlklOSLMrj18M+1v4+ybkb+d0ftK0Y/Z7csjrJAvsOQHF+luQv+nher0vU/iHJN2sLvgPattIAlelnrF8/zQlSMfo51PkC+wxA0Y5TgsGC7yXKBFC0xUowWPA9S5kAivaXkzy+tsfPW/mltv0E33b2GYDW2i+d+4lO5NO1Bh8A5ftWj58f0OPnNyf5dhsLMZ0zfQAof8zvNca/NslXzPgAaJNeN5/+TVtDz4wPoC4fTvKBPsb3sTYXwYwPoB7Hj/t3rxNXbm97Ecz4AOoyNsnYvii9T4QRfAAU59PpfMfe8yZ4bFWSbc34BB9ALd6Q5BzBlzyQZBv7A0DrjdWwkv2c3HKnfQGg9T4i3R93ZZKX2ycAzPZqmfH92P4A0Gr/VtPK9hN899snAFrt1YLviX5unwBorbtqW+F+j+m6pAGgnQ5P8kXBJ/gAapntPbW2lXavToB6fanGlZ7b5/N2TbKnfQSgVV5S40oPct2Gw50A9WZAazjUCVCn39a64oME39VJfm1fAWiFywTf5P46yU5JDrO/AAi+GoLvMWvsLwDFO7PWFZ/qB5tOdAGoc/yvcsYHAIIPAAQfAAg+ABpgUa0r7uQWgDo9mv5vW2nGB4Dx34oDUJqTalxphzoB6nVvkh3M+ACoxZOTHGjGZ8YHUJObkjzXjA+AWuyZZKEZnxkfQG2quXenGR8ASbJa8AFQkwVJrhN8ANTkBUkuEXwA1GTfJGe1eQWd3ALARM5PcqjgE3wANVmVZNu2rZRDnQD0sk13ovM+Mz4zPoDaXJPkxTXP+NbaBwCq8qLupOeiWoPvM/YBgCot7AbgvbOw7Au7y57WUcfp3KLG4U4AHk1yZpJ/T/KtIb/2B5McnuSpw8wvwQfAMP1PksuSLE1yxgC/d2iSZyfZJ8lekzz3liTPmY3gOzXJ0bYxACO0IsnTpvMC070b95okW9oOAIzA2nTuKTot072Ob4HtAMAILB9W5riAHYCm+0GSXYf1YsMIvodsEwBmyDuTvHSYLziM4LvadgFgyK5L5zyUTw77hYcRfFfaPgAMyS+TLE7ywplawNiQXsc1fQBMxwVJDh7Fguap9VCn5ScmuTjJfunc1Xz7bnu/8gA8waokpyX5wKgXPKwZ331Jtqt8I56U5L1mxEDl1iZZneTBbrjdk+SOJHemc/H52bPdwWHN+M5OckzlG/se+3vuTHJ7kvvTuX/fvCS7dNt2ygPFejjJN5N8rfvfoo0N8bVqn9WMVVabC5McOMXf/Zck70iyufEEGunRJCck+VBtg/WgjkxyuuCb0ElJ3t2Cdby5u43PGOJrfjvJ/g1f7zVJfpzk50nuSucQzoLuLPb5mfyGulCK/0ryV8owmBOTXJHON/UuS/JAOsd713YHj9Xdtmbcz9cX2B7u9n1VOncJP7fPwXN9oW1pksNmeN+5sWHrfMEU1uHjBW9jre52hfiC2XP1LA8AHx3SepxnMNUKaLcacqAZ3jQLA8C/ztC6HNWdMRtktaa1zxpqoHlG8ea/ZsTr9E9JLklyt4FXm8Xmu1Sh0vA7qgHrd8k012G8N6RzAwUDu7axdqhhBeoMv9n24XROoJnOOkx2pvAxBnltg7bEcAJ1hl8b1meQy2N+aMDX0jnrHijIyS0KvekG35emsLzPGfirbr4+bpwxJaAgK5Ps2JL9/YF0bmQ+qDOSvGWagYuxvmpzlICCvG0av/uWhq3LOVP4nXcPYT3G0jmhhnq8VwmgbLdl8MM8Tb2B+CDrsHjIy14Yh/9qaHcbMqB8i1Pu53oberQB/b9HOLS6LTJkQDsM8sa/tMHr8fk++v+xEfTjFgHR2ga0xF0teeMvbFD/bxISrWtnGSqgPfr9FoRrC5+9rhlxXx4RFmZ7NXBWJyU6ts/nnVf4ei4f8fLm2rUQfFC20wrv//WzsMy3221a4UdKIPioz0MtWIfZCL5PJfmC3ad41ygBtM8N2fjnG6cWsh5N/YzGZ2RltyMMEdA+p6UdH+w3dR3eJTyc2NJWDnVSqqVKMKNOVgIEHzTLSiWYcR9UAtrIHbspWa9DOsuT7Fr4OjTl/emwmbHdjA8K4Ma8w3OVEhTpECUQfNTlNiUYms8oQZGergSCj7rcUUg/Dyygj9+wOxXp+Uog+KjL8kL6ue9GHrvSZmQaXqwE0D5Hp93X8C1uUD+/G9fFuZbPjA9mXdtvqPz1BvXl23a3Ih2kBIKPdvlN4f3f2A20m3a7tc/a3Yr0j0owMdd6UKqvJnlNwfv1+sLelw6dGePN+GCWPdLS9TrXpgXBBxMp+ZZlKzby2OtsWoboIiUQfLTHHQX3faceP/+OzcqQLVQCwUd7lHpW58oCB6k32t2K9jklEHy0wzMK7PPxSXbs8dj7GtzvV9rdivZmJYB2uCjlXbjbq7+XN7zW6+Ji8NLbpYYMMz7Kt66w/va6cfaKJPs0vO/z7W7Fe1WSQ5VB8FG2TQvq61VJduvx2NNsSkbky0og+CjbzoX087QkL+vxWAkXFzsxol3WKYGr+in7DTy/4fv1svT+XrRS3nvu2NI+S5PsYcYH5Wny506vT3Jvj9D7Y0Ght8Ru1krPSOeWf0Bhmvp1LCdvpF/LCqvxr+JsyDa3EwwjIPim452T9On9Laux1o52hKEEBN8g9ktyxSR9WVNofa8XClW0Rw0lIPj6cXA69wqdbFA5sdDa7icQqmpXGU6g/OA7cgaXe8Aky16V5E2F1/YGYVBdq+rb2l3OQMnB18uXM7NnJC5JsmWSZyf5WZLVac/36H2hBcGNPIDqZnw/UZ4pOdzMp+p2m7cAlBt8Lroe3EEGfi3Jmaa20Ozgs2+Prp7Uo/XvHXduoUT9XHh7hTL15eNCjw2sFHzQPDv28ZxXKNOkrk9yjDIwwfvryDavoOCjRL/o83k3KdWEjuvO8vZWCno4XQmgec5Pfx/Wf0Gp/s8B6dxJZtATHn6Y5OhJXntxOpd0OEGkPe1ybxloniv7fAP/c+V1+ugUBr3p/sFwVpK1wqP49lbDDDTPH/p8A3+vsrocl+TmAQe5a2egH0uER9HtIUMMNNPqAd7Il7Zw/U9Ncus0BrfPjqCPpwmRYtt5bXvDuNaJtrg1ye4D/s6N6Zwoc1uSHyX5RkPW5fVJtk6yWZLd0rk92k5Jdknny22HcVLafUk+kuSTI1yvg5JcYFct0lFJPiP4oHnuTbL9kF/zoSQPJFmR5Dd5/OSQed32uyRz0/lG+C26gbVNN6zmd393bpLNk2zVfc5sujOdw6CzeW9R1w3KC2CI+j3hpbbWtJto2ybltWWGF2iu9xmksj6dzz4Pa/B2so3Ka+8wvECzXVvp4HRRkv0L2D7vESRFNqAAN1YSdgcUuG2uFiTFtaWGFCjHh9OOi6pXJvl8kje2ZLsIk/LacSXvcM7SoVYLk7wwyZ7pXCKwe5px79r7kixPclc6Z4Te2v33F1u8Lb6a5DV2Sfmh49COcN0kySPdtr77nvuO0kw460OO6DAg+JAjw+ZriQCYjpslNcDg7kuynTKY9ZnxAbW4SgkQfEBNVilB0S4RfACDuUcJiravEgAM7ry4MLzUtrykHc3JLUCTuKyhbEVkikOdAFRF8AFNcooSIPiAmjxPCYp2vOADGMzLU9iJEjzBnYIPYHC/V4JinZXOd0MKPoAB7KYERVsn+AAGs3mSXypDsRp/uNN1fEATuZ6vbI3OFjM+oImuUQLM+ACzPuSLGR/QUkcqATNlrhIADfSUJLsm2VkpirUmyX+aigIMxuHOsjUyYxzqBJrqECXAjA+ozYVJFimDjDHjA2qxVAmK1shD1YIPaLKdlADBB9Tk9UmWKEPRzhV8AIPZXwmK9izBBzCYg5L8ThmKdV3TOuSsTqAE9ybZXhmKdWOSvc34APq3qRIUbfcmdUbwASVYkOR8ZSjW1kkWCz6AwbxWCYrWmGv6BB9QiguVoGjOKQGY4qxBK7OtS3KUGR8AtZif5KWCD2AwDpeV7SY7EcDgfEefP17M+ABA8AFtdZASFG3Wbzou+IDS/I0SFO2c2e6Az/iAEi1PsosyFOmaJC+ezQ7MtQ2AQoPvNcpQpJ2TbJXkcjM+gP45s7N8s5Y/PuMDSh00L1WGYv1iNhcu+IBS7aYExdo9ybcEH8BgvqkERdt5thbsMz6gZOckeZ0yFGusmoUCDImTXMr2vST7jHqhDnUCJXu3EhTtDjM+ALO+2ow8h8z4AKiK4APaMGP4ozIU6wrBBzC4eUpQrFckOUHwAQzme0pQtJ+NcmFObgHawkku5bokyX5mfADU4tVJ3jaqhflaIqAtfpVkf2Uo0u1JDjXjAxjMa5WgWLtlhIeqBR/QFlsrQdEeEnwAg9k7yeeVoVjzBR/A4DZTgqL9QfABDOYGJSjaV0axENfxAW3jer6yrUqyrRkfALVYN9MLEHxA24ylc10YZVom+AAGN18JivWiJEcJPoDB7KQERVsp+ACMbTXZws4BQE3OTnK64AOgJtfP1Au7jg9oqwuTLFKGos1IRpnxAW11thIg+ICaXJzkXGVA8AE1Wa4ERVuf5BDBB9C/PypB8YZ+4+q5agq02H8kOSLJAqUo1uok15rxAfTvMiUo2inDfkGXMwA18FVFZRtqVpnxATX4vhIU7W4zPgAzPrM+Mz4Af+Qj+ABohwsEH8BgjlWCog3tkgbTf6AmPusr22FJzjPjA6AWOw7jRdy5BajJiiT7K0OxXjWMF3GoE6iRQ55lGkpmOdQJ1OjrSiA9Acz6MOMDaLGHlaBOgg+o1X8rgeADqMkPlaA4hws+gKlbpQTF2UvwAUzdPUpQnJcJPoCpu18JivNMwQcwdQ8qQZ0EH1CrR5RA8AGA4AMAwQdQvj2UoDjLBR/A1G2rBMW5eBgv4ibVQK0uSbKvMhRlrDEvAlCgdUnmK4PgA6iFryWqMPQSn/EBUFHoCT6gVscrQRGOzQwcmZynrkCFnNTSbHcm2WWmXtyMD6jRXkrQWF+fydBLnNwC1MmJLc1zY5K9R7EgMz4AZtOHupOwvUe1QJ/xATBK9yf5cpK3KwXAaCxJ51CnNpp2d5KPNWkHMOMDavMSJRiKryW5pTuDu6f7/0VwcgtQm58keY4y1JsfTm4BarOLEgzFmwUfQBl8xDMcRwg+gDI8rARDUewX+Qo+oDaXK8FQbFFqx53cAtTInVsqzhAzPgCm6q2CD6AM31WCoXilaSpAORzunL7bkzzdjA/AH/612KHETgs+oPbwOyTJ95ViSpYrAUD5DkpyapIr07nB8u/jRtO92kmm+gA8ZlE617ptkmTLdA4L7pBk2yQLkmyW5Pndx0qeMes0ALPigG6YbpXkyd3/zu2G77ZJtuv+7EnpfMw1J8mmmfrJKb9Nso2yAwAAAAAAADPtfwH/UmHTV/706QAAAABJRU5ErkJggg==" style="width:48px;height:auto;" class="app-gun-logo" id="app-gun-logo"/>
+      <div><div class="logo-name">Pistolskytteappen</div></div>
+    </div>
+  <div class="gren-valj-sub">Välj gren</div>
+  <div class="gren-card" onclick="valjGren('precision')">
+    <div class="gren-icon">🎯</div>
+    <div><div class="gren-card-title">Precision nationellt</div><div class="gren-card-sub">6 serier × 5 skott · 300p · 25m</div></div>
+  </div>
+  <div class="gren-card" onclick="valjGren('snabb')">
+    <div class="gren-icon">⚡</div>
+    <div><div class="gren-card-title">Militär snabbmatch</div><div class="gren-card-sub">12 serier × 5 skott · 600p · 25m</div></div>
+  </div>
+  <div class="gren-card" onclick="valjGren('helmatch')">
+    <div class="gren-icon">🏆</div>
+    <div><div class="gren-card-title">Nationell helmatch</div><div class="gren-card-sub">12 serier × 5 skott · 600p · 25m</div></div>
+  </div>
+
+</div>
+
+  
+</div>
+
+<!-- Namnval-skärm -->
+<div id="namn-screen" class="dold">
+  <div style="margin-bottom:8px;">
+    <div class="namn-titel">🎯 Pistolskytteappen</div>
+  </div>
+  <div class="namn-sub" id="namn-sub-text">Välj ditt namn och en PIN-kod. PIN behövs om du loggar in på en ny enhet.</div>
+  <div style="width:100%;max-width:380px;display:flex;flex-direction:column;gap:10px;">
+    <div><label style="margin-top:0;">Namn</label>
+      <input type="text" id="namn-input" placeholder="Ex: Fredrik" maxlength="30" autocomplete="off">
+    </div>
+    <div id="namn-pin-wrap">
+      <label style="margin-top:0;">PIN-kod (4 siffror)</label>
+      <input type="number" id="namn-pin" placeholder="1234" maxlength="4" min="0" max="9999" autocomplete="off">
+    </div>
+    <button class="btn" id="namn-btn" onclick="valjNamn()">Registrera →</button>
+    <div class="namn-status" id="namn-status"></div>
+  </div>
+</div>
+
+<!-- Admin-panel -->
+<div id="admin-panel">
+  <div class="admin-header">
+    <h2>👑 Admin</h2>
+    <button class="btn btn-secondary" style="margin-top:0;padding:6px 14px;font-size:13px;" onclick="stangAdmin()">Stäng</button>
+    <button class="btn btn-secondary" style="margin-top:0;padding:6px 14px;font-size:12px;" onclick="tilldelaGamlaResultat()">🔗 Tilldela gamla resultat</button>
+    <button class="btn" style="margin-top:0;padding:6px 14px;font-size:12px;" onclick="adminLaggTillAnvandare()">+ Ny användare</button>
+  </div>
+  <div id="admin-content" style="padding-bottom:40px;"></div>
+</div>
+
+<!-- Gäst-modal -->
+<div id="gast-modal" onclick="stangGastModal(event)">
+  <div id="gast-modal-inner">
+    <h3>👥 Lägg till gäst</h3>
+    <div><label style="margin-top:0;">Namn</label>
+      <input type="text" id="gast-modal-namn" placeholder="Gästens namn..." maxlength="20">
+    </div>
+    <div class="row2">
+      <div><label style="margin-top:0;">Typ</label>
+        <select id="gast-modal-typ">
+          <option value="traning">Träning</option>
+          <option value="tavling">Tävling</option>
+        </select>
+      </div>
+      <div><label style="margin-top:0;">Vapengrupp</label>
+        <select id="gast-modal-vg">
+          <option value="A">A</option><option value="A-optics">A optics</option>
+          <option value="B">B</option><option value="C">C</option><option value="R">R</option>
+        </select>
+      </div>
+    </div>
+    <div id="gast-modal-tavling-falt" style="display:none;">
+      <div class="row2">
+        <div><label style="margin-top:0;">Klass</label>
+          <select id="gast-modal-klass">
+            <option>Öppen</option><option>Klass 1</option><option>Klass 2</option><option>Klass 3</option>
+            <option>Junior</option><option>Senior</option><option>Dam</option><option>Veteran Y</option><option>Veteran Ä</option>
+          </select>
+        </div>
+        <div><label style="margin-top:0;">Vapen</label>
+          <input type="text" id="gast-modal-vapen" placeholder="t.ex. CZ 75">
+        </div>
+      </div>
+      <label style="margin-top:8px;">Tävlingsnamn</label>
+      <input type="text" id="gast-modal-tavlingsnamn" placeholder="t.ex. DM Precision">
+    </div>
+    <button class="btn" onclick="laggTillGast()">Lägg till →</button>
+    <button class="btn btn-secondary" style="margin-top:6px;" onclick="stangGastModal()">Avbryt</button>
+  </div>
+</div>
+
+<!-- Gäst-export -->
+<div id="gast-export">
+  <h2 style="margin-bottom:4px;">Alla resultat 🎯</h2>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:8px;">Exportera varje persons resultat</p>
+  <div id="gast-export-lista"></div>
+  <button class="btn btn-secondary" style="margin-top:8px;" onclick="stangGastExport()">Stäng</button>
+</div>
+
+<!-- Historik action-bar -->
+<div id="hist-action-bar">
+  <span class="hist-action-count" id="hist-action-count">0 valda</span>
+  <button class="hist-action-btn" onclick="exporteraMarkerade('mail')">✉️ Mail</button>
+  <button class="hist-action-btn" onclick="exporteraMarkerade('wa')">💬 WA</button>
+  <button class="hist-action-btn red" onclick="raderaMarkerade()">🗑 Radera</button>
+  <button class="hist-action-btn" onclick="avslutaSelectLage()">✕</button>
+</div>
+
+<!-- Redigera-modal -->
+<div id="redigera-modal" onclick="stangRedigera(event)">
+  <div id="redigera-inner">
+    <h3 style="margin:0;">✏️ Redigera resultat</h3>
+    <div class="row2">
+      <div><label style="margin-top:0;">Typ</label>
+        <select id="red-typ"><option value="traning">Träning</option><option value="tavling">Tävling</option></select>
+      </div>
+      <div><label style="margin-top:0;">Datum</label>
+        <input type="date" id="red-datum">
+      </div>
+    </div>
+    <div class="row2">
+      <div><label style="margin-top:0;">Vapengrupp</label>
+        <select id="red-vg">
+          <option value="A">A</option><option value="A-optics">A optics</option>
+          <option value="B">B</option><option value="C">C</option><option value="R">R</option>
+        </select>
+      </div>
+      <div><label style="margin-top:0;">Vapen</label>
+        <input type="text" id="red-vapen" placeholder="t.ex. CZ 75">
+      </div>
+    </div>
+    <div id="red-tavling-falt">
+      <div class="row2">
+        <div><label style="margin-top:0;">Klass</label>
+          <select id="red-klass">
+            <option>Öppen</option><option>Klass 1</option><option>Klass 2</option><option>Klass 3</option>
+            <option>Junior</option><option>Senior</option><option>Dam</option><option>Veteran Y</option><option>Veteran Ä</option>
+          </select>
+        </div>
+        <div><label style="margin-top:0;">Tävlingsnamn</label>
+          <input type="text" id="red-tavlingsnamn" placeholder="t.ex. DM">
+        </div>
+      </div>
+    </div>
+    <div><label style="margin-top:0;">Noter</label>
+      <input type="text" id="red-noter" placeholder="Anteckningar...">
+    </div>
+    <input type="hidden" id="red-id">
+    <button class="btn" onclick="sparaRedigering()">Spara ändringar</button>
+    <button class="btn btn-secondary" style="margin-top:4px;" onclick="stangRedigera()">Avbryt</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+<!-- Konfetti -->
+<div id="konfetti"></div>
+<div id="firande-banner">✨ PERFEKT SERIE!</div>
+
+<div id="app" style="display:none;">
+  <!-- LOGGA -->
+  <div id="view-logga" class="view active">
+    <div class="app-logo-header">
+      <img src="data:image/png;base64,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" style="width:48px;height:auto;" class="app-gun-logo" id="app-gun-logo"/>
+      <div>
+        <div class="logo-name">Pistolskytteappen</div>
+        <div class="logo-sub" id="gren-sub-label">Välj gren</div>
+      </div>
+      <button onclick="byttGren()" style="margin-left:auto;font-size:11px;color:var(--blue);background:none;border:none;cursor:pointer;padding:4px 8px;">Byt gren</button>
+    </div>
+    <div id="anvandare-bar"></div>
+    <div class="row2">
+      <div><label>Typ</label>
+        <select id="typ" onchange="toggleFalt()">
+          <option value="traning">Träning</option>
+          <option value="tavling">Tävling</option>
+        </select>
+      </div>
+      <div><label>Datum</label><input type="date" id="datum"></div>
+    </div>
+    <div id="falt-traning">
+      <div class="row2">
+        <div><label>Vapengrupp</label>
+          <select id="vapengrupp-tr" onchange="renderSerier()">
+            <option value="A">A</option><option value="A-optics">A optics</option><option value="B">B</option><option value="C">C</option><option value="R">R</option>
+          </select>
+        </div>
+        <div><label>Vapen</label><input type="text" id="vapen-tr" placeholder="t.ex. CZ 75"></div>
+      </div>
+    </div>
+    <div id="falt-tavling" style="display:none;">
+      <div class="row3">
+        <div><label>Vapengrupp</label>
+          <select id="vapengrupp-tv" onchange="renderSerier()">
+            <option value="A">A</option><option value="A-optics">A optics</option><option value="B">B</option><option value="C">C</option><option value="R">R</option>
+          </select>
+        </div>
+        <div><label>Klass</label>
+          <select id="klass">
+            <option>Öppen</option><option>Klass 1</option><option>Klass 2</option><option>Klass 3</option>
+            <option>Junior</option><option>Senior</option><option>Dam</option><option>Veteran Y</option><option>Veteran Ä</option>
+          </select>
+        </div>
+        <div><label>Vapen</label><input type="text" id="vapen-tv" placeholder="t.ex. CZ 75"></div>
+      </div>
+      <label>Tävlingsnamn</label>
+      <input type="text" id="tavlingsnamn" placeholder="t.ex. DM Precision">
+    </div>
+    <label>Noteringar</label>
+    <input type="text" id="noter" placeholder="Valfria anteckningar...">
+    <div style="margin-top:16px;">
+      <div class="mode-toggle-wrap">
+        <div class="mode-toggle">
+          <button class="mode-toggle-btn active" id="btn-skott" onclick="setGlobalMode('skott')">Skott</button>
+          <button class="mode-toggle-btn" id="btn-summa" onclick="setGlobalMode('summa')">Summa</button>
+        </div>
+      </div>
+      <div id="serier-container"></div>
+      <div id="summa-x-wrap" style="display:none;">
+        <div class="sum-x-block">
+          <div class="sum-x-label">Innetior (X)</div>
+          <input class="sum-x-input" type="number" id="summa-x-inp" min="0" max="60" placeholder="0" inputmode="numeric" oninput="updateTotals()">
+        </div>
+      </div>
+    </div>
+    <div class="totals-bar">
+      <div class="tot-item"><div class="tot-val" id="tot-x">0</div><div class="tot-label">Innetior (X)</div></div>
+      <div class="tot-item"><div class="tot-val" id="tot-10">0</div><div class="tot-label">Tior (10+X)</div></div>
+      <div class="tot-item"><div class="tot-val" id="tot-sum">0</div><div class="tot-label">Totalt</div></div>
+    </div>
+    <button class="btn" id="spara-btn" onclick="sparaResultat()">Spara resultat</button>
+    <button class="btn btn-secondary" style="margin-top:6px;font-size:13px;" onclick="raderaAllt()">🗑 Radera allt</button>
+    <div class="sync-bar"><div class="sync-dot" id="sync-dot"></div><span id="sync-text"></span></div>
+  </div>
+
+  <!-- HISTORIK -->
+  <div id="view-historik" class="view">
+    <h2 style="margin-top:8px;">Historik <span class="cloud-badge">Moln</span></h2>
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="setFilter('alla',this)">Alla</button>
+      <button class="filter-btn" onclick="setFilter('precision',this)">Precision</button>
+      <button class="filter-btn" onclick="setFilter('snabb',this)">Milsnabb</button>
+      <button class="filter-btn" onclick="setFilter('helmatch',this)">Helmatch</button>
+      <button class="filter-btn" onclick="setFilter('gast',this)">👥 Gäster</button>
+    </div>
+    <div id="historik-list"><div class="loading">Laddar...</div></div>
+  </div>
+
+  <!-- STATISTIK -->
+  <div id="view-statistik" class="view">
+    <h2 style="margin-top:8px;">Statistik <span class="cloud-badge">Moln</span></h2>
+    <div class="filter-row" style="margin-bottom:12px;">
+      <button class="filter-btn active" id="stat-btn-alla" onclick="setStatFilter('alla',this)">Alla</button>
+      <button class="filter-btn" id="stat-btn-precision" onclick="setStatFilter('precision',this)">Precision</button>
+      <button class="filter-btn" id="stat-btn-snabb" onclick="setStatFilter('snabb',this)">Milsnabb</button>
+      <button class="filter-btn" id="stat-btn-helmatch" onclick="setStatFilter('helmatch',this)">Helmatch</button>
+    </div>
+    <div id="statistik-content"><div class="loading">Laddar...</div></div>
+  </div>
+
+  <!-- INSTÄLLNINGAR -->
+  <div id="view-installningar" class="view">
+    <h2 style="margin-top:8px;">Inställningar</h2>
+    <div id="admin-btn-wrap" style="display:none;margin-bottom:8px;"><button class="btn" style="background:linear-gradient(135deg,#9333EA,#C026D3);color:#fff;" onclick="oppnaAdmin()">👑 Admin-panel</button></div>
+
+    <div class="export-section">
+      <h3>Tema</h3>
+      <p>Välj utseende för appen.</p>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button id="tema-btn-light" class="btn btn-secondary" style="margin-top:0;flex:1;" onclick="setAppTheme('light')">☀️ Ljust</button>
+        <button id="tema-btn-dark"  class="btn btn-secondary" style="margin-top:0;flex:1;" onclick="setAppTheme('dark')">🌙 Mörkt</button>
+        <button id="tema-btn-auto"  class="btn btn-secondary" style="margin-top:0;flex:1;" onclick="setAppTheme('auto')">Auto</button>
+      </div>
+    </div>
+
+    <div class="export-section">
+      <h3>Supabase-molnlagring</h3>
+      <p>Data sparas automatiskt i molnet på alla enheter.</p>
+      <button class="btn btn-secondary" onclick="testSupabase()">Testa anslutning</button>
+      <div id="supabase-test" style="margin-top:8px;font-size:13px;"></div>
+    </div>
+    <div class="export-section">
+      <h3>Exportera data</h3>
+      <button class="btn btn-secondary" onclick="exportData()">Exportera till JSON</button>
+    </div>
+    <div class="export-section">
+      <h3>Importera data</h3>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(this)">
+      <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">Välj JSON-fil</button>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="active" onclick="navLogga(this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
+    Logga
+  </button>
+  <button onclick="switchView('historik',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Historik
+  </button>
+  <button onclick="switchView('statistik',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Statistik
+  </button>
+  <button onclick="switchView('installningar',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Inställningar
+  </button>
+</nav>
+
+<script>
+var SB_URL='https://hpwkipddtgbwnaqhxulp.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhwd2tpcGRkdGdid25hcWh4dWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3NjQzNzYsImV4cCI6MjA5MjM0MDM3Nn0.lgDgZFH_212DHs4hiAoXP5LB6W7yy_uRTtcoR_dFkQk';
+
+// Gren-konfiguration
+var GRENKONFIG = {
+  precision: {
+    namn: 'Precision nationellt', sub: 'Precision · 25m · 30 skott',
+    maxPerSerie: 50, skottPerSerie: 5, antalSerier: 6, maxTotal: 300, harX: true,
+    harMedalj: 'serie', // medalj per serie
+    krav: {A:{brons:32,silver:38,guld:43},'A-optics':{brons:32,silver:38,guld:43},B:{brons:33,silver:39,guld:45},C:{brons:34,silver:40,guld:46},R:{brons:32,silver:38,guld:43}},
+    moment: null
+  },
+  snabb: {
+    namn: 'Militär snabbmatch', sub: 'Snabbmatch · 25m · 60 skott',
+    maxPerSerie: 50, skottPerSerie: 5, antalSerier: 12, maxTotal: 600, harX: true,
+    harMedalj: 'total',
+    krav: {A:{brons:377,silver:454,guld:515},'A-optics':{brons:377,silver:454,guld:515},B:{brons:391,silver:472,guld:543},C:{brons:404,silver:481,guld:550},R:{brons:388,silver:467,guld:532}},
+    moment: [
+      {namn:'Moment 1 – 10 sek', serier:[0,1,2,3]},
+      {namn:'Moment 2 – 8 sek', serier:[4,5,6,7]},
+      {namn:'Moment 3 – 6 sek', serier:[8,9,10,11]}
+    ]
+  },
+  helmatch: {
+    namn: 'Nationell helmatch', sub: 'Nationell helmatch · 25m · 60 skott',
+    maxPerSerie: 50, skottPerSerie: 5, antalSerier: 12, maxTotal: 600, harX: true,
+    harMedalj: null,
+    krav: null,
+    moment: [
+      {namn:'Precision – 5 min', serier:[0,1,2,3], harX: true},
+      {namn:'Duell – 5×3 sek', serier:[4,5,6,7], harX: true},
+      {namn:'Figurskjutning – 18/16/14/12 sek', serier:[8,9,10,11], harX: false}
+    ]
+  }
+};
+
+function sb(path,opts){var h={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'};if(opts&&opts.extraHeaders)Object.assign(h,opts.extraHeaders);return fetch(SB_URL+'/rest/v1/'+path,Object.assign({headers:h},opts||{}));}
+function getMedalj(sum,vg,gren){var k=GRENKONFIG[gren]&&GRENKONFIG[gren].krav?GRENKONFIG[gren].krav[vg]:null;if(!k)return null;if(sum>=k.guld)return'guld';if(sum>=k.silver)return'silver';if(sum>=k.brons)return'brons';return null;}
+function sortVal(v){return v===null?-1:v==='X'?11:v;}
+function sortShots(arr){return[...arr].sort(function(a,b){return sortVal(b)-sortVal(a);});}
+function shotNumeric(v){return v===null?0:v==='X'?10:v;}
+function shotDisplay(v){return v===null?'':v==='X'?'X':String(v);}
+
+
+var aktGren='precision';
+var filterTyp='alla';
+var shots=[];
+var sumVals=[];
+var sumXVals=[]; // X per serie i summa-läge
+var globalMode='skott';
+var activeSerie=0,activeShot=0;
+var perfektaCelebrerade={};
+
+function initShots(){
+  var n=GRENKONFIG[aktGren].antalSerier;
+  var s=GRENKONFIG[aktGren].skottPerSerie;
+  shots=Array.from({length:n},function(){return Array(s).fill(null);});
+  sumVals=Array(n).fill(null);
+  activeSerie=0;activeShot=0;perfektaCelebrerade={};
 }
+
+function valjGren(gren){
+  aktGren=gren;
+  document.getElementById('gren-valj').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('bottom-nav').style.display='flex';
+  var k=GRENKONFIG[gren];
+  document.getElementById('gren-sub-label').textContent=k.sub;
+  document.getElementById('tot-sum').textContent='0 / '+k.maxTotal;
+  initShots();
+  // Initialisera session för "mig" om sessions är tomma
+  if(sessions.length===0){
+    sessions=[nySess('Mig','A','traning','','','')];
+    aktivSessIdx=0;
+  } else {
+    // Återställ shots-state för aktiv session vid grenbyte
+    sessions[aktivSessIdx].shots=null;
+    sessions[aktivSessIdx].sumVals=null;
+  }
+  document.getElementById('datum').value=new Date().toISOString().split('T')[0];
+  renderTabbbar();
+  renderSerier();
+}
+
+function byttGren(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('gren-valj').style.display='flex';
+  document.getElementById('bottom-nav').style.display='flex';
+}
+
+function getVapengrupp(){return document.getElementById(document.getElementById('typ').value==='traning'?'vapengrupp-tr':'vapengrupp-tv').value;}
+function toggleFalt(){var tr=document.getElementById('typ').value==='traning';document.getElementById('falt-traning').style.display=tr?'':'none';document.getElementById('falt-tavling').style.display=tr?'none':'';renderSerier();}
+
+function setGlobalMode(m){
+  globalMode=m;
+  document.getElementById('btn-skott').className='mode-toggle-btn'+(m==='skott'?' active':'');
+  document.getElementById('btn-summa').className='mode-toggle-btn'+(m==='summa'?' active':'');
+  var k=GRENKONFIG[aktGren];
+  var grenHarX=k.harX||( k.moment&&k.moment.some(function(mom){return mom.harX!==false;}));
+  document.getElementById('summa-x-wrap').style.display='none'; // Replaced by per-serie X inputs
+  renderSerier();
+}
+
+function navLogga(btn){
+  avslutaSelectLage();
+  document.querySelectorAll('.bottom-nav button').forEach(function(el){el.classList.remove('active');});
+  if(btn) btn.classList.add('active');
+  document.getElementById('namn-screen').classList.add('dold');
+  if(aktGren){
+    // Gren vald — visa logga-vyn
+    document.getElementById('app').style.display='block';
+    document.getElementById('gren-valj').style.display='none';
+    document.querySelectorAll('.view').forEach(function(el){el.classList.remove('active');});
+    document.getElementById('view-logga').classList.add('active');
+  } else {
+    // Ingen gren — visa grenväljaren
+    document.getElementById('app').style.display='none';
+    document.getElementById('gren-valj').style.display='flex';
+  }
+}
+
+function switchView(v,btn){
+  document.getElementById('namn-screen').classList.add('dold');
+  document.getElementById('gren-valj').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.querySelectorAll('.view').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.bottom-nav button').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('view-'+v).classList.add('active');
+  if(btn) btn.classList.add('active');
+  // Rensa markeringar när man lämnar historik
+  if(v !== 'historik') avslutaSelectLage();
+  if(v==='historik') renderHistorik();
+  if(v==='statistik') renderStatistik();
+}
+function setFilter(f,el){filterTyp=f;document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});el.classList.add('active');renderHistorik();}
+
+function firandePerfekt(){
+  var banner=document.getElementById('firande-banner');
+  var kon=document.getElementById('konfetti');
+  banner.classList.add('visas');
+  kon.style.display='block';kon.innerHTML='';
+  var farger=['#9333EA','#C026D3','#7C3AED','#E879F9','#A855F7','#DB2777','#6D28D9'];
+  for(var i=0;i<80;i++){
+    var bit=document.createElement('div');bit.className='konfetti-bit';
+    bit.style.left=Math.random()*100+'%';
+    bit.style.background=farger[Math.floor(Math.random()*farger.length)];
+    bit.style.animationDuration=(1.2+Math.random()*2)+'s';
+    bit.style.animationDelay=(Math.random()*0.6)+'s';
+    bit.style.borderRadius=Math.random()>0.5?'50%':'2px';
+    bit.style.width=(6+Math.random()*8)+'px';
+    bit.style.height=(6+Math.random()*8)+'px';
+    kon.appendChild(bit);
+  }
+  setTimeout(function(){banner.classList.remove('visas');setTimeout(function(){kon.style.display='none';kon.innerHTML='';},500);},2500);
+}
+
+function getSerieSum(s){
+  if(globalMode==='summa')return sumVals[s];
+  var arr=shots[s];if(!arr)return null;
+  var f=arr.filter(function(v){return v!==null;}).length;
+  return f>0?arr.reduce(function(a,v){return a+shotNumeric(v);},0):null;
+}
+
+function serieHarX(serieIdx){
+  var k=GRENKONFIG[aktGren];
+  if(!k.harX)return false;
+  if(!k.moment)return true;
+  for(var i=0;i<k.moment.length;i++){
+    var m=k.moment[i];
+    if(m.serier.indexOf(serieIdx)>=0){
+      return m.harX!==undefined?m.harX:true;
+    }
+  }
+  return true;
+}
+
+// Apply dark mode filter to app gun logo
+(function(){
+  function applyGunFilter(){
+    var logo = document.getElementById('app-gun-logo');
+    if(!logo) return;
+    var isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    logo.style.filter = isDark ? 'invert(1)' : '';
+  }
+  if(window.matchMedia){
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyGunFilter);
+  }
+  setTimeout(applyGunFilter, 100);
+})();
+
+function renderSerier(){
+  var con=document.getElementById('serier-container');
+  var k=GRENKONFIG[aktGren];
+  var vg=getVapengrupp();
+  var html='';
+  var maxP=k.maxPerSerie;
+
+  if(k.moment){
+    for(var mi=0;mi<k.moment.length;mi++){
+      var mom=k.moment[mi];
+      html+='<div class="moment-header">'+mom.namn+'</div>';
+      if(globalMode==='summa'){
+        // 2x2 grid för summa-läge
+        html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">';
+        for(var si=0;si<mom.serier.length;si++){
+          html+=renderSerieBlock(mom.serier[si],vg,k,maxP);
+        }
+        html+='</div>';
+      } else {
+        for(var si=0;si<mom.serier.length;si++){
+          html+=renderSerieBlock(mom.serier[si],vg,k,maxP);
+        }
+      }
+    }
+  } else {
+    for(var s=0;s<k.antalSerier;s++){
+      html+=renderSerieBlock(s,vg,k,maxP);
+    }
+  }
+  con.innerHTML=html;
+  updateTotals();
+  renderTabbbar();
+  if(globalMode==='skott'){
+    setTimeout(function(){
+      var el=document.getElementById('serie-'+activeSerie);
+      if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});
+    },80);
+  }
+}
+
+function renderSerieBlock(s,vg,k,maxP){
+  var isActive=s===activeSerie&&globalMode==='skott';
+  var sum=getSerieSum(s);
+  var sv=shots[s]||[];
+  var filled=globalMode==='skott'?sv.filter(function(v){return v!==null;}).length:(sum!==null?k.skottPerSerie:0);
+  var allFilled=filled===k.skottPerSerie;
+  var xs=serieHarX(s)&&globalMode==='skott'?sv.filter(function(v){return v==='X';}).length:0;
+  var isPerfekt=allFilled&&sum===maxP;
+
+  // Only show medal when all shots filled
+  var medal=null;
+  if(allFilled&&k.harMedalj==='serie'&&!isPerfekt){
+    medal=getMedalj(sum,vg,aktGren);
+  }
+
+  var blockCls='serie-block';
+  if(isPerfekt)blockCls+=' perfekt';
+  else if(medal)blockCls+=' '+medal;
+  else if(isActive)blockCls+=' active-serie';
+
+  var medalTag='';
+  if(isPerfekt)medalTag='<span class="medal-tag perfekt">'+maxP+'p ★</span>';
+  else if(medal)medalTag='<span class="medal-tag '+medal+'">'+medal.charAt(0).toUpperCase()+medal.slice(1)+'</span>';
+  var summaryHtml=sum!==null?'<span style="font-weight:600;">'+sum+'p'+(xs?' · '+xs+'X':'')+' '+medalTag+'</span>':'';
+
+  var bodyHtml='';
+  if(globalMode==='skott'){
+    var shotsHtml='';
+    for(var i=0;i<k.skottPerSerie;i++){
+      var val=sv[i]||null,isAct=isActive&&i===activeShot,cls='shot-box';
+      if(isAct)cls+=' active-shot';
+      else if(val===null)cls+=' empty-slot';
+      if(val==='X'&&!isAct)cls+=' is-x';
+      if(isPerfekt&&!isAct)cls+=' is-perfect';
+      shotsHtml+='<div class="'+cls+'" onclick="clickShot('+s+','+i+')">'+shotDisplay(val)+'</div>';
+    }
+    bodyHtml='<div class="shots-display">'+shotsHtml+'</div>';
+    if(isActive){
+      var hasX=serieHarX(s);
+      var vals=hasX?['X','10','9','8','7','6','5','4','3','2','1','0']:['10','9','8','7','6','5','4','3','2','1','0'];
+      bodyHtml+='<div class="val-buttons">';
+      vals.forEach(function(v){var c='val-btn';if(v==='X')c+=' val-x';else if(v==='10')c+=' val-10';else if(parseInt(v)<5)c+=' val-low';bodyHtml+='<div class="'+c+'" onclick="registerVal(\'' + v + '\')">'+v+'</div>';});
+      bodyHtml+='<div class="val-btn val-del" onclick="clearActiveShot()">&#9003;</div></div>';
+      bodyHtml+='<div class="kb-hint">'+( hasX?'- = X &nbsp;·&nbsp; ':'')+' + = 10 &nbsp;·&nbsp; 0–9 = valör</div>';
+    }
+  } else {
+    var cv=sumVals[s]!==null?sumVals[s]:'';
+    var cx=sumXVals[s]||0;
+    var hasX2=serieHarX(s);
+    bodyHtml='<input class="sum-input" type="number" min="0" max="'+maxP+'" placeholder="0–'+maxP+'" value="'+cv+'" inputmode="numeric" id="sum-inp-'+s+'" oninput="onSumInput('+s+',this)">';
+    if(hasX2) bodyHtml+='<div style="display:flex;align-items:center;gap:8px;margin-top:6px;"><label style="font-size:12px;color:var(--muted);margin:0;">Antal X:</label><input class="sum-input" style="width:80px;font-size:20px;" type="number" min="0" max="'+k.skottPerSerie+'" placeholder="0" value="'+cx+'" inputmode="numeric" id="sum-x-'+s+'" oninput="onSumXInput('+s+',this)"></div>';
+  }
+  return '<div class="'+blockCls+'" id="serie-'+s+'"><div class="serie-title"><span>Serie '+(s+1)+'</span>'+summaryHtml+'</div>'+bodyHtml+'</div>';
+}
+
+function onSumInput(s,inp){
+  var k=GRENKONFIG[aktGren];
+  var v=parseInt(inp.value);
+  sumVals[s]=isNaN(v)?null:Math.min(k.maxPerSerie,Math.max(0,v));
+  if(sumVals[s]!==null)inp.value=sumVals[s];
+  var vg=getVapengrupp();
+  var isPerfekt=sumVals[s]===k.maxPerSerie;
+  var medal=isPerfekt?'perfekt':(k.harMedalj==='serie'?getMedalj(sumVals[s],vg,aktGren):null);
+  if(isPerfekt&&!perfektaCelebrerade[s]){perfektaCelebrerade[s]=true;setTimeout(firandePerfekt,200);}
+  var block=document.getElementById('serie-'+s);
+  if(block){
+    block.className='serie-block'+(medal?' '+medal:'');
+    var medalTag=medal?'<span class="medal-tag '+medal+'">'+(medal==='perfekt'?k.maxPerSerie+'p ★':medal.charAt(0).toUpperCase()+medal.slice(1))+'</span>':'';
+    var sumTxt=sumVals[s]!==null?'<span style="font-weight:600;">'+sumVals[s]+'p '+medalTag+'</span>':'';
+    block.querySelector('.serie-title').innerHTML='<span>Serie '+(s+1)+'</span>'+sumTxt;
+  }
+  updateTotals();
+  // Auto-hoppa till nästa serie efter kort fördröjning
+  if(sumVals[s]!==null){
+    clearTimeout(window._sumJump);
+    if(s < GRENKONFIG[aktGren].antalSerier-1){
+      window._sumJump=setTimeout(function(){
+        var next=document.getElementById('sum-inp-'+(s+1));
+        if(next){next.focus();next.select();next.scrollIntoView({behavior:'smooth',block:'nearest'});}
+      },600);
+    } else {
+      // Sista serien — hoppa till spara
+      window._sumJump=setTimeout(highlightaSpara, 600);
+    }
+  }
+}
+
+function clickShot(s,i){activeSerie=s;activeShot=i;renderSerier();}
+
+function raderaAllt(){
+  if(!confirm('Radera alla inlagda skott?')) return;
+  initShots();
+  sumVals=Array(GRENKONFIG[aktGren].antalSerier).fill(null);
+  sumXVals=Array(GRENKONFIG[aktGren].antalSerier).fill(0);
+  perfektaCelebrerade={};
+  document.getElementById('noter').value='';
+  renderSerier();
+  toast('Allt raderat','ok');
+}
+
+function highlightaSpara(){
+  var btn=document.getElementById('spara-btn');
+  if(!btn)return;
+  btn.classList.add('redo-att-spara');
+  btn.scrollIntoView({behavior:'smooth',block:'center'});
+  setTimeout(function(){btn.classList.remove('redo-att-spara');},4000);
+}
+
+function insertAndSort(s,slot,val){
+  var k=GRENKONFIG[aktGren];
+  shots[s][slot]=val;shots[s]=sortShots(shots[s]);
+  var f=shots[s].filter(function(v){return v!==null;}).length;
+  var sum=shots[s].reduce(function(a,v){return a+shotNumeric(v);},0);
+  if(f===k.skottPerSerie&&sum===k.maxPerSerie&&!perfektaCelebrerade[s]){perfektaCelebrerade[s]=true;setTimeout(firandePerfekt,200);}
+  var nxt=shots[s].findIndex(function(v){return v===null;});
+  if(nxt!==-1)activeShot=nxt;
+  else if(activeSerie<k.antalSerier-1){
+    activeSerie++;
+    activeShot=shots[activeSerie].findIndex(function(v){return v===null;});
+    if(activeShot===-1)activeShot=0;
+    setTimeout(function(){var el=document.getElementById('serie-'+activeSerie);if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});},80);
+  } else {
+    // Alla serier klara — highlighta spara-knappen
+    setTimeout(highlightaSpara, 200);
+  }
+}
+
+function registerVal(v){
+  insertAndSort(activeSerie,activeShot,v==='X'?'X':parseInt(v));
+  renderSerier();
+  setTimeout(function(){
+    var boxes=document.querySelectorAll('#serie-'+activeSerie+' .shot-box');
+    var filled=shots[activeSerie].filter(function(x){return x!==null;}).length;
+    if(filled>0&&filled<=shots[activeSerie].length){var t=boxes[filled-1];if(t){t.classList.add('bounce');setTimeout(function(){t.classList.remove('bounce');},300);}}
+  },20);
+}
+
+function clearActiveShot(){
+  var k=GRENKONFIG[aktGren];
+  var sum=shots[activeSerie].reduce(function(a,v){return a+shotNumeric(v);},0);
+  if(sum<k.maxPerSerie)perfektaCelebrerade[activeSerie]=false;
+  shots[activeSerie][activeShot]=null;shots[activeSerie]=sortShots(shots[activeSerie]);renderSerier();
+}
+
+function updateTotals(){
+  var k=GRENKONFIG[aktGren];
+  var total=0,xs=0,tens=0;
+  for(var s=0;s<k.antalSerier;s++){var sv=getSerieSum(s);if(sv!==null)total+=sv;}
+  if(globalMode==='skott'){
+    var all=shots.flat(),f=all.filter(function(v){return v!==null;});
+    xs=f.filter(function(v){return v==='X';}).length;
+    tens=f.filter(function(v){return v==='X'||v===10;}).length;
+  } else {
+    xs=sumXVals.reduce(function(a,v){return a+(v||0);},0);tens=xs;
+  }
+  document.getElementById('tot-x').textContent=xs;
+  document.getElementById('tot-10').textContent=tens;
+  document.getElementById('tot-sum').textContent=total+'p / '+k.maxTotal+'p';
+}
+
+document.addEventListener('keydown',function(e){
+  if(!document.getElementById('view-logga').classList.contains('active')||globalMode!=='skott')return;
+
+  // Enter sparar om spara-knappen är highlightad
+  if(e.key==='Enter'){
+    var btn=document.getElementById('spara-btn');
+    if(btn&&btn.classList.contains('redo-att-spara')){
+      e.preventDefault();
+      sparaResultat();
+      return;
+    }
+  }
+
+  var tag=document.activeElement.tagName.toLowerCase();
+  var isNumpad = e.code&&e.code.startsWith('Numpad');
+
+  // Numpad-knappar: lämna fokus från input/select och registrera direkt
+  var numpadDigit = null;
+  if(e.code==='Numpad0'||e.key==='0'&&isNumpad) numpadDigit='0';
+  else if(e.code==='Numpad1'||e.key==='1'&&isNumpad) numpadDigit='1';
+  else if(e.code==='Numpad2'||e.key==='2'&&isNumpad) numpadDigit='2';
+  else if(e.code==='Numpad3'||e.key==='3'&&isNumpad) numpadDigit='3';
+  else if(e.code==='Numpad4'||e.key==='4'&&isNumpad) numpadDigit='4';
+  else if(e.code==='Numpad5'||e.key==='5'&&isNumpad) numpadDigit='5';
+  else if(e.code==='Numpad6'||e.key==='6'&&isNumpad) numpadDigit='6';
+  else if(e.code==='Numpad7'||e.key==='7'&&isNumpad) numpadDigit='7';
+  else if(e.code==='Numpad8'||e.key==='8'&&isNumpad) numpadDigit='8';
+  else if(e.code==='Numpad9'||e.key==='9'&&isNumpad) numpadDigit='9';
+  else if(e.code==='NumpadSubtract') numpadDigit='-';
+  else if(e.code==='NumpadAdd') numpadDigit='+';
+  else if(e.code==='NumpadDecimal'||e.code==='NumpadDelete') numpadDigit='del';
+
+  if(numpadDigit!==null){
+    e.preventDefault();
+    if(document.activeElement&&tag==='input'||tag==='select'){
+      document.activeElement.blur();
+    }
+    var hasX=serieHarX(activeSerie);
+    if(numpadDigit==='-'&&hasX){registerVal('X');return;}
+    if(numpadDigit==='+'){ registerVal('10');return;}
+    if(numpadDigit==='del'){clearActiveShot();return;}
+    if(numpadDigit>='0'&&numpadDigit<='9'){registerVal(numpadDigit);return;}
+    return;
+  }
+
+  // Vanliga tangenter — kräver att inget input/select är fokuserat
+  if(tag==='input'||tag==='select')return;
+  var hasX2=serieHarX(activeSerie);
+  if(e.key==='-'&&hasX2){e.preventDefault();registerVal('X');return;}
+  if(e.key==='+'||e.key==='='){e.preventDefault();registerVal('10');return;}
+  if(e.key==='Backspace'){e.preventDefault();clearActiveShot();return;}
+  if(e.key>='0'&&e.key<='9'){e.preventDefault();registerVal(e.key);return;}
+  if(e.key==='ArrowRight'){e.preventDefault();if(activeShot<GRENKONFIG[aktGren].skottPerSerie-1)activeShot++;renderSerier();return;}
+  if(e.key==='ArrowLeft'){e.preventDefault();if(activeShot>0)activeShot--;renderSerier();return;}
+  if(e.key==='ArrowDown'){e.preventDefault();if(activeSerie<GRENKONFIG[aktGren].antalSerier-1)activeSerie++;renderSerier();return;}
+  if(e.key==='ArrowUp'){e.preventDefault();if(activeSerie>0)activeSerie--;renderSerier();return;}
+});
+
+function setSync(state,text){document.getElementById('sync-dot').className='sync-dot '+state;document.getElementById('sync-text').textContent=text;}
+function setAppTheme(t){
+  localStorage.setItem('app_theme', t);
+  applyAppTheme(t);
+  // Update button states
+  ['light','dark','auto'].forEach(function(n){
+    var b=document.getElementById('tema-btn-'+n);
+    if(!b)return;
+    b.style.background = n===t ? 'var(--ink)' : 'var(--card)';
+    b.style.color = n===t ? 'var(--surface)' : 'var(--ink)';
+  });
+}
+
+function applyAppTheme(t){
+  var isDark = t==='dark' || (t==='auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  var style = document.getElementById('app-theme-override');
+  if(!style){ style=document.createElement('style'); style.id='app-theme-override'; document.head.appendChild(style); }
+
+  // Set color-scheme on html element — this overrides @media (prefers-color-scheme)
+  var htmlEl = document.documentElement;
+
+  if(t==='light'){
+    htmlEl.style.colorScheme = 'light';
+    document.body.style.colorScheme = 'light';
+    style.textContent = ':root{--ink:#1a1a1a!important;--muted:#6b6b6b!important;--hint:#aaaaaa!important;--surface:#ffffff!important;--raised:#f5f5f3!important;--card:#ffffff!important;--border:rgba(0,0,0,0.1)!important;--border2:rgba(0,0,0,0.22)!important;--gold:#C8900A!important;--gold-bg:#FFF0B0!important;--gold-text:#5A3500!important;--silver:#686870!important;--silver-bg:#E0E0E8!important;--silver-text:#1A1A28!important;--bronze:#A83500!important;--bronze-bg:#FFE0D0!important;--bronze-text:#4A1000!important;--blue:#378ADD!important;--green:#639922!important;--input-bg:#ffffff!important;}'
+      + '@media (prefers-color-scheme: dark){:root{--ink:#1a1a1a!important;--muted:#6b6b6b!important;--hint:#aaaaaa!important;--surface:#ffffff!important;--raised:#f5f5f3!important;--card:#ffffff!important;--border:rgba(0,0,0,0.1)!important;--border2:rgba(0,0,0,0.22)!important;--gold:#C8900A!important;--gold-bg:#FFF0B0!important;--gold-text:#5A3500!important;--silver:#686870!important;--silver-bg:#E0E0E8!important;--silver-text:#1A1A28!important;--bronze:#A83500!important;--bronze-bg:#FFE0D0!important;--bronze-text:#4A1000!important;--blue:#378ADD!important;--green:#639922!important;--input-bg:#ffffff!important;}}';
+  } else if(t==='dark'){
+    htmlEl.style.colorScheme = 'dark';
+    document.body.style.colorScheme = 'dark';
+    style.textContent = ':root{--ink:#ffffff!important;--muted:#aeaeb2!important;--hint:#7a7a80!important;--surface:#1c1c1e!important;--raised:#0a0a0a!important;--card:#1e1e20!important;--border:rgba(255,255,255,0.12)!important;--border2:rgba(255,255,255,0.28)!important;--gold:#F0A800!important;--gold-bg:#2e1f00!important;--gold-text:#FFD000!important;--silver:#a0a0aa!important;--silver-bg:#1a1a26!important;--silver-text:#e0e0f0!important;--bronze:#cc4a18!important;--bronze-bg:#2e0e00!important;--bronze-text:#FF8055!important;--blue:#5aafff!important;--green:#7ab830!important;--input-bg:#252528!important;}';
+  } else {
+    htmlEl.style.colorScheme = '';
+    document.body.style.colorScheme = '';
+    style.textContent = '';
+  }
+  // Apply gun filters
+  var gunImg = document.getElementById('splash-gun-img');
+  var logoImg = document.getElementById('app-gun-logo');
+  if(gunImg)  gunImg.style.filter  = isDark ? 'invert(1)' : '';
+  if(logoImg) logoImg.style.filter = isDark ? 'invert(1)' : '';
+}
+
+function toast(msg,type){var el=document.getElementById('toast');el.textContent=msg;el.className='show'+(type?' toast-'+type:'');clearTimeout(window._tt);window._tt=setTimeout(function(){el.className='';},2600);}
+
+function sparaResultat(){
+  var k=GRENKONFIG[aktGren];
+  var typ=document.getElementById('typ').value,isTr=typ==='traning',vg=getVapengrupp();
+  var total=0,xs=0,tens=0,serieData,allFilled;
+
+  if(globalMode==='skott'){
+    allFilled=shots.flat().filter(function(v){return v!==null;});
+    if(allFilled.length===0){toast('Ange minst ett skott.','err');return;}
+    total=allFilled.reduce(function(a,v){return a+shotNumeric(v);},0);
+    xs=allFilled.filter(function(v){return v==='X';}).length;
+    tens=allFilled.filter(function(v){return v==='X'||v===10;}).length;
+    serieData=shots.map(function(sv,si){
+      var arr=sv.slice(),sum=arr.reduce(function(a,v){return a+shotNumeric(v);},0);
+      var f=arr.filter(function(v){return v!==null;}).length;
+      var allF=f===k.skottPerSerie;
+      var isPerfekt=allF&&sum===k.maxPerSerie;
+      var medal=isPerfekt?'perfekt':(allF&&k.harMedalj==='serie'?getMedalj(sum,vg,aktGren):null);
+      return{shots:arr,sum:sum,medal:medal};
+    });
+  } else {
+    if(!sumVals.some(function(v){return v!==null;})){toast('Ange minst en serie.','err');return;}
+    sumVals.forEach(function(v){if(v!==null)total+=v;});
+    xs=sumXVals.reduce(function(a,v){return a+(v||0);},0);tens=xs;
+    serieData=sumVals.map(function(v,si){
+      var isPerfekt=v===k.maxPerSerie;
+      var medal=isPerfekt?'perfekt':(k.harMedalj==='serie'&&v!==null?getMedalj(v,vg,aktGren):null);
+      return{shots:[],sum:v!==null?v:0,medal:medal};
+    });
+    allFilled=Array(k.antalSerier*k.skottPerSerie).fill(1);
+  }
+
+  // Medalj på totalen för snabbmatch
+  var totalMedal=null;
+  if(k.harMedalj==='total'){totalMedal=getMedalj(total,vg,aktGren);}
+
+  var r={
+    id:Date.now(),typ:typ,gren:aktGren,anvandare_id:localStorage.getItem('skytte_uid')||null,
+    datum:document.getElementById('datum').value,
+    vapengrupp:vg,
+    vapen:isTr?document.getElementById('vapen-tr').value:document.getElementById('vapen-tv').value,
+    klass:isTr?null:document.getElementById('klass').value,
+    tavlingsnamn:isTr?'':document.getElementById('tavlingsnamn').value,
+    noter:document.getElementById('noter').value,
+    std_poang:null,
+    serier:serieData,total:total,xs:xs,tens:tens,
+    skott_count:allFilled.length,
+    total_medal:totalMedal,
+    guld:serieData.filter(function(s){return s.medal==='guld';}).length,
+    silver:serieData.filter(function(s){return s.medal==='silver';}).length,
+    brons:serieData.filter(function(s){return s.medal==='brons';}).length
+  };
+
+  setSync('syncing','Sparar i molnet...');
+  sb('resultat',{method:'POST',body:JSON.stringify(r)}).then(function(res){
+    if(res.ok)setSync('ok','Sparat i molnet');
+    else{res.text().then(function(t){console.error('Supabase error:',t);setSync('err','Molnfel: '+t.slice(0,80));});}
+  }).catch(function(err){setSync('err','Ingen anslutning');console.error(err);});
+
+  var sparaBtn=document.getElementById('spara-btn');if(sparaBtn)sparaBtn.classList.remove('redo-att-spara');
+
+  // GÄSTLÄGE: Om aktiv session är en gäst (index > 0), spara separat som typ='gast'
+  if(sessions.length > 1 && aktivSessIdx > 0){
+    var gs = sessions[aktivSessIdx];
+    var rGast = JSON.parse(JSON.stringify(r));
+    rGast.typ = 'gast';
+    rGast.vapen = gs.namn;
+    rGast.noter = 'Gäst: ' + gs.namn;
+    sb('resultat',{method:'POST',body:JSON.stringify(rGast)}).then(function(res){
+      if(res.ok) setSync('ok','Gästresultat sparat');
+      else res.text().then(function(t){ setSync('err','Molnfel: '+t.slice(0,60)); });
+    }).catch(function(){ setSync('err','Ingen anslutning'); });
+    gs.sparat = true;
+    gs.shots = shots.map(function(a){ return a.slice(); });
+    renderTabbbar();
+    var allaSparat = sessions.every(function(s){ return s.sparat; });
+    if(allaSparat) setTimeout(visaGastExport, 400);
+    else toast('Sparat! ' + total + 'p · ' + xs + 'X', 'ok');
+  } else {
+    toast('Sparat! ' + total + ' p · ' + xs + 'X', 'ok');
+  }
+
+  initShots();
+  sumVals = Array(GRENKONFIG[aktGren].antalSerier).fill(null);
+  document.getElementById('noter').value='';
+  var xInp2=document.getElementById('summa-x-inp');if(xInp2)xInp2.value='';
+  if(!isTr)document.getElementById('tavlingsnamn').value='';
+  renderSerier();
+// Permanent change listener for historik checkboxes
+
+
+// Apply saved theme on startup
+(function(){
+  var saved = localStorage.getItem('app_theme') || 'auto';
+  setAppTheme(saved);
+  // Listen for system theme changes when in auto mode
+  if(window.matchMedia){
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){
+      if((localStorage.getItem('app_theme')||'auto')==='auto') applyAppTheme('auto');
+    });
+  }
+})();
+  toast('Sparat! '+total+' p · '+xs+'X','ok');
+}
+
+function medalChips(r){
+  var h='';
+  if(r.total_medal){h='<div class="medal-summary"><span class="ms-chip ms-'+r.total_medal+'">'+r.total_medal.charAt(0).toUpperCase()+r.total_medal.slice(1)+' totalt</span></div>';return h;}
+  if(!r.guld&&!r.silver&&!r.brons)return'';
+  h='<div class="medal-summary">';
+  if(r.guld)h+='<span class="ms-chip ms-guld">'+r.guld+' Guld</span>';
+  if(r.silver)h+='<span class="ms-chip ms-silver">'+r.silver+' Silver</span>';
+  if(r.brons)h+='<span class="ms-chip ms-brons">'+r.brons+' Brons</span>';
+  return h+'</div>';
+}
+
+function grenBadge(gren){
+  var m={precision:'Precision',snabb:'Milsnabb',helmatch:'Helmatch'};
+  return '<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:rgba(55,138,221,0.15);color:var(--blue);font-weight:600;">'+( m[gren]||gren)+'</span>';
+}
+
+function renderHistorik(){
+  var el=document.getElementById('historik-list');
+  el.innerHTML='<div class="loading">Hämtar från molnet...</div>';
+  var uid = localStorage.getItem('skytte_uid');
+  var adminMode = (localStorage.getItem('skytte_namn') === ADMIN_NAMN);
+  var q='resultat?select=*&order=datum.desc,id.desc';
+  if(!adminMode && uid) q+='&anvandare_id=eq.'+uid;
+  if(filterTyp==='gast'){
+    q+='&typ=eq.gast';
+  } else if(filterTyp==='traning'){
+    q+='&typ=eq.traning';
+  } else if(filterTyp==='tavling'){
+    q+='&typ=eq.tavling';
+  } else if(filterTyp==='precision'||filterTyp==='snabb'||filterTyp==='helmatch'){
+    q+='&gren=eq.'+filterTyp+'&typ=neq.gast';
+  } else {
+    // Alla — exkludera gäster
+    q+='&typ=neq.gast';
+  }
+  sb(q,{extraHeaders:{'Prefer':''}}).then(function(r){return r.json();}).then(function(data){
+    if(!data||data.length===0){el.innerHTML='<div class="empty">Inga resultat än.</div>';return;}
+    window.histResultater = {}; data.forEach(function(r){ window.histResultater[""+r.id]=r; });
+    el.innerHTML=data.map(function(r){
+      var gastNamnDisplay=r.typ==='gast'?r.vapen:'';
+if(r.typ==='gast') gastResultatCache[r.id]=r;
+var badge=r.typ==='gast'?'<span class="badge" style="background:rgba(147,51,234,0.15);color:#9333EA;">👥 '+r.vapen+'</span>':(r.typ==='traning'?'<span class="badge badge-traning">Träning</span>':'<span class="badge badge-tavling">Tävling</span>');
+      var gb=grenBadge(r.gren||'precision');
+      var k=GRENKONFIG[r.gren||'precision']||GRENKONFIG.precision;
+      var meta=[r.vapengrupp,r.klass,r.vapen].filter(Boolean).join(' · ')+(r.tavlingsnamn?' · '+r.tavlingsnamn:'');
+      var snabbTabell=(r.gren==='snabb'&&(r.serier||[]).length>0)?byggSnabbTabell(r.serier):((r.gren==='helmatch'&&(r.serier||[]).length>0)?byggHelmatchTabell(r.serier):null);
+var sh=(r.serier||[]).map(function(s,i){
+        var xs=(s.shots||[]).filter(function(v){return v==='X';}).length;
+        var isPerfekt=s.sum===k.maxPerSerie&&s.shots&&s.shots.filter(function(v){return v!==null;}).length===k.skottPerSerie;
+        var cls='series-chip'+(isPerfekt?' perfekt':(s.medal&&s.medal!=='perfekt'?' '+s.medal:''));
+        return'<span class="'+cls+'">S'+(i+1)+': '+s.sum+'p'+(xs?' +'+xs+'X':'')+(isPerfekt?' ★':'')+'</span>';
+      }).join('');
+      var seriesHtml = snabbTabell || ('<div class="series-row" style="margin-top:10px;">'+sh+'</div>');
+      var noterHtml = (r.noter&&r.typ!=='gast') ? '<div style="font-size:13px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border);">'+r.noter+'</div>' : '';
+      var gastHtml = r.typ==='gast' ? '<div style="display:flex;gap:8px;margin-top:10px;"><button data-rid="'+r.id+'" data-k="mail" onclick="handleGastExp(this)" style="flex:1;padding:8px;font-size:13px;font-weight:600;background:#378ADD;color:#fff;border:none;border-radius:var(--rad-sm);cursor:pointer;">✉️ Mail</button><button data-rid="'+r.id+'" data-k="wa" onclick="handleGastExp(this)" style="flex:1;padding:8px;font-size:13px;font-weight:600;background:#25D366;color:#fff;border:none;border-radius:var(--rad-sm);cursor:pointer;">💬 WhatsApp</button></div>' : '';
+      return '<div class="hist-card-wrap" id="wrap-'+r.id+'">'
+        + '<div class="card">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">'
+        + '<div>'+badge+gb+'</div>'
+        + '<div style="display:flex;align-items:center;gap:4px;">'
+        + '<span class="hist-date" style="font-size:14px;font-weight:600;color:var(--ink);">'+r.datum+'</span>'
+        + '<button onclick="oppnaRedigera('+r.id+')" style="background:none;border:0.5px solid var(--border2);border-radius:6px;cursor:pointer;color:var(--muted);font-size:14px;padding:3px 7px;opacity:0.8;line-height:1;">✏️</button>'
+        + '<button onclick="taBortKort('+r.id+',event)" style="background:none;border:0.5px solid var(--border2);border-radius:6px;cursor:pointer;color:var(--muted);font-size:16px;padding:3px 7px;opacity:0.8;line-height:1;">🗑</button>'
+        + '<div class="hist-cb-btn" data-id="'+r.id+'" ontouchend="event.preventDefault();event.stopPropagation();onHistCbClick(this)" onclick="event.stopPropagation();onHistCbClick(this)" style="width:22px;height:22px;border:2px solid var(--border2);border-radius:5px;background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--blue);flex-shrink:0;user-select:none;-webkit-user-select:none;"></div>'
+        + '</div></div>'
+        + '<div style="display:flex;align-items:baseline;gap:2px;margin-top:10px;"><span class="hist-score">'+r.total+'p</span><span class="hist-denom">/ '+k.maxTotal+'p</span></div>'
+        + '<div style="display:flex;gap:10px;align-items:center;margin-top:4px;"><span class="hist-xs">'+r.xs+'X</span><span class="hist-meta">'+meta+'</span></div>'
+        + medalChips(r)
+        + seriesHtml
+        + noterHtml
+        + gastHtml
+        + '</div></div>';
+    }).join('');
+
+
+
+
+
+
+
+
+
+  }).catch(function(){el.innerHTML='<div class="empty">Kunde inte hämta data.</div>';});
+}
+
+function editStdPoang(id,current,e){
+  e.stopPropagation();
+  var val=prompt('Ange standardpoäng (lämna tomt för att ta bort):', current!==null&&current!==undefined?current:'');
+  if(val===null)return;
+  var p=val.trim()===''?null:parseInt(val);
+  if(val.trim()!==''&&isNaN(p)){toast('Ange ett giltigt tal.','err');return;}
+  sb('resultat?id=eq.'+id,{method:'PATCH',extraHeaders:{'Prefer':''},body:JSON.stringify({std_poang:p})}).then(function(res){
+    if(res.ok){toast(p!==null?'Std-poäng '+p+'p sparad.':'Std-poäng borttagen.','ok');renderHistorik();}
+    else{toast('Kunde inte spara.','err');}
+  }).catch(function(){toast('Ingen anslutning.','err');});
+}
+
+
+function byggHelmatchTabell(serier){
+  var moment = [
+    {namn:'Precision', idx:[0,1,2,3], harX:true},
+    {namn:'Duell', idx:[4,5,6,7], harX:true},
+    {namn:'Figurskjutning', idx:[8,9,10,11], harX:false}
+  ];
+  var tbl = '<div style="font-size:11px;margin-top:8px;">';
+  moment.forEach(function(m){
+    tbl += '<div style="font-weight:700;color:var(--muted);font-size:10px;margin:6px 0 2px;">'+m.namn+'</div>';
+    tbl += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:2px;">';
+    m.idx.forEach(function(si){
+      var s = serier[si] || {sum:0, shots:[]};
+      var xs = m.harX ? (s.shots||[]).filter(function(v){return v==='X';}).length : null;
+      tbl += '<div style="background:var(--raised);border-radius:4px;padding:4px 6px;text-align:center;">'
+        +'<div style="font-weight:700;font-size:13px;">'+s.sum+'p</div>'
+        +(xs!==null?'<div style="font-size:10px;color:var(--blue);">'+(xs?xs+'X':'')+'</div>':'')
+        +'</div>';
+    });
+    var momTot = m.idx.reduce(function(a,si){ return a+(serier[si]?serier[si].sum:0); },0);
+    var momX   = m.harX ? m.idx.reduce(function(a,si){ return a+(serier[si]?(serier[si].shots||[]).filter(function(v){return v==='X';}).length:0); },0) : null;
+    tbl += '<div style="background:var(--card);border-radius:4px;padding:4px 6px;text-align:center;border:0.5px solid var(--border2);">'
+      +'<div style="font-weight:800;font-size:13px;">'+momTot+'p</div>'
+      +(momX!==null?'<div style="font-size:10px;color:var(--blue);">'+(momX?momX+'X':'')+'</div>':'')
+      +'</div>';
+    tbl += '</div>';
+  });
+  var tot = serier.reduce(function(a,s){ return a+(s?s.sum:0); },0);
+  var totX = serier.reduce(function(a,s){ return a+(s?(s.shots||[]).filter(function(v){return v==='X';}).length:0); },0);
+  tbl += '<div style="text-align:right;font-size:12px;font-weight:800;color:var(--ink);margin-top:4px;">Totalt: '+tot+'p · '+totX+'X</div>';
+  tbl += '</div>';
+  return tbl;
+}
+
+function byggSnabbTabell(serier){
+  var moment = [
+    {namn:'10 sek', idx:[0,1,2,3]},
+    {namn:'8 sek',  idx:[4,5,6,7]},
+    {namn:'6 sek',  idx:[8,9,10,11]}
+  ];
+  var tbl = '<div style="font-size:11px;margin-top:8px;">';
+  moment.forEach(function(m){
+    tbl += '<div style="font-weight:700;color:var(--muted);font-size:10px;margin:6px 0 2px;">'+m.namn+'</div>';
+    tbl += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:2px;">';
+    m.idx.forEach(function(si){
+      var s = serier[si] || {sum:0, shots:[]};
+      var xs = (s.shots||[]).filter(function(v){return v==='X';}).length;
+      tbl += '<div style="background:var(--raised);border-radius:4px;padding:4px 6px;text-align:center;">'
+        +'<div style="font-weight:700;font-size:13px;">'+s.sum+'p</div>'
+        +'<div style="font-size:10px;color:var(--blue);">'+(xs?xs+'X':'')+'</div>'
+        +'</div>';
+    });
+    var momTot = m.idx.reduce(function(a,si){ return a+(serier[si]?serier[si].sum:0); },0);
+    var momX   = m.idx.reduce(function(a,si){ return a+(serier[si]?(serier[si].shots||[]).filter(function(v){return v==='X';}).length:0); },0);
+    tbl += '<div style="background:var(--card);border-radius:4px;padding:4px 6px;text-align:center;border:0.5px solid var(--border2);">'
+      +'<div style="font-weight:800;font-size:13px;">'+momTot+'p</div>'
+      +'<div style="font-size:10px;color:var(--blue);">'+(momX?momX+'X':'')+'</div>'
+      +'</div>';
+    tbl += '</div>';
+  });
+  var tot = serier.reduce(function(a,s){ return a+(s?s.sum:0); },0);
+  var totX = serier.reduce(function(a,s){ return a+(s?(s.shots||[]).filter(function(v){return v==='X';}).length:0); },0);
+  tbl += '<div style="text-align:right;font-size:12px;font-weight:800;color:var(--ink);margin-top:4px;">Totalt: '+tot+'p'+(totX?' · '+totX+'X':'')+'</div>';
+  tbl += '</div>';
+  return tbl;
+}
+
+
+function handleGastExp(btn){
+  var rid = btn.getAttribute('data-rid');
+  var kanal = btn.getAttribute('data-k');
+  var r = gastResultatCache[rid];
+  if(!r){ toast('Kunde inte hitta resultat','err'); return; }
+  exportGastResultat(r, kanal);
+}
+
+function exportGastResultat(r, kanal){
+  var k = GRENKONFIG[r.gren||'precision'] || GRENKONFIG.precision;
+  var serier = r.serier||[];
+  var rader = serier.map(function(s,i){
+    return 'S'+(i+1)+': '+s.sum+'p'+(s.medal==='perfekt'?' ★':'');
+  }).filter(function(s){ return s.indexOf('0p')===-1||true; });
+  var txt = '🎯 Skyttresultat\n'
+    + 'Namn: ' + r.vapen + '\n'
+    + k.namn + ' · ' + (r.vapengrupp||'') + '\n'
+    + 'Datum: ' + (r.datum||'') + '\n\n'
+    + rader.join('\n')
+    + '\n\nTotalt: ' + r.total + 'p · ' + (r.xs||0) + 'X';
+  var enc = encodeURIComponent(txt);
+  if(kanal==='mail') window.open('mailto:?subject=Skyttresultat '+r.vapen+'&body='+enc);
+  else window.open('https://wa.me/?text='+enc);
+}
+
+function taBortKort(id,e){
+  e.stopPropagation();
+  if(!confirm('Ta bort?'))return;
+  sb('resultat?id=eq.'+id,{method:'DELETE',extraHeaders:{'Prefer':''}}).then(function(){toast('Borttaget','ok');renderHistorik();});
+}
+
+function setupSwipeDelete(){
+  document.querySelectorAll('.swipe-wrap').forEach(function(wrap){
+    var card=wrap.querySelector('.card');var startX=0,curX=0,dragging=false;
+    card.addEventListener('touchstart',function(e){startX=e.touches[0].clientX;curX=0;dragging=true;},{passive:true});
+    card.addEventListener('touchmove',function(e){if(!dragging)return;curX=e.touches[0].clientX-startX;if(curX>0)curX=0;if(curX<-80)curX=-80;card.style.transform='translateX('+curX+'px)';},{passive:true});
+    card.addEventListener('touchend',function(){dragging=false;if(curX<-40)card.style.transform='translateX(-80px)';else card.style.transform='translateX(0)';});
+    wrap.querySelector('.del-reveal').addEventListener('click',function(){
+      var id=wrap.dataset.id;if(!confirm('Ta bort?'))return;
+      sb('resultat?id=eq.'+id,{method:'DELETE',extraHeaders:{'Prefer':''}}).then(function(){toast('Borttaget','ok');renderHistorik();});
+    });
+  });
+}
+
+var statFilter = 'alla';
+
+function setStatFilter(f, btn){
+  statFilter = f;
+  document.querySelectorAll('[id^="stat-btn-"]').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderStatistik();
+}
+
+function renderStatistik(){
+  var el=document.getElementById('statistik-content');
+  el.innerHTML='<div class="loading">Hämtar statistik...</div>';
+  sb('resultat?select=*&order=datum.asc&typ=neq.gast'+((!( localStorage.getItem('skytte_namn')===ADMIN_NAMN) && localStorage.getItem('skytte_uid')) ? '&anvandare_id=eq.'+localStorage.getItem('skytte_uid') : ''),{extraHeaders:{'Prefer':''}}).then(function(r){return r.json();}).then(function(data){
+    if(!data||data.length===0){el.innerHTML='<div class="empty">Logga resultat för att se statistik.</div>';return;}
+
+    // Filtrera per vald gren
+    var grenNamn={precision:'Precision nationellt',snabb:'Militär snabbmatch',helmatch:'Nationell helmatch'};
+    var html='';
+    var visaGrenar = statFilter==='alla' ? ['precision','snabb','helmatch'] : [statFilter];
+
+    visaGrenar.forEach(function(gren){
+      var gdata=data.filter(function(r){return(r.gren||'precision')===gren;});
+      if(gdata.length===0)return;
+      var k=GRENKONFIG[gren];
+      var tr=gdata.filter(function(r){return r.typ==='traning';});
+      var tv=gdata.filter(function(r){return r.typ==='tavling';});
+      function avg(a){return a.length?Math.round(a.reduce(function(x,b){return x+b.total;},0)/a.length):'-';}
+      function maxv(a){return a.length?Math.max.apply(null,a.map(function(r){return r.total;})):'-';}
+      function avgX(a){return a.length?(a.reduce(function(x,b){return x+(b.xs||0);},0)/a.length).toFixed(1):'-';}
+
+      html+='<div class="section-title" style="margin-top:16px;">'+grenNamn[gren]+'</div>';
+      html+='<div class="stat-grid"><div class="stat-card"><div class="stat-label">Snitt träning</div><div class="stat-val">'+avg(tr)+'p</div><div class="stat-sub">'+tr.length+' pass</div></div><div class="stat-card"><div class="stat-label">Bästa träning</div><div class="stat-val">'+maxv(tr)+'p</div><div class="stat-sub">/ '+k.maxTotal+'p</div></div><div class="stat-card"><div class="stat-label">Snitt tävling</div><div class="stat-val">'+avg(tv)+'p</div><div class="stat-sub">'+tv.length+' tävlingar</div></div><div class="stat-card"><div class="stat-label">Bästa tävling</div><div class="stat-val">'+maxv(tv)+'p</div><div class="stat-sub">/ '+k.maxTotal+'p</div></div></div>';
+
+      if(k.harX){
+        html+='<div class="stat-grid"><div class="stat-card"><div class="stat-label">Snitt X träning</div><div class="stat-val">'+avgX(tr)+'</div></div><div class="stat-card"><div class="stat-label">Snitt X tävling</div><div class="stat-val">'+avgX(tv)+'</div></div></div>';
+      }
+
+      // Medaljer per serie / total
+      if(k.harMedalj==='serie'){
+        var tG=gdata.reduce(function(a,r){return a+(r.guld||0);},0);
+        var tS=gdata.reduce(function(a,r){return a+(r.silver||0);},0);
+        var tB=gdata.reduce(function(a,r){return a+(r.brons||0);},0);
+        var tP=gdata.reduce(function(a,r){return a+((r.serier||[]).filter(function(s){return s.sum===k.maxPerSerie;}).length);},0);
+        html+='<div style="background:var(--card);border-radius:var(--rad-sm);padding:12px;margin-bottom:12px;display:flex;justify-content:space-around;">';
+        html+='<div style="text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--gold-text);">'+tG+'</div><div style="font-size:11px;color:var(--muted);">Guld</div></div>';
+        html+='<div style="text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--silver-text);">'+tS+'</div><div style="font-size:11px;color:var(--muted);">Silver</div></div>';
+        html+='<div style="text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--bronze-text);">'+tB+'</div><div style="font-size:11px;color:var(--muted);">Brons</div></div>';
+        html+='<div style="text-align:center;"><div style="font-size:20px;font-weight:700;color:#9333EA;">'+tP+'</div><div style="font-size:11px;color:var(--muted);">'+k.maxPerSerie+'p ★</div></div>';
+        html+='</div>';
+      } else if(k.harMedalj==='total'){
+        var tGT=gdata.filter(function(r){return r.total_medal==='guld';}).length;
+        var tST=gdata.filter(function(r){return r.total_medal==='silver';}).length;
+        var tBT=gdata.filter(function(r){return r.total_medal==='brons';}).length;
+        html+='<div style="background:var(--card);border-radius:var(--rad-sm);padding:12px;margin-bottom:12px;display:flex;justify-content:space-around;">';
+        html+='<div style="text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--gold-text);">'+tGT+'</div><div style="font-size:11px;color:var(--muted);">Guld</div></div>';
+        html+='<div style="text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--silver-text);">'+tST+'</div><div style="font-size:11px;color:var(--muted);">Silver</div></div>';
+        html+='<div style="text-align:center;"><div style="font-size:20px;font-weight:700;color:var(--bronze-text);">'+tBT+'</div><div style="font-size:11px;color:var(--muted);">Brons</div></div>';
+        html+='</div>';
+      }
+
+      // Diagram
+      if(gdata.length>=2){
+        html+='<div class="section-title" style="font-size:12px;">Utveckling över tid</div>';
+        var sa=[...gdata].sort(function(a,b){return a.datum.localeCompare(b.datum);});
+        var W=344,H=140,PL=36,PR=10,PT=12,gW=W-PL-PR,gH=H-PT-24;
+        var vs=sa.map(function(r){return r.total;});
+        var mn=Math.max(0,Math.min.apply(null,vs)-20),mx=Math.min(k.maxTotal,Math.max.apply(null,vs)+10),n=sa.length;
+        function tx(i){return PL+i*(gW/(n>1?n-1:1));}
+        function ty(v){return PT+gH-(((v-mn)/(mx-mn))*gH);}
+        var gv=[mn,Math.round((mn+mx)/2),mx],gh='';
+        gv.forEach(function(v){var y=ty(v);gh+='<line x1="'+PL+'" y1="'+y.toFixed(1)+'" x2="'+(W-PR)+'" y2="'+y.toFixed(1)+'" stroke="rgba(128,128,128,0.2)" stroke-width="0.5"/><text x="'+(PL-3)+'" y="'+(y+4).toFixed(1)+'" text-anchor="end" font-size="9" fill="#888">'+v+'</text>';});
+        var tp=[],tvp=[];
+        sa.forEach(function(r,i){var x=tx(i),y=ty(r.total);(r.typ==='traning'?tp:tvp).push({x:x,y:y});});
+        function mkp(pts,col){return pts.length<2?'':'<path d="'+pts.map(function(p,j){return(j===0?'M':'L')+p.x.toFixed(1)+','+p.y.toFixed(1);}).join(' ')+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round"/>';}
+        var dots=sa.map(function(r,i){var x=tx(i),y=ty(r.total),c=r.typ==='traning'?'#4a9ded':'#7ab830';return'<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="4" fill="'+c+'" stroke="var(--raised)" stroke-width="2"/>';}).join('');
+        var xl='<text x="'+tx(0).toFixed(1)+'" y="'+(H-4)+'" text-anchor="middle" font-size="9" fill="#888">'+sa[0].datum.slice(5)+'</text><text x="'+tx(n-1).toFixed(1)+'" y="'+(H-4)+'" text-anchor="middle" font-size="9" fill="#888">'+sa[n-1].datum.slice(5)+'</text>';
+        var lg='<circle cx="'+PL+'" cy="'+(PT-3)+'" r="4" fill="#4a9ded"/><text x="'+(PL+9)+'" y="'+PT+'" font-size="9" fill="#888">Träning</text><circle cx="'+(PL+58)+'" cy="'+(PT-3)+'" r="4" fill="#7ab830"/><text x="'+(PL+67)+'" y="'+PT+'" font-size="9" fill="#888">Tävling</text>';
+        html+='<div style="background:var(--card);border-radius:var(--rad-sm);padding:8px;margin-bottom:14px;"><svg viewBox="0 0 '+W+' '+H+'" width="100%">'+gh+mkp(tp,'#4a9ded')+mkp(tvp,'#7ab830')+dots+xl+lg+'</svg></div>';
+      }
+
+      // Excel-tabell
+      html+='<div class="section-title" style="font-size:12px;">Resultatlogg</div>';
+      var tableRows=([...gdata]).reverse().map(function(r){
+        var dateFmt=r.datum?r.datum.slice(5):'—';
+        var vg2=r.vapengrupp||'—';
+        var serier=r.serier||[];
+        var serierTd='';
+        for(var i2=0;i2<k.antalSerier;i2++){
+          var s2=serier[i2];
+          if(!s2){serierTd+='<td>—</td>';continue;}
+          var isPerfektCell=s2.sum===k.maxPerSerie;
+          var mc=isPerfektCell?'c-perfekt':(s2.medal==='guld'?'c-guld':(s2.medal==='silver'?'c-silver':(s2.medal==='brons'?'c-brons':'')));
+          serierTd+='<td class="'+mc+'">'+(s2.sum>0?s2.sum+'p':'—')+'</td>';
+        }
+        var xCell=k.harX?'<td class="c-x">'+(r.xs||0)+'</td>':'';
+        var medalCell=r.total_medal?'<td class="ms-'+r.total_medal+'" style="font-weight:700;">'+r.total_medal.charAt(0).toUpperCase()+'</td>':'';
+        return'<tr><td>'+dateFmt+'</td><td class="vg">'+vg2+'</td>'+serierTd+xCell+'<td class="c-sum">'+r.total+'p</td>'+medalCell+'</tr>';
+      }).join('');
+      var sHeaders='';for(var si2=0;si2<k.antalSerier;si2++)sHeaders+='<th>S'+(si2+1)+'</th>';
+      var xHeader=k.harX?'<th>X</th>':'';
+      var medalHeader=k.harMedalj==='total'?'<th>M</th>':'';
+      html+='<div class="excel-wrap" style="margin-bottom:20px;"><table class="excel-table"><thead><tr><th>Datum</th><th>Gr.</th>'+sHeaders+xHeader+'<th>Tot</th>'+medalHeader+'</tr></thead><tbody>'+tableRows+'</tbody></table></div>';
+
+      // Std-poäng sammanfattning per år
+      var tavlMedStd=tv.filter(function(r){return r.std_poang!==null&&r.std_poang!==undefined;});
+      if(tavlMedStd.length>0){
+        html+='<div class="section-title" style="font-size:12px;margin-top:8px;">Standardpoäng per år</div>';
+        var arMap={};
+        tavlMedStd.forEach(function(r){
+          var ar=r.datum?r.datum.slice(0,4):'?';
+          if(!arMap[ar])arMap[ar]={n:0,sum:0,best:0};
+          arMap[ar].n++;arMap[ar].sum+=r.std_poang;
+          if(r.std_poang>arMap[ar].best)arMap[ar].best=r.std_poang;
+        });
+        html+='<div class="excel-wrap" style="margin-bottom:8px;"><table class="excel-table"><thead><tr><th>År</th><th>Antal</th><th>Snitt</th><th>Bäst</th></tr></thead><tbody>';
+        Object.keys(arMap).sort().forEach(function(ar){
+          var d=arMap[ar];
+          html+='<tr><td>'+ar+'</td><td>'+d.n+'</td><td class="c-sum">'+Math.round(d.sum/d.n)+'p</td><td class="c-sum">'+d.best+'p</td></tr>';
+        });
+        html+='</tbody></table></div>';
+      }
+      html+='<hr class="divider">';
+    });
+
+    el.innerHTML=html;
+  }).catch(function(){el.innerHTML='<div class="empty">Kunde inte hämta statistik.</div>';});
+}
+
+function testSupabase(){
+  var el=document.getElementById('supabase-test');el.textContent='Testar...';el.style.color='var(--muted)';
+  sb('resultat?select=count',{extraHeaders:{'Prefer':'count=exact'}}).then(function(r){if(r.ok){el.textContent='Anslutning OK!';el.style.color='var(--green)';}else{el.textContent='Fel: '+r.status;el.style.color='#D85A30';}}).catch(function(){el.textContent='Kunde inte ansluta.';el.style.color='#D85A30';});
+}
+
+function exportData(){
+  sb('resultat?select=*&order=datum.desc',{extraHeaders:{'Prefer':''}}).then(function(r){return r.json();}).then(function(data){
+    var blob=new Blob([JSON.stringify({version:3,exportDatum:new Date().toISOString(),resultat:data},null,2)],{type:'application/json'});
+    var url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download='skytte-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(url);
+  });
+}
+
+function importData(input){
+  var file=input.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var data=JSON.parse(e.target.result),imp=data.resultat||[];
+      var done=0;
+      imp.forEach(function(r){sb('resultat',{method:'POST',extraHeaders:{'Prefer':'resolution=ignore-duplicates'},body:JSON.stringify(r)}).then(function(){done++;if(done===imp.length)toast('Importerat! '+imp.length+' resultat.','ok');});});
+      input.value='';
+    }catch(err){toast('Kunde inte läsa filen.','err');}
+  };
+  reader.readAsText(file);
+}
+
+
+
+
+
+
+// ══════════════════════════════════
+// GÄSTLÄGE
+// ══════════════════════════════════
+
+// Session per användare
+function nySess(namn, vg, typ, klass, vapen, tavlingsnamn){
+  return {
+    namn: namn,
+    typ: typ||'traning',
+    vapengrupp: vg||'A',
+    klass: klass||'Öppen',
+    vapen: vapen||'',
+    tavlingsnamn: tavlingsnamn||'',
+    noter: '',
+    shots: null,   // null = inte initierat ännu
+    sumVals: null,
+    activeSerie: 0,
+    activeShot: 0,
+    perfektaCelebrerade: {},
+    globalMode: 'skott',
+    sparat: false
+  };
+}
+
+// sessions[0] = "mig", sessions[1..] = gäster
+var sessions = [];
+var aktivSessIdx = 0;
+
+function initSessions(){
+  // Skapa session för "mig" baserat på nuvarande UI
+  var vg = getVapengrupp();
+  var typ = document.getElementById('typ').value;
+  sessions = [nySess('Mig', vg, typ, '', '', '')];
+  aktivSessIdx = 0;
+}
+
+function sparaAktivSess(){
+  var s = sessions[aktivSessIdx];
+  if(!s) return;
+  s.shots = shots.map(function(a){ return a.slice(); });
+  s.sumVals = sumVals.slice();
+  s.activeSerie = activeSerie;
+  s.activeShot = activeShot;
+  s.perfektaCelebrerade = JSON.parse(JSON.stringify(perfektaCelebrerade));
+  s.globalMode = globalMode;
+  s.typ = document.getElementById('typ').value;
+  s.vapengrupp = getVapengrupp();
+  var k = document.getElementById('klass'); s.klass = k?k.value:'';
+  var vTr = document.getElementById('vapen-tr'); s.vapen = vTr?vTr.value:'';
+  var tv = document.getElementById('tavlingsnamn'); s.tavlingsnamn = tv?tv.value:'';
+  var not = document.getElementById('noter'); s.noter = not?not.value:'';
+}
+
+function laddaSess(idx){
+  var s = sessions[idx];
+  if(!s) return;
+  aktivSessIdx = idx;
+  var k = GRENKONFIG[aktGren];
+
+  // Återställ skott-state
+  if(s.shots === null){
+    // Ny gäst — initiera tomma skott
+    shots = Array.from({length:k.antalSerier}, function(){ return Array(k.skottPerSerie).fill(null); });
+    sumVals = Array(k.antalSerier).fill(null);
+    activeSerie = 0; activeShot = 0; perfektaCelebrerade = {};
+    globalMode = 'skott';
+    s.shots = shots.map(function(a){return a.slice();});
+    s.sumVals = sumVals.slice();
+  } else {
+    shots = s.shots.map(function(a){return a.slice();});
+    sumVals = s.sumVals.slice();
+    activeSerie = s.activeSerie;
+    activeShot = s.activeShot;
+    perfektaCelebrerade = JSON.parse(JSON.stringify(s.perfektaCelebrerade));
+    globalMode = s.globalMode;
+  }
+
+  // Uppdatera UI-fält
+  var typEl = document.getElementById('typ');
+  if(typEl){ typEl.value = s.typ; toggleFalt(); }
+  var vgTr = document.getElementById('vapengrupp-tr');
+  var vgTv = document.getElementById('vapengrupp-tv');
+  if(vgTr) vgTr.value = s.vapengrupp;
+  if(vgTv) vgTv.value = s.vapengrupp;
+  var klassEl = document.getElementById('klass');
+  if(klassEl && s.klass) klassEl.value = s.klass;
+  var vapenTr = document.getElementById('vapen-tr');
+  var vapenTv = document.getElementById('vapen-tv');
+  if(vapenTr) vapenTr.value = s.vapen;
+  if(vapenTv) vapenTv.value = s.vapen;
+  var tavEl = document.getElementById('tavlingsnamn');
+  if(tavEl) tavEl.value = s.tavlingsnamn;
+  var notEl = document.getElementById('noter');
+  if(notEl) notEl.value = s.noter;
+
+  // Synka mode-toggle
+  document.getElementById('btn-skott').className='mode-toggle-btn'+(globalMode==='skott'?' active':'');
+  document.getElementById('btn-summa').className='mode-toggle-btn'+(globalMode==='summa'?' active':'');
+  var k2=GRENKONFIG[aktGren];
+  var harX=k2.harX||(k2.moment&&k2.moment.some(function(m){return m.harX!==false;}));
+  document.getElementById('summa-x-wrap').style.display=(globalMode==='summa'&&harX)?'block':'none';
+
+  renderTabbbar();
+  renderSerier();
+}
+
+function renderTabbbar(){
+  var bar = document.getElementById('anvandare-bar');
+  bar.className = 'anvandare-bar synlig';
+  var h = '';
+  // Visa "Mig" + gäster om det finns gäster
+  if(sessions.length > 1){
+    h += sessions.map(function(s,i){
+      var cls = 'anvandare-tab'+(i===aktivSessIdx?' aktiv':'')+(s.sparat?' sparat':'');
+      return '<button class="'+cls+'" onclick="byttSess('+i+')">'+s.namn+(s.sparat?' ✓':'')+'</button>';
+    }).join('');
+  }
+  h += '<button class="anvandare-tab lagg-till" onclick="oppnaGastModal()">+ Gäst</button>';
+  bar.innerHTML = h;
+}
+
+function byttSess(idx){
+  if(idx === aktivSessIdx) return;
+  sparaAktivSess();
+  laddaSess(idx);
+}
+
+// Modal
+function oppnaGastModal(){
+  document.getElementById('gast-modal').classList.add('open');
+  document.getElementById('gast-modal-namn').value='';
+  document.getElementById('gast-modal-typ').value='traning';
+  gastModalTypChange();
+}
+
+function stangGastModal(e){
+  if(e && e.target !== document.getElementById('gast-modal')) return;
+  document.getElementById('gast-modal').classList.remove('open');
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  var typSel = document.getElementById('gast-modal-typ');
+  if(typSel) typSel.addEventListener('change', gastModalTypChange);
+});
+
+function gastModalTypChange(){
+  var typ = document.getElementById('gast-modal-typ').value;
+  document.getElementById('gast-modal-tavling-falt').style.display = typ==='tavling'?'block':'none';
+}
+
+function laggTillGast(){
+  var namn = (document.getElementById('gast-modal-namn').value||'').trim();
+  if(!namn){ toast('Ange gästens namn','err'); return; }
+  var typ = document.getElementById('gast-modal-typ').value;
+  var vg  = document.getElementById('gast-modal-vg').value;
+  var klass = (document.getElementById('gast-modal-klass')||{}).value||'';
+  var vapen = (document.getElementById('gast-modal-vapen')||{}).value||'';
+  var tavl  = (document.getElementById('gast-modal-tavlingsnamn')||{}).value||'';
+
+  // Om sessions inte initierats ännu, gör det nu
+  if(sessions.length === 0) initSessions();
+
+  var s = nySess(namn, vg, typ, klass, vapen, tavl);
+  sessions.push(s);
+  document.getElementById('gast-modal').classList.remove('open');
+  // Byt till den nya gästen direkt
+  sparaAktivSess();
+  laddaSess(sessions.length-1);
+  toast(namn+' tillagd!','ok');
+}
+
+// Ta bort gäst
+function taBortGast(idx){
+  if(!confirm('Ta bort '+sessions[idx].namn+'?')) return;
+  sessions.splice(idx,1);
+  if(aktivSessIdx >= sessions.length) aktivSessIdx=sessions.length-1;
+  laddaSess(aktivSessIdx);
+}
+
+// Export
+function visaGastExport(){
+  var lista = document.getElementById('gast-export-lista');
+  lista.innerHTML='';
+  sessions.forEach(function(s,i){
+    var k=GRENKONFIG[aktGren]||GRENKONFIG.precision;
+    var total=0,xs=0,rader=[];
+    var sh=s.shots||[];
+    var sv=s.sumVals||[];
+    for(var si=0;si<k.antalSerier;si++){
+      if(sv[si]!==null&&sv[si]!==undefined){
+        total+=sv[si]; rader.push('S'+(si+1)+': '+sv[si]+'p');
+      } else if(sh[si]){
+        var filled=sh[si].filter(function(v){return v!==null;});
+        if(filled.length){
+          var sum=filled.reduce(function(a,v){return a+shotNumeric(v);},0);
+          total+=sum;
+          xs+=filled.filter(function(v){return v==='X';}).length;
+          rader.push('S'+(si+1)+': '+sum+'p');
+        }
+      }
+    }
+    var div=document.createElement('div');
+    div.className='gast-res-card';
+    div.innerHTML='<div class="gast-res-namn">'+s.namn+'</div>'
+      +'<div class="gast-res-score">'+total+'p</div>'
+      +'<div style="font-size:12px;color:var(--muted);margin:2px 0 8px;">'+xs+'X · '+k.namn+' · '+s.vapengrupp+'</div>'
+      +'<div style="font-size:12px;color:var(--muted);">'+rader.join(' · ')+'</div>'
+      +'<div class="gast-exp-btns">'
+        +'<button class="gast-exp-btn btn-mail" data-idx="'+i+'" data-k="mail" onclick="exporteraGast(this)">✉️ Mail</button>'
+        +'<button class="gast-exp-btn btn-wa"   data-idx="'+i+'" data-k="wa"   onclick="exporteraGast(this)">💬 WhatsApp</button>'
+      +'</div>';
+    lista.appendChild(div);
+  });
+  document.getElementById('gast-export').classList.add('open');
+}
+
+function exporteraGast(btn){
+  var idx=parseInt(btn.getAttribute('data-idx'));
+  var kanal=btn.getAttribute('data-k');
+  var s=sessions[idx];
+  var k=GRENKONFIG[aktGren]||GRENKONFIG.precision;
+  var total=0,xs=0,rader=[];
+  var sh=s.shots||[]; var sv=s.sumVals||[];
+  for(var si=0;si<k.antalSerier;si++){
+    if(sv[si]!==null&&sv[si]!==undefined){ total+=sv[si]; rader.push('S'+(si+1)+': '+sv[si]+'p'); }
+    else if(sh[si]){
+      var filled=sh[si].filter(function(v){return v!==null;});
+      if(filled.length){
+        var sum=filled.reduce(function(a,v){return a+shotNumeric(v);},0);
+        total+=sum; xs+=filled.filter(function(v){return v==='X';}).length;
+        rader.push('S'+(si+1)+': '+sum+'p');
+      }
+    }
+  }
+  var datum=new Date().toISOString().split('T')[0];
+  var txt='🎯 '+s.namn+'\n'+k.namn+' · '+s.vapengrupp+'\n'+'Datum: '+datum+'\n\n'
+    +rader.join('\n')+'\n\nTotalt: '+total+'p'+(xs?' · '+xs+'X':'');
+  var enc=encodeURIComponent(txt);
+  if(kanal==='mail') window.open('mailto:?subject=Skyttresultat '+s.namn+'&body='+enc);
+  else window.open('https://wa.me/?text='+enc);
+}
+
+function stangGastExport(){
+  document.getElementById('gast-export').classList.remove('open');
+}
+
+
+
+
+// ══════════════════════════════════════
+// NAMN-BASERAD IDENTITET
+// ══════════════════════════════════════
+var ADMIN_NAMN = 'Fredrik';  // Ditt admin-namn
+var aktivtNamn = null;
+
+function visaNamnScreen(){
+  document.getElementById('namn-screen').classList.remove('dold');
+  document.getElementById('gren-valj').style.display='none';
+  document.getElementById('app').style.display='none';
+}
+function doljNamnScreen(){
+  document.getElementById('namn-screen').classList.add('dold');
+}
+
+function namnStatus(msg, typ){
+  var el = document.getElementById('namn-status');
+  el.textContent = msg;
+  el.className = 'namn-status' + (typ ? ' '+typ : '');
+}
+
+// Enkel hash-funktion (FNV-1a)
+function hashPin(namn, pin){
+  var str = namn.toLowerCase() + ':' + pin;
+  var hash = 2166136261;
+  for(var i=0; i<str.length; i++){
+    hash ^= str.charCodeAt(i);
+    hash = (hash * 16777619) >>> 0;
+  }
+  return hash.toString(16);
+}
+
+var namnLage = 'register'; // 'register' eller 'login'
+
+function visaNamnLage(lage){
+  namnLage = lage;
+  var pinWrap = document.getElementById('namn-pin-wrap');
+  var sub = document.getElementById('namn-sub-text');
+  var btn = document.getElementById('namn-btn');
+  if(lage === 'login'){
+    sub.textContent = 'Ange ditt namn och PIN för att logga in.';
+    btn.textContent = 'Logga in →';
+  } else {
+    sub.textContent = 'Välj ditt namn och en PIN-kod. PIN behövs om du loggar in på en ny enhet.';
+    btn.textContent = 'Registrera →';
+  }
+}
+
+function valjNamn(){
+  var namn = (document.getElementById('namn-input').value||'').trim();
+  var pin = (document.getElementById('namn-pin').value||'').trim();
+  if(!namn){ namnStatus('Ange ett namn.','err'); return; }
+  if(namn.length < 2){ namnStatus('Minst 2 tecken.','err'); return; }
+  if(!pin || pin.length < 4){ namnStatus('Ange en 4-siffrig PIN.','err'); return; }
+  if(!/^\d{4}$/.test(pin)){ namnStatus('PIN måste vara exakt 4 siffror.','err'); return; }
+
+  var pinHash = hashPin(namn, pin);
+  namnStatus('Kollar...');
+
+  sb('anvandare?namn=eq.'+encodeURIComponent(namn),{extraHeaders:{'Prefer':''}}).then(function(r){
+    return r.json();
+  }).then(function(data){
+    if(data && data.length > 0){
+      // Namnet finns — verifiera PIN
+      if(data[0].pin_hash !== pinHash){
+        namnStatus('Fel PIN. Försök igen.','err');
+        return;
+      }
+      namnStatus('Välkommen tillbaka, '+namn+'! ✓','ok');
+      setTimeout(function(){ aktiveraNamn(namn, data[0].id); }, 600);
+    } else {
+      // Nytt namn — skapa användare med PIN-hash
+      sb('anvandare',{method:'POST',body:JSON.stringify({namn:namn, pin_hash:pinHash})}).then(function(r2){
+        if(r2.ok){
+          namnStatus('Välkommen, '+namn+'! ✓','ok');
+          setTimeout(function(){
+            sb('anvandare?namn=eq.'+encodeURIComponent(namn),{extraHeaders:{'Prefer':''}}).then(function(r3){return r3.json();}).then(function(d){
+              aktiveraNamn(namn, d&&d[0]?d[0].id:null);
+            });
+          }, 600);
+        } else {
+          r2.text().then(function(t){ namnStatus('Fel: '+t.slice(0,60),'err'); });
+        }
+      });
+    }
+  }).catch(function(){ namnStatus('Ingen anslutning.','err'); });
+}
+
+function aktiveraNamn(namn, uid){
+  aktivtNamn = namn;
+  localStorage.setItem('skytte_namn', namn);
+  localStorage.setItem('skytte_uid', uid||'');
+  doljNamnScreen();
+  // Uppdatera chip
+  var chip = document.getElementById('anvandare-chip');
+  if(chip){ chip.textContent = '👤 '+namn; chip.style.display='inline'; }
+  // Visa admin-knapp om admin
+  if(namn === ADMIN_NAMN){
+    var abw = document.getElementById('admin-btn-wrap');
+    if(abw) abw.style.display='block';
+  }
+}
+
+function kollaLagraNamn(){
+  var sparat = localStorage.getItem('skytte_namn');
+  if(sparat){
+    // Redan inloggad — visa grenväljaren
+    aktivtNamn = sparat;
+    var chip = document.getElementById('anvandare-chip');
+    var isAdm = sparat === ADMIN_NAMN;
+    if(chip){ chip.textContent = (isAdm?'👑 ':'👤 ')+sparat; chip.style.display='inline'; }
+    if(isAdm){
+      var abw = document.getElementById('admin-btn-wrap');
+      if(abw) abw.style.display='block';
+    }
+    doljNamnScreen();
+    document.getElementById('gren-valj').style.display='flex';
+    document.getElementById('bottom-nav').style.display='flex';
+  } else {
+    // Ej inloggad — visa namnvals-skärm
+    visaNamnScreen();
+    visaNamnLage('register');
+  }
+}
+
+// ── Admin
+function oppnaAdmin(){
+  var panel = document.getElementById('admin-panel');
+  panel.classList.add('open');
+  laddaAdminData();
+}
+
+function stangAdmin(){
+  document.getElementById('admin-panel').classList.remove('open');
+}
+
+function tilldelaGamlaResultat(){
+  var uid = localStorage.getItem('skytte_uid');
+  if(!uid){toast('Inte inloggad','err');return;}
+  if(!confirm('Tilldela alla resultat utan ägare till dig?')) return;
+  sb('resultat?anvandare_id=is.null',{method:'PATCH',extraHeaders:{'Prefer':''},body:JSON.stringify({anvandare_id:uid})})
+    .then(function(r){
+      if(r.ok){toast('Klart! Gamla resultat tilldelade.','ok');laddaAdminData();}
+      else{toast('Fel vid tilldelning.','err');}
+    }).catch(function(){toast('Ingen anslutning.','err');});
+}
+
+function adminLaggTillAnvandare(){
+  var namn = (prompt('Namn på ny användare:')||'').trim();
+  if(!namn){ return; }
+  if(namn.length < 2){ toast('Minst 2 tecken.','err'); return; }
+  var pin = (prompt('PIN-kod (4 siffror) för '+namn+':')||'').trim();
+  if(!pin || !/^\d{4}$/.test(pin)){ toast('PIN måste vara 4 siffror.','err'); return; }
+
+  var pinHash = hashPin(namn, pin);
+
+  // Kolla om namnet redan finns
+  sb('anvandare?namn=eq.'+encodeURIComponent(namn),{extraHeaders:{'Prefer':''}})
+    .then(function(r){return r.json();}).then(function(data){
+      if(data && data.length > 0){
+        toast(namn+' finns redan.','err');
+        return;
+      }
+      // Skapa användaren
+      sb('anvandare',{method:'POST',body:JSON.stringify({namn:namn, pin_hash:pinHash})})
+        .then(function(r2){
+          if(r2.ok){
+            toast(namn+' skapad med PIN '+pin,'ok');
+            laddaAdminData();
+          } else {
+            r2.text().then(function(t){ toast('Fel: '+t.slice(0,60),'err'); });
+          }
+        });
+    }).catch(function(){ toast('Ingen anslutning.','err'); });
+}
+
+function laddaAdminData(){
+  var content = document.getElementById('admin-content');
+  content.innerHTML = '<div class="loading" style="padding:20px;">Hämtar användare...</div>';
+  // Hämta alla användare
+  sb('anvandare?select=*&order=namn.asc',{extraHeaders:{'Prefer':''}}).then(function(r){return r.json();}).then(function(anvandare){
+    if(!anvandare||anvandare.length===0){
+      content.innerHTML='<div class="empty" style="padding:20px;">Inga användare.</div>';return;
+    }
+    // Hämta antal resultat per användare
+    sb('resultat?select=anvandare_id,typ&typ=neq.gast',{extraHeaders:{'Prefer':''}}).then(function(r2){return r2.json();}).then(function(res){
+      var raknare={};
+      (res||[]).forEach(function(r){ raknare[r.anvandare_id]=(raknare[r.anvandare_id]||0)+1; });
+      content.innerHTML = '<div style="padding:8px 0;">'
+        + anvandare.map(function(a){
+          var ant = raknare[a.id]||0;
+          return '<div class="admin-user-card" style="cursor:pointer;" onclick="adminVisaAnvandare(\'' + a.id + '\',\'' + a.namn + '\')">'
+            +'<div style="flex:1;"><div class="admin-user-namn">'+a.namn+(a.namn===ADMIN_NAMN?' 👑':' 👤')+'</div>'
+            +'<div class="admin-user-info">'+ant+' resultat — klicka för att se</div></div>'
+            +'<button class="admin-del-btn" data-uid="'+a.id+'" data-namn="'+a.namn+'" onclick="event.stopPropagation();handleAdminDel(this)">Ta bort</button>'
+            +'</div>';
+        }).join('')
+        +'</div>';
+    });
+  }).catch(function(){
+    content.innerHTML='<div class="empty" style="padding:20px;">Kunde inte hämta data.</div>';
+  });
+}
+
+function adminVisaAnvandare(uid, namn){
+  var content = document.getElementById('admin-content');
+  content.innerHTML = '<div style="padding:16px;">'
+    +'<button onclick="laddaAdminData()" style="background:none;border:none;color:var(--blue);cursor:pointer;font-size:14px;padding:0 0 12px;">← Tillbaka</button>'
+    +'<h3 style="margin:0 0 12px;">'+namn+'</h3>'
+    +'<div id="admin-anv-lista"><div class="loading">Hämtar resultat...</div></div>'
+    +'</div>';
+
+  sb('resultat?select=*&anvandare_id=eq.'+uid+'&order=datum.desc',{extraHeaders:{'Prefer':''}})
+    .then(function(r){return r.json();}).then(function(data){
+      var lista = document.getElementById('admin-anv-lista');
+      if(!data||data.length===0){lista.innerHTML='<div class="empty">Inga resultat.</div>';return;}
+      var grenNamn={precision:'Precision',snabb:'Milsnabb',helmatch:'Helmatch'};
+      lista.innerHTML = data.map(function(r){
+        var k=GRENKONFIG[r.gren||'precision']||GRENKONFIG.precision;
+        return '<div class="card" style="margin-bottom:8px;">'
+          +'<div style="display:flex;justify-content:space-between;">'
+          +'<span style="font-weight:700;">'+r.total+'p</span>'
+          +'<span style="font-size:12px;color:var(--muted);">'+r.datum+'</span>'
+          +'</div>'
+          +'<div style="font-size:12px;color:var(--muted);">'+( grenNamn[r.gren]||r.gren)+' · '+r.xs+'X</div>'
+          +'</div>';
+      }).join('');
+    }).catch(function(){
+      document.getElementById('admin-anv-lista').innerHTML='<div class="empty">Fel vid hämtning.</div>';
+    });
+}
+
+function handleAdminDel(btn){ adminTaBortAnvandare(btn.getAttribute("data-uid"), btn.getAttribute("data-namn")); }
+function adminTaBortAnvandare(uid, namn){
+  if(!confirm('Ta bort '+namn+' och ALL deras data? Det går inte att ångra!')) return;
+  // Ta bort resultat först
+  sb('resultat?anvandare_id=eq.'+uid,{method:'DELETE',extraHeaders:{'Prefer':''}}).then(function(){
+    // Sen ta bort användaren
+    sb('anvandare?id=eq.'+uid,{method:'DELETE',extraHeaders:{'Prefer':''}}).then(function(){
+      toast('Borttaget!','ok');
+      laddaAdminData();
+    });
+  }).catch(function(){ toast('Fel vid borttagning.','err'); });
+}
+
+
+
+// ══════════════════════════════════
+// HISTORIK MULTI-SELECT & REDIGERA
+// ══════════════════════════════════
+var selectLage = false;
+var markerade = {}; // id -> result object
+
+
+
+function avslutaSelectLage(){
+  document.querySelectorAll('.hist-cb-btn').forEach(function(el){
+    el.textContent = '';
+    el.style.borderColor = '';
+    el.style.background = 'var(--card)';
+  });
+  document.querySelectorAll('.hist-card-wrap.markerad').forEach(function(w){ w.classList.remove('markerad'); });
+  markerade = {};
+  document.getElementById('hist-action-bar').classList.remove('synlig');
+}
+
+
+function onHistCbClick(el){
+  var id = ''+el.getAttribute('data-id');
+  var wrap = document.getElementById('wrap-'+id);
+  if(markerade[id]){
+    delete markerade[id];
+    el.textContent = '';
+    el.style.borderColor = '';
+    el.style.background = 'var(--card)';
+    if(wrap) wrap.classList.remove('markerad');
+  } else {
+    markerade[id] = (window.histResultater && window.histResultater[id]) || {id:id};
+    el.textContent = '✕';
+    el.style.borderColor = 'var(--blue)';
+    el.style.background = 'rgba(55,138,221,0.12)';
+    if(wrap) wrap.classList.add('markerad');
+  }
+  var antal = Object.keys(markerade).length;
+  var bar = document.getElementById('hist-action-bar');
+  if(antal > 0){ bar.classList.add('synlig'); document.getElementById('hist-action-count').textContent = antal + ' valda'; }
+  else { bar.classList.remove('synlig'); }
+}
+
+function onHistCb(id, cb){
+  id = ""+id;
+  var wrap = document.getElementById("wrap-"+id);
+  var isChecked = cb ? cb.checked : !markerade[id];
+  if(isChecked){
+    markerade[id] = (window.histResultater && window.histResultater[id]) || {id:id};
+    if(wrap) wrap.classList.add("markerad");
+  } else {
+    delete markerade[id];
+    if(wrap) wrap.classList.remove("markerad");
+  }
+  var antal = Object.keys(markerade).length;
+  var bar = document.getElementById("hist-action-bar");
+  if(antal > 0){ bar.classList.add("synlig"); document.getElementById("hist-action-count").textContent = antal + " valda"; }
+  else { bar.classList.remove("synlig"); }
+}
+
+function exporteraMarkerade(kanal){
+  var ids = Object.keys(markerade);
+  if(!ids.length) return;
+  var rader = ids.map(function(id){
+    var r = markerade[id];
+    var k = GRENKONFIG[r.gren||'precision']||GRENKONFIG.precision;
+    var rad = r.datum+' — '+k.namn+(r.vapengrupp?' · '+r.vapengrupp:'')+(r.vapen?' · '+r.vapen:'')+' \n';
+    rad += 'Totalt: '+r.total+'p · '+(r.xs||0)+'X\n';
+    // Serier
+    if(r.serier && r.serier.length){
+      if(r.gren==='snabb'){
+        var mom=[{namn:'10sek',idx:[0,1,2,3]},{namn:'8sek',idx:[4,5,6,7]},{namn:'6sek',idx:[8,9,10,11]}];
+        mom.forEach(function(m){
+          var del=m.idx.map(function(i){var s=r.serier[i]||{sum:0};return'S'+(i+1)+':'+s.sum+'p';}).join(' ');
+          var tot=m.idx.reduce(function(a,i){return a+(r.serier[i]?r.serier[i].sum:0);},0);
+          rad+=m.namn+': '+del+' = '+tot+'p\n';
+        });
+      } else {
+        var serArr=r.serier.map(function(s,i){
+          var xs=(s.shots||[]).filter(function(v){return v==='X';}).length;
+          return'S'+(i+1)+':'+s.sum+'p'+(xs?'+'+xs+'X':'');
+        });
+        // Visa 4 per rad
+        for(var i=0;i<serArr.length;i+=4){
+          rad+=serArr.slice(i,i+4).join('  ')+'\n';
+        }
+      }
+    }
+    return rad;
+  }).join('\n---\n');
+  var txt = '🎯 Skyttresultat\n\n'+rader;
+  var enc = encodeURIComponent(txt);
+  if(kanal==='mail') window.open('mailto:?subject=Skyttresultat&body='+enc);
+  else window.open('https://wa.me/?text='+enc);
+}
+
+function raderaMarkerade(){
+  var ids = Object.keys(markerade);
+  if(!ids.length) return;
+  if(!confirm('Radera '+ids.length+' resultat?')) return;
+  var promises = ids.map(function(id){
+    return sb('resultat?id=eq.'+id,{method:'DELETE',extraHeaders:{'Prefer':''}});
+  });
+  Promise.all(promises).then(function(){
+    toast('Raderade '+ids.length+' resultat','ok');
+    avslutaSelectLage();
+    renderHistorik();
+  }).catch(function(){ toast('Fel vid radering','err'); });
+}
+
+// ── Redigera
+var redigeraCache = {};
+
+function oppnaRedigera(id){
+  document.body.style.overflow = 'hidden';
+  if(window.histResultater && window.histResultater[""+id]) redigeraCache[""+id] = window.histResultater[""+id];
+  var r = redigeraCache[id];
+  if(!r){ toast('Kunde inte hitta resultat','err'); return; }
+  document.getElementById('red-id').value = id;
+  document.getElementById('red-typ').value = r.typ||'traning';
+  document.getElementById('red-datum').value = r.datum||'';
+  document.getElementById('red-vg').value = r.vapengrupp||'A';
+  document.getElementById('red-vapen').value = r.vapen||'';
+  document.getElementById('red-klass').value = r.klass||'Öppen';
+  document.getElementById('red-tavlingsnamn').value = r.tavlingsnamn||'';
+  document.getElementById('red-noter').value = r.noter||'';
+  document.getElementById('red-tavling-falt').style.display = r.typ==='tavling'?'block':'none';
+  document.getElementById('red-typ').onchange = function(){
+    document.getElementById('red-tavling-falt').style.display = this.value==='tavling'?'block':'none';
+  };
+  document.getElementById('redigera-modal').classList.add('open');
+}
+
+function stangRedigera(e){
+  if(e && e.target !== document.getElementById('redigera-modal')) return;
+  document.getElementById('redigera-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function sparaRedigering(){
+  var id = document.getElementById('red-id').value;
+  var upd = {
+    typ: document.getElementById('red-typ').value,
+    datum: document.getElementById('red-datum').value,
+    vapengrupp: document.getElementById('red-vg').value,
+    vapen: document.getElementById('red-vapen').value,
+    klass: document.getElementById('red-klass').value,
+    tavlingsnamn: document.getElementById('red-tavlingsnamn').value,
+    noter: document.getElementById('red-noter').value
+  };
+  sb('resultat?id=eq.'+id,{method:'PATCH',extraHeaders:{'Prefer':''},body:JSON.stringify(upd)})
+    .then(function(r){
+      if(r.ok){
+        toast('Sparat!','ok');
+        document.getElementById('redigera-modal').classList.remove('open');
+        document.body.style.overflow = '';
+        renderHistorik();
+      } else { toast('Fel vid sparande','err'); }
+    }).catch(function(){ toast('Ingen anslutning','err'); });
+}
+
+// Splash gun animation
+(function(){
+  var gun=document.getElementById('splash-gun-g');if(!gun)return;
+  var phases=[
+    [0.55,0.78,{tx:220,ty:0,s:0.18,op:0},{tx:185,ty:0,s:0.24,op:1}],
+    [0.78,1.40,{tx:185,ty:0,s:0.24,op:1},{tx:185,ty:0,s:0.24,op:1}],
+    [1.40,1.49,{tx:185,ty:0,s:0.24,op:1},{tx:189,ty:0,s:0.24,op:1}],
+    [1.49,1.58,{tx:189,ty:0,s:0.24,op:1},{tx:185,ty:0,s:0.24,op:1}],
+    [1.58,2.45,{tx:185,ty:0,s:0.24,op:1},{tx:-5,ty:-8,s:0.55,op:1}],
+    [2.45,4.60,{tx:-5,ty:-8,s:0.55,op:1},{tx:-5,ty:-8,s:0.55,op:1}]
+  ];
+  function ease(t){return t<0.5?2*t*t:-1+(4-2*t)*t;}
+  var start=null;
+  function frame(ts){
+    if(!start)start=ts;var t=(ts-start)/1000;
+    var cur=phases[0];for(var i=0;i<phases.length;i++){if(t>=phases[i][0])cur=phases[i];}
+    var dur=cur[1]-cur[0]||0.001,p=ease(Math.min(1,Math.max(0,(t-cur[0])/dur)));
+    var f=cur[2],to=cur[3];
+    gun.setAttribute('transform','translate('+(f.tx+(to.tx-f.tx)*p).toFixed(2)+','+(f.ty+(to.ty-f.ty)*p).toFixed(2)+') scale('+(f.s+(to.s-f.s)*p).toFixed(4)+')');
+    gun.style.opacity=f.op+(to.op-f.op)*p;
+    if(t<4.7)requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // Dark mode: apply invert filter directly on the SVG image element
+  var imgEl = document.getElementById('splash-gun-img');
+  if(imgEl){
+    var isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if(isDark){
+      imgEl.style.filter = 'invert(1)';
+    }
+    // Also listen for changes
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        imgEl.style.filter = e.matches ? 'invert(1)' : '';
+      });
+    }
+  }
+})();
+
+setTimeout(function(){
+  var s=document.getElementById('splash');
+  s.classList.add('splash-out');
+  setTimeout(function(){
+    s.style.display='none';
+    // Visa rätt skärm efter splash
+    document.getElementById('bottom-nav').style.display='flex';
+    kollaLagraNamn();
+  },650);
+},5400);
+</script>
+</body>
+</html>
