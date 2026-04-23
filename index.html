@@ -157,8 +157,7 @@
     .t-bull { fill: currentColor; opacity: 0; animation: sfade 0.3s ease forwards 0.58s; }
     @keyframes draw-ring { to { stroke-dashoffset: 0; } }
     @keyframes sfade { to { opacity: 1; } }
-    .s-flash { opacity: 0; animation: s-flash-anim 0.22s ease forwards 1.42s; }
-    @keyframes s-flash-anim { 0%{opacity:0} 35%{opacity:1} 100%{opacity:0} }
+    .s-flash { display: none; }
     .s-bullet { opacity: 0; animation: s-bullet-fly 0.32s linear forwards 1.46s; }
     @keyframes s-bullet-fly { 0%{transform:translate(0,0);opacity:1} 80%{opacity:0.8} 100%{transform:translate(-148px,0px);opacity:0} }
     .s-impact { fill: none; stroke: currentColor; stroke-width: 1.4; opacity: 0; transform-origin: 0px 0px; animation: s-impact-anim 0.55s ease-out forwards 1.78s; }
@@ -420,6 +419,7 @@
   <div class="admin-header">
     <h2>👑 Admin</h2>
     <button class="btn btn-secondary" style="margin-top:0;padding:6px 14px;font-size:13px;" onclick="stangAdmin()">Stäng</button>
+    <button class="btn btn-secondary" style="margin-top:0;padding:6px 14px;font-size:12px;" onclick="tilldelaGamlaResultat()">🔗 Tilldela gamla resultat till mig</button>
   </div>
   <div id="admin-content" style="padding-bottom:40px;"></div>
 </div>
@@ -551,6 +551,7 @@
       <div class="tot-item"><div class="tot-val" id="tot-sum">0</div><div class="tot-label">Totalt</div></div>
     </div>
     <button class="btn" id="spara-btn" onclick="sparaResultat()">Spara resultat</button>
+    <button class="btn btn-secondary" style="margin-top:6px;font-size:13px;" onclick="raderaAllt()">🗑 Radera allt</button>
     <div class="sync-bar"><div class="sync-dot" id="sync-dot"></div><span id="sync-text"></span></div>
   </div>
 
@@ -646,7 +647,7 @@ var GRENKONFIG = {
   },
   snabb: {
     namn: 'Militär snabbmatch', sub: 'Snabbmatch · 25m · 60 skott',
-    maxPerSerie: 50, skottPerSerie: 6, antalSerier: 12, maxTotal: 600, harX: true,
+    maxPerSerie: 50, skottPerSerie: 5, antalSerier: 12, maxTotal: 600, harX: true,
     harMedalj: 'total',
     krav: {A:{brons:377,silver:454,guld:515},'A-optics':{brons:377,silver:454,guld:515},B:{brons:391,silver:472,guld:543},C:{brons:404,silver:481,guld:550},R:{brons:388,silver:467,guld:532}},
     moment: [
@@ -680,6 +681,7 @@ var aktGren='precision';
 var filterTyp='alla';
 var shots=[];
 var sumVals=[];
+var sumXVals=[]; // X per serie i summa-läge
 var globalMode='skott';
 var activeSerie=0,activeShot=0;
 var perfektaCelebrerade={};
@@ -717,8 +719,8 @@ function valjGren(gren){
 
 function byttGren(){
   document.getElementById('app').style.display='none';
-  document.getElementById('bottom-nav').style.display='none';
   document.getElementById('gren-valj').style.display='flex';
+  document.getElementById('bottom-nav').style.display='flex';
 }
 
 function getVapengrupp(){return document.getElementById(document.getElementById('typ').value==='traning'?'vapengrupp-tr':'vapengrupp-tv').value;}
@@ -730,7 +732,7 @@ function setGlobalMode(m){
   document.getElementById('btn-summa').className='mode-toggle-btn'+(m==='summa'?' active':'');
   var k=GRENKONFIG[aktGren];
   var grenHarX=k.harX||( k.moment&&k.moment.some(function(mom){return mom.harX!==false;}));
-  document.getElementById('summa-x-wrap').style.display=(m==='summa'&&grenHarX)?'block':'none';
+  document.getElementById('summa-x-wrap').style.display='none'; // Replaced by per-serie X inputs
   renderSerier();
 }
 
@@ -808,8 +810,17 @@ function renderSerier(){
     for(var mi=0;mi<k.moment.length;mi++){
       var mom=k.moment[mi];
       html+='<div class="moment-header">'+mom.namn+'</div>';
-      for(var si=0;si<mom.serier.length;si++){
-        html+=renderSerieBlock(mom.serier[si],vg,k,maxP);
+      if(globalMode==='summa'){
+        // 2x2 grid för summa-läge
+        html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">';
+        for(var si=0;si<mom.serier.length;si++){
+          html+=renderSerieBlock(mom.serier[si],vg,k,maxP);
+        }
+        html+='</div>';
+      } else {
+        for(var si=0;si<mom.serier.length;si++){
+          html+=renderSerieBlock(mom.serier[si],vg,k,maxP);
+        }
       }
     }
   } else {
@@ -875,7 +886,10 @@ function renderSerieBlock(s,vg,k,maxP){
     }
   } else {
     var cv=sumVals[s]!==null?sumVals[s]:'';
+    var cx=sumXVals[s]||0;
+    var hasX2=serieHarX(s);
     bodyHtml='<input class="sum-input" type="number" min="0" max="'+maxP+'" placeholder="0–'+maxP+'" value="'+cv+'" inputmode="numeric" id="sum-inp-'+s+'" oninput="onSumInput('+s+',this)">';
+    if(hasX2) bodyHtml+='<div style="display:flex;align-items:center;gap:8px;margin-top:6px;"><label style="font-size:12px;color:var(--muted);margin:0;">X-ringar:</label><input class="sum-input" style="width:80px;font-size:20px;" type="number" min="0" max="'+k.skottPerSerie+'" placeholder="0" value="'+cx+'" inputmode="numeric" id="sum-x-'+s+'" oninput="onSumXInput('+s+',this)"></div>';
   }
   return '<div class="'+blockCls+'" id="serie-'+s+'"><div class="serie-title"><span>Serie '+(s+1)+'</span>'+summaryHtml+'</div>'+bodyHtml+'</div>';
 }
@@ -913,6 +927,17 @@ function onSumInput(s,inp){
 }
 
 function clickShot(s,i){activeSerie=s;activeShot=i;renderSerier();}
+
+function raderaAllt(){
+  if(!confirm('Radera alla inlagda skott?')) return;
+  initShots();
+  sumVals=Array(GRENKONFIG[aktGren].antalSerier).fill(null);
+  sumXVals=Array(GRENKONFIG[aktGren].antalSerier).fill(0);
+  perfektaCelebrerade={};
+  document.getElementById('noter').value='';
+  renderSerier();
+  toast('Allt raderat','ok');
+}
 
 function highlightaSpara(){
   var btn=document.getElementById('spara-btn');
@@ -967,8 +992,7 @@ function updateTotals(){
     xs=f.filter(function(v){return v==='X';}).length;
     tens=f.filter(function(v){return v==='X'||v===10;}).length;
   } else {
-    var xInp=document.getElementById('summa-x-inp');
-    xs=xInp?parseInt(xInp.value)||0:0;tens=xs;
+    xs=sumXVals.reduce(function(a,v){return a+(v||0);},0);tens=xs;
   }
   document.getElementById('tot-x').textContent=xs;
   document.getElementById('tot-10').textContent=tens;
@@ -1099,8 +1123,7 @@ function sparaResultat(){
   } else {
     if(!sumVals.some(function(v){return v!==null;})){toast('Ange minst en serie.','err');return;}
     sumVals.forEach(function(v){if(v!==null)total+=v;});
-    var xInp=document.getElementById('summa-x-inp');
-    xs=xInp?parseInt(xInp.value)||0:0;tens=xs;
+    xs=sumXVals.reduce(function(a,v){return a+(v||0);},0);tens=xs;
     serieData=sumVals.map(function(v,si){
       var isPerfekt=v===k.maxPerSerie;
       var medal=isPerfekt?'perfekt':(k.harMedalj==='serie'&&v!==null?getMedalj(v,vg,aktGren):null);
@@ -1762,7 +1785,11 @@ function stangGastExport(){
 var ADMIN_NAMN = 'Fredrik';  // Ditt admin-namn
 var aktivtNamn = null;
 
-function visaNamnScreen(){ document.getElementById('namn-screen').classList.remove('dold'); }
+function visaNamnScreen(){
+  document.getElementById('namn-screen').classList.remove('dold');
+  document.getElementById('gren-valj').style.display='none';
+  document.getElementById('app').style.display='none';
+}
 function doljNamnScreen(){ document.getElementById('namn-screen').classList.add('dold'); }
 
 function namnStatus(msg, typ){
@@ -1866,8 +1893,9 @@ function kollaLagraNamn(){
     // Redan inloggad på denna enhet
     aktivtNamn = sparat;
     var chip = document.getElementById('anvandare-chip');
-    if(chip){ chip.textContent = '👤 '+sparat; chip.style.display='inline'; }
-    if(sparat === ADMIN_NAMN){
+    var isAdm = sparat === ADMIN_NAMN;
+    if(chip){ chip.textContent = (isAdm?'👑 ':'👤 ')+sparat; chip.style.display='inline'; }
+    if(isAdm){
       var abw = document.getElementById('admin-btn-wrap');
       if(abw) abw.style.display='block';
     }
@@ -1890,6 +1918,17 @@ function stangAdmin(){
   document.getElementById('admin-panel').classList.remove('open');
 }
 
+function tilldelaGamlaResultat(){
+  var uid = localStorage.getItem('skytte_uid');
+  if(!uid){toast('Inte inloggad','err');return;}
+  if(!confirm('Tilldela alla resultat utan ägare till dig?')) return;
+  sb('resultat?anvandare_id=is.null',{method:'PATCH',extraHeaders:{'Prefer':''},body:JSON.stringify({anvandare_id:uid})})
+    .then(function(r){
+      if(r.ok){toast('Klart! Gamla resultat tilldelade.','ok');laddaAdminData();}
+      else{toast('Fel vid tilldelning.','err');}
+    }).catch(function(){toast('Ingen anslutning.','err');});
+}
+
 function laddaAdminData(){
   var content = document.getElementById('admin-content');
   content.innerHTML = '<div class="loading" style="padding:20px;">Hämtar användare...</div>';
@@ -1905,10 +1944,10 @@ function laddaAdminData(){
       content.innerHTML = '<div style="padding:8px 0;">'
         + anvandare.map(function(a){
           var ant = raknare[a.id]||0;
-          return '<div class="admin-user-card">'
-            +'<div><div class="admin-user-namn">'+a.namn+(a.namn===ADMIN_NAMN?' 👑':'')+'</div>'
-            +'<div class="admin-user-info">'+ant+' resultat</div></div>'
-            +'<button class="admin-del-btn" data-uid="'+a.id+'" data-namn="'+a.namn+'" onclick="handleAdminDel(this)">Ta bort</button>'
+          return '<div class="admin-user-card" style="cursor:pointer;" onclick="adminVisaAnvandare(\'' + a.id + '\',\'' + a.namn + '\')">'
+            +'<div style="flex:1;"><div class="admin-user-namn">'+a.namn+(a.namn===ADMIN_NAMN?' 👑':' 👤')+'</div>'
+            +'<div class="admin-user-info">'+ant+' resultat — klicka för att se</div></div>'
+            +'<button class="admin-del-btn" data-uid="'+a.id+'" data-namn="'+a.namn+'" onclick="event.stopPropagation();handleAdminDel(this)">Ta bort</button>'
             +'</div>';
         }).join('')
         +'</div>';
@@ -1916,6 +1955,34 @@ function laddaAdminData(){
   }).catch(function(){
     content.innerHTML='<div class="empty" style="padding:20px;">Kunde inte hämta data.</div>';
   });
+}
+
+function adminVisaAnvandare(uid, namn){
+  var content = document.getElementById('admin-content');
+  content.innerHTML = '<div style="padding:16px;">'
+    +'<button onclick="laddaAdminData()" style="background:none;border:none;color:var(--blue);cursor:pointer;font-size:14px;padding:0 0 12px;">← Tillbaka</button>'
+    +'<h3 style="margin:0 0 12px;">'+namn+'</h3>'
+    +'<div id="admin-anv-lista"><div class="loading">Hämtar resultat...</div></div>'
+    +'</div>';
+
+  sb('resultat?select=*&anvandare_id=eq.'+uid+'&order=datum.desc',{extraHeaders:{'Prefer':''}})
+    .then(function(r){return r.json();}).then(function(data){
+      var lista = document.getElementById('admin-anv-lista');
+      if(!data||data.length===0){lista.innerHTML='<div class="empty">Inga resultat.</div>';return;}
+      var grenNamn={precision:'Precision',snabb:'Milsnabb',helmatch:'Helmatch'};
+      lista.innerHTML = data.map(function(r){
+        var k=GRENKONFIG[r.gren||'precision']||GRENKONFIG.precision;
+        return '<div class="card" style="margin-bottom:8px;">'
+          +'<div style="display:flex;justify-content:space-between;">'
+          +'<span style="font-weight:700;">'+r.total+'p</span>'
+          +'<span style="font-size:12px;color:var(--muted);">'+r.datum+'</span>'
+          +'</div>'
+          +'<div style="font-size:12px;color:var(--muted);">'+( grenNamn[r.gren]||r.gren)+' · '+r.xs+'X</div>'
+          +'</div>';
+      }).join('');
+    }).catch(function(){
+      document.getElementById('admin-anv-lista').innerHTML='<div class="empty">Fel vid hämtning.</div>';
+    });
 }
 
 function handleAdminDel(btn){ adminTaBortAnvandare(btn.getAttribute("data-uid"), btn.getAttribute("data-namn")); }
@@ -1931,8 +1998,6 @@ function adminTaBortAnvandare(uid, namn){
   }).catch(function(){ toast('Fel vid borttagning.','err'); });
 }
 
-// Kör vid start
-kollaLagraNamn();
 
 // Splash gun animation
 (function(){
@@ -1979,7 +2044,9 @@ setTimeout(function(){
   s.classList.add('splash-out');
   setTimeout(function(){
     s.style.display='none';
-    document.getElementById('gren-valj').style.display='flex';
+    // Visa rätt skärm efter splash
+    document.getElementById('bottom-nav').style.display='flex';
+    kollaLagraNamn();
   },650);
 },5400);
 </script>
