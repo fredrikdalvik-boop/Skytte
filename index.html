@@ -1854,6 +1854,13 @@ function aktiveraNamn(namn, uid){
 }
 
 function kollaLagraNamn(){
+  // Version check — clear old sessions without PIN
+  var appVersion = '2';
+  if(localStorage.getItem('skytte_version') !== appVersion){
+    localStorage.removeItem('skytte_namn');
+    localStorage.removeItem('skytte_uid');
+    localStorage.setItem('skytte_version', appVersion);
+  }
   var sparat = localStorage.getItem('skytte_namn');
   if(sparat){
     // Redan inloggad på denna enhet
