@@ -9,6 +9,11 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Skytte">
   <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Pistolskytte">
+  <meta name="theme-color" content="#1a1a1a">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <title>Pistolskytteappen</title>
   <style>
@@ -364,6 +369,23 @@
     #redigera-modal { position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,0.5); display: none; align-items: flex-end; }
     #redigera-modal.open { display: flex; }
     #redigera-inner { background: var(--surface); border-radius: 20px 20px 0 0; padding: 20px 20px 40px; width: 100%; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; height: 85vh; overflow-y: scroll; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; }
+
+    /* iOS Install Guide */
+    #ios-install-guide { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: calc(100% - 24px); max-width: 456px; background: var(--card); border-radius: 20px 20px 0 0; padding: 20px 20px 32px; z-index: 10001; box-shadow: 0 -4px 30px rgba(0,0,0,0.2); border-top: 0.5px solid var(--border2); display: none; flex-direction: column; gap: 12px; animation: slideUp 0.4s cubic-bezier(0.175,0.885,0.32,1.275); }
+    #ios-install-guide.synlig { display: flex; }
+    @keyframes slideUp { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
+    .ios-guide-titel { font-size: 16px; font-weight: 700; color: var(--ink); }
+    .ios-guide-steps { display: flex; flex-direction: column; gap: 10px; }
+    .ios-guide-step { display: flex; align-items: center; gap: 12px; }
+    .ios-guide-num { width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ios-guide-text { font-size: 14px; color: var(--ink); }
+    .ios-guide-text strong { color: var(--blue); }
+    .ios-share-icon { display: inline-block; width: 22px; height: 22px; vertical-align: middle; }
+    .ios-arrow { position: fixed; bottom: 8px; left: 50%; transform: translateX(-50%); font-size: 28px; animation: bounce 1s ease-in-out infinite; z-index: 10002; pointer-events: none; display: none; }
+    .ios-arrow.synlig { display: block; }
+    @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(8px)} }
+    #ios-install-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 10000; display: none; }
+    #ios-install-overlay.synlig { display: block; }
   </style>
 </head>
 <body>
@@ -552,6 +574,35 @@
   </div>
 </div>
 
+<!-- iOS Install Guide -->
+<div id="ios-install-overlay" onclick="stangIosGuide()"></div>
+<div id="ios-install-guide">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <div class="ios-guide-titel">📱 Installera Pistolskytteappen</div>
+    <button onclick="stangIosGuide()" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:0;">✕</button>
+  </div>
+  <div class="ios-guide-steps">
+    <div class="ios-guide-step">
+      <div class="ios-guide-num">1</div>
+      <div class="ios-guide-text">Tryck på <strong>dela-ikonen</strong>
+        <svg class="ios-share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue)"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        i botten av Safari
+      </div>
+    </div>
+    <div class="ios-guide-step">
+      <div class="ios-guide-num">2</div>
+      <div class="ios-guide-text">Scrolla ner och tryck <strong>"Lägg till på hemskärmen"</strong></div>
+    </div>
+    <div class="ios-guide-step">
+      <div class="ios-guide-num">3</div>
+      <div class="ios-guide-text">Tryck <strong>"Lägg till"</strong> uppe till höger</div>
+    </div>
+  </div>
+  <div style="text-align:center;font-size:12px;color:var(--muted);">Appen sparar data offline och fungerar som en vanlig app!</div>
+  <button class="btn btn-secondary" onclick="stangIosGuide();localStorage.setItem('ios_guide_seen','1');" style="margin-top:4px;">Stäng — visa inte igen</button>
+</div>
+<div class="ios-arrow" id="ios-arrow">↓</div>
+
 <!-- Toast -->
 <div id="toast"></div>
 <!-- Konfetti -->
@@ -662,6 +713,21 @@
   <!-- INSTÄLLNINGAR -->
   <div id="view-installningar" class="view">
     <h2 style="margin-top:8px;">Inställningar</h2>
+
+    <div class="export-section" id="install-section">
+      <h3>📱 Installera appen</h3>
+      <div id="install-btn-wrap">
+        <button class="btn" id="pwa-install-btn" style="display:none;" onclick="installPWA()">
+          ⬇️ Installera på hemskärmen
+        </button>
+        <div id="install-manual" style="font-size:13px;color:var(--muted);line-height:1.6;">
+          <strong style="color:var(--ink);">iPhone/iPad (Safari):</strong><br>
+          Tryck på <strong>dela-ikonen</strong> ↑ → "Lägg till på hemskärmen"<br><br>
+          <strong style="color:var(--ink);">Android (Chrome):</strong><br>
+          Tryck på <strong>⋮</strong> → "Installera app" eller "Lägg till på startskärmen"
+        </div>
+      </div>
+    </div>
     <div id="admin-btn-wrap" style="display:none;margin-bottom:8px;"><button class="btn" style="background:linear-gradient(135deg,#9333EA,#C026D3);color:#fff;" onclick="oppnaAdmin()">👑 Admin-panel</button></div>
 
     <div class="export-section">
@@ -1295,6 +1361,7 @@ function sparaResultat(){
 
 
 // Apply saved theme on startup
+kollaInstallation();
 (function(){
   var saved = localStorage.getItem('app_theme') || 'auto';
   setAppTheme(saved);
@@ -2018,12 +2085,17 @@ function aktiveraNamn(namn, uid){
   aktivtNamn = namn;
   localStorage.setItem('skytte_namn', namn);
   localStorage.setItem('skytte_uid', uid||'');
+  localStorage.setItem('skytte_version', '2');
   doljNamnScreen();
+  // Visa grenväljaren och menyn
+  document.getElementById('gren-valj').style.display='flex';
+  document.getElementById('bottom-nav').style.display='flex';
   // Uppdatera chip
+  var isAdmin = namn === ADMIN_NAMN;
   var chip = document.getElementById('anvandare-chip');
-  if(chip){ chip.textContent = '👤 '+namn; chip.style.display='inline'; }
+  if(chip){ chip.textContent = (isAdmin?'👑 ':'👤 ')+namn; chip.style.display='inline'; }
   // Visa admin-knapp om admin
-  if(namn === ADMIN_NAMN){
+  if(isAdmin){
     var abw = document.getElementById('admin-btn-wrap');
     if(abw) abw.style.display='block';
   }
@@ -2331,6 +2403,63 @@ function sparaRedigering(){
         renderHistorik();
       } else { toast('Fel vid sparande','err'); }
     }).catch(function(){ toast('Ingen anslutning','err'); });
+}
+
+
+
+// iOS Install Guide
+function visaIosGuide(){
+  document.getElementById('ios-install-guide').classList.add('synlig');
+  document.getElementById('ios-install-overlay').classList.add('synlig');
+  document.getElementById('ios-arrow').classList.add('synlig');
+}
+
+function stangIosGuide(){
+  document.getElementById('ios-install-guide').classList.remove('synlig');
+  document.getElementById('ios-install-overlay').classList.remove('synlig');
+  document.getElementById('ios-arrow').classList.remove('synlig');
+}
+
+function kollaInstallation(){
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  var isInStandaloneMode = window.navigator.standalone === true;
+  var harSett = localStorage.getItem('ios_guide_seen');
+  var harInstallerat = localStorage.getItem('pwa_installed');
+
+  if(isIOS && !isInStandaloneMode && !harSett && !harInstallerat){
+    // Visa iOS-guiden efter 3 sekunder
+    setTimeout(visaIosGuide, 3000);
+  }
+}
+
+// Markera som installerad om i standalone mode
+if(window.navigator.standalone === true){
+  localStorage.setItem('pwa_installed', '1');
+}
+
+// PWA Installation
+var deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  var btn = document.getElementById('pwa-install-btn');
+  var manual = document.getElementById('install-manual');
+  if(btn){ btn.style.display = 'block'; }
+  if(manual){ manual.style.display = 'none'; }
+});
+
+window.addEventListener('appinstalled', function(){
+  deferredInstallPrompt = null;
+  var btn = document.getElementById('pwa-install-btn');
+  if(btn){ btn.textContent = '✓ Appen är installerad!'; btn.disabled = true; btn.style.background = 'var(--green)'; }
+});
+
+function installPWA(){
+  if(!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(function(result){
+    deferredInstallPrompt = null;
+  });
 }
 
 // Splash gun animation
