@@ -2018,12 +2018,17 @@ function aktiveraNamn(namn, uid){
   aktivtNamn = namn;
   localStorage.setItem('skytte_namn', namn);
   localStorage.setItem('skytte_uid', uid||'');
+  localStorage.setItem('skytte_version', '2');
   doljNamnScreen();
+  // Visa grenväljaren och menyn
+  document.getElementById('gren-valj').style.display='flex';
+  document.getElementById('bottom-nav').style.display='flex';
   // Uppdatera chip
+  var isAdmin = namn === ADMIN_NAMN;
   var chip = document.getElementById('anvandare-chip');
-  if(chip){ chip.textContent = '👤 '+namn; chip.style.display='inline'; }
+  if(chip){ chip.textContent = (isAdmin?'👑 ':'👤 ')+namn; chip.style.display='inline'; }
   // Visa admin-knapp om admin
-  if(namn === ADMIN_NAMN){
+  if(isAdmin){
     var abw = document.getElementById('admin-btn-wrap');
     if(abw) abw.style.display='block';
   }
