@@ -38,7 +38,7 @@
     }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--raised); color: var(--ink); min-height: 100vh; }
     #app { max-width: 480px; margin: 0 auto; padding: 0 0 80px 0; background: var(--raised); min-height: 100vh; }
-    .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: var(--surface); border-top: 1px solid var(--border2); display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+    .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: var(--surface); border-top: 1px solid var(--border2); display: flex; z-index: 10000; padding-bottom: env(safe-area-inset-bottom); }
     .bottom-nav button { flex: 1; padding: 12px 4px 10px; font-size: 10px; font-weight: 500; border: none; background: transparent; cursor: pointer; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 3px; transition: color 0.15s; }
     .bottom-nav button.active { color: var(--blue); }
     .bottom-nav button svg { width: 22px; height: 22px; }
@@ -145,7 +145,7 @@
     .konfetti-bit { position: absolute; width: 8px; height: 8px; border-radius: 2px; animation: fall linear forwards; }
     @keyframes fall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
     /* Splash */
-    #splash { position: fixed; inset: 0; z-index: 9999; background: var(--raised); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; transition: opacity 0.6s ease; }
+    #splash { position: fixed; top: 0; left: 0; right: 0; bottom: 60px; z-index: 9998; background: var(--raised); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; transition: opacity 0.6s ease; }
     #splash.splash-out { opacity: 0; pointer-events: none; }
     #splash-anim { color: var(--ink); overflow: visible; display: block; }
     .t-ring { fill: none; stroke: currentColor; }
@@ -321,7 +321,7 @@
 
 
     /* Namnval-skärm */
-    #namn-screen { position: fixed; inset: 0; z-index: 9999; background: var(--raised); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; gap: 16px; }
+    #namn-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 60px; z-index: 9998; background: var(--raised); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; gap: 16px; }
     #namn-screen.dold { display: none; }
     .namn-titel { font-size: 22px; font-weight: 800; letter-spacing: 1px; color: var(--ink); text-align: center; }
     .namn-sub { font-size: 13px; color: var(--muted); text-align: center; max-width: 300px; line-height: 1.5; }
@@ -340,6 +340,30 @@
     .admin-user-namn { font-size: 15px; font-weight: 600; color: var(--ink); flex: 1; }
     .admin-user-info { font-size: 12px; color: var(--muted); }
     .admin-del-btn { background: none; border: 0.5px solid #C0392B; border-radius: 6px; color: #C0392B; font-size: 12px; padding: 4px 10px; cursor: pointer; }
+
+    /* Multi-select historik */
+    .hist-card-wrap { position: relative; margin-bottom: 10px; }
+    .hist-card-wrap .card { margin-bottom: 0; cursor: pointer; transition: box-shadow 0.15s; }
+    .hist-card-wrap.markerad .card { border: 2px solid var(--blue) !important; background: rgba(55,138,221,0.06) !important; box-shadow: none !important; }
+    .hist-checkmark { position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border2); background: var(--surface); display: none; align-items: center; justify-content: center; font-size: 13px; z-index: 10; }
+    .hist-select-lage .hist-checkmark { display: flex; }
+    .hist-card-wrap.markerad .hist-checkmark { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .hist-cb-btn:hover { border-color: var(--blue) !important; }
+
+    /* Action-bar */
+    #hist-action-bar { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 448px; background: var(--ink); color: var(--surface); border-radius: 16px; padding: 10px 16px; display: none; align-items: center; gap: 8px; z-index: 200; box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+    #hist-action-bar.synlig { display: flex; }
+    .hist-action-count { font-size: 14px; font-weight: 700; flex: 1; }
+    .hist-action-btn { background: rgba(255,255,255,0.15); border: none; color: #fff; border-radius: 10px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .hist-action-btn.red { background: rgba(192,57,43,0.8); }
+
+    /* Select-läge-knapp */
+    .hist-select-toggle { font-size: 12px; color: var(--blue); background: none; border: none; cursor: pointer; padding: 0; font-weight: 600; }
+
+    /* Redigera-modal */
+    #redigera-modal { position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,0.5); display: none; align-items: flex-end; }
+    #redigera-modal.open { display: flex; }
+    #redigera-inner { background: var(--surface); border-radius: 20px 20px 0 0; padding: 20px 20px 40px; width: 100%; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; height: 85vh; overflow-y: scroll; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; }
   </style>
 </head>
 <body>
@@ -383,7 +407,7 @@
   </div>
   <div class="gren-card" onclick="valjGren('snabb')">
     <div class="gren-icon">⚡</div>
-    <div><div class="gren-card-title">Militär snabbmatch</div><div class="gren-card-sub">12 serier × 6 skott · 600p · 25m</div></div>
+    <div><div class="gren-card-title">Militär snabbmatch</div><div class="gren-card-sub">12 serier × 5 skott · 600p · 25m</div></div>
   </div>
   <div class="gren-card" onclick="valjGren('helmatch')">
     <div class="gren-icon">🏆</div>
@@ -419,7 +443,8 @@
   <div class="admin-header">
     <h2>👑 Admin</h2>
     <button class="btn btn-secondary" style="margin-top:0;padding:6px 14px;font-size:13px;" onclick="stangAdmin()">Stäng</button>
-    <button class="btn btn-secondary" style="margin-top:0;padding:6px 14px;font-size:12px;" onclick="tilldelaGamlaResultat()">🔗 Tilldela gamla resultat till mig</button>
+    <button class="btn btn-secondary" style="margin-top:0;padding:6px 14px;font-size:12px;" onclick="tilldelaGamlaResultat()">🔗 Tilldela gamla resultat</button>
+    <button class="btn" style="margin-top:0;padding:6px 14px;font-size:12px;" onclick="adminLaggTillAnvandare()">+ Ny användare</button>
   </div>
   <div id="admin-content" style="padding-bottom:40px;"></div>
 </div>
@@ -471,6 +496,60 @@
   <p style="font-size:13px;color:var(--muted);margin-bottom:8px;">Exportera varje persons resultat</p>
   <div id="gast-export-lista"></div>
   <button class="btn btn-secondary" style="margin-top:8px;" onclick="stangGastExport()">Stäng</button>
+</div>
+
+<!-- Historik action-bar -->
+<div id="hist-action-bar">
+  <span class="hist-action-count" id="hist-action-count">0 valda</span>
+  <button class="hist-action-btn" onclick="exporteraMarkerade('mail')">✉️ Mail</button>
+  <button class="hist-action-btn" onclick="exporteraMarkerade('wa')">💬 WA</button>
+  <button class="hist-action-btn red" onclick="raderaMarkerade()">🗑 Radera</button>
+  <button class="hist-action-btn" onclick="avslutaSelectLage()">✕</button>
+</div>
+
+<!-- Redigera-modal -->
+<div id="redigera-modal" onclick="stangRedigera(event)">
+  <div id="redigera-inner">
+    <h3 style="margin:0;">✏️ Redigera resultat</h3>
+    <div class="row2">
+      <div><label style="margin-top:0;">Typ</label>
+        <select id="red-typ"><option value="traning">Träning</option><option value="tavling">Tävling</option></select>
+      </div>
+      <div><label style="margin-top:0;">Datum</label>
+        <input type="date" id="red-datum">
+      </div>
+    </div>
+    <div class="row2">
+      <div><label style="margin-top:0;">Vapengrupp</label>
+        <select id="red-vg">
+          <option value="A">A</option><option value="A-optics">A optics</option>
+          <option value="B">B</option><option value="C">C</option><option value="R">R</option>
+        </select>
+      </div>
+      <div><label style="margin-top:0;">Vapen</label>
+        <input type="text" id="red-vapen" placeholder="t.ex. CZ 75">
+      </div>
+    </div>
+    <div id="red-tavling-falt">
+      <div class="row2">
+        <div><label style="margin-top:0;">Klass</label>
+          <select id="red-klass">
+            <option>Öppen</option><option>Klass 1</option><option>Klass 2</option><option>Klass 3</option>
+            <option>Junior</option><option>Senior</option><option>Dam</option><option>Veteran Y</option><option>Veteran Ä</option>
+          </select>
+        </div>
+        <div><label style="margin-top:0;">Tävlingsnamn</label>
+          <input type="text" id="red-tavlingsnamn" placeholder="t.ex. DM">
+        </div>
+      </div>
+    </div>
+    <div><label style="margin-top:0;">Noter</label>
+      <input type="text" id="red-noter" placeholder="Anteckningar...">
+    </div>
+    <input type="hidden" id="red-id">
+    <button class="btn" onclick="sparaRedigering()">Spara ändringar</button>
+    <button class="btn btn-secondary" style="margin-top:4px;" onclick="stangRedigera()">Avbryt</button>
+  </div>
 </div>
 
 <!-- Toast -->
@@ -613,8 +692,8 @@
   </div>
 </div>
 
-<nav class="bottom-nav" id="bottom-nav" style="display:none;">
-  <button class="active" onclick="switchView('logga',this)">
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="active" onclick="navLogga(this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
     Logga
   </button>
@@ -658,12 +737,12 @@ var GRENKONFIG = {
   },
   helmatch: {
     namn: 'Nationell helmatch', sub: 'Nationell helmatch · 25m · 60 skott',
-    maxPerSerie: 50, skottPerSerie: 5, antalSerier: 12, maxTotal: 600, harX: false,
+    maxPerSerie: 50, skottPerSerie: 5, antalSerier: 12, maxTotal: 600, harX: true,
     harMedalj: null,
     krav: null,
     moment: [
       {namn:'Precision – 5 min', serier:[0,1,2,3], harX: true},
-      {namn:'Snabbskjutning – 5×3 sek', serier:[4,5,6,7], harX: true},
+      {namn:'Duell – 5×3 sek', serier:[4,5,6,7], harX: true},
       {namn:'Figurskjutning – 18/16/14/12 sek', serier:[8,9,10,11], harX: false}
     ]
   }
@@ -736,12 +815,34 @@ function setGlobalMode(m){
   renderSerier();
 }
 
+function navLogga(btn){
+  // Logga-knappen: visa grenväljaren (eller appen om gren redan vald)
+  document.querySelectorAll('.bottom-nav button').forEach(function(el){el.classList.remove('active');});
+  if(btn) btn.classList.add('active');
+  document.getElementById('namn-screen').classList.add('dold');
+  if(aktGren){
+    // Gren vald — visa logga-vyn
+    document.getElementById('app').style.display='block';
+    document.getElementById('gren-valj').style.display='none';
+    document.querySelectorAll('.view').forEach(function(el){el.classList.remove('active');});
+    document.getElementById('view-logga').classList.add('active');
+  } else {
+    // Ingen gren — visa grenväljaren
+    document.getElementById('app').style.display='none';
+    document.getElementById('gren-valj').style.display='flex';
+  }
+}
+
 function switchView(v,btn){
+  document.getElementById('namn-screen').classList.add('dold');
+  document.getElementById('gren-valj').style.display='none';
+  document.getElementById('app').style.display='block';
   document.querySelectorAll('.view').forEach(function(el){el.classList.remove('active');});
   document.querySelectorAll('.bottom-nav button').forEach(function(el){el.classList.remove('active');});
-  document.getElementById('view-'+v).classList.add('active');btn.classList.add('active');
-  if(v==='historik')renderHistorik();
-  if(v==='statistik')renderStatistik();
+  document.getElementById('view-'+v).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(v==='historik') renderHistorik();
+  if(v==='statistik') renderStatistik();
 }
 function setFilter(f,el){filterTyp=f;document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});el.classList.add('active');renderHistorik();}
 
@@ -889,7 +990,7 @@ function renderSerieBlock(s,vg,k,maxP){
     var cx=sumXVals[s]||0;
     var hasX2=serieHarX(s);
     bodyHtml='<input class="sum-input" type="number" min="0" max="'+maxP+'" placeholder="0–'+maxP+'" value="'+cv+'" inputmode="numeric" id="sum-inp-'+s+'" oninput="onSumInput('+s+',this)">';
-    if(hasX2) bodyHtml+='<div style="display:flex;align-items:center;gap:8px;margin-top:6px;"><label style="font-size:12px;color:var(--muted);margin:0;">X-ringar:</label><input class="sum-input" style="width:80px;font-size:20px;" type="number" min="0" max="'+k.skottPerSerie+'" placeholder="0" value="'+cx+'" inputmode="numeric" id="sum-x-'+s+'" oninput="onSumXInput('+s+',this)"></div>';
+    if(hasX2) bodyHtml+='<div style="display:flex;align-items:center;gap:8px;margin-top:6px;"><label style="font-size:12px;color:var(--muted);margin:0;">Antal X:</label><input class="sum-input" style="width:80px;font-size:20px;" type="number" min="0" max="'+k.skottPerSerie+'" placeholder="0" value="'+cx+'" inputmode="numeric" id="sum-x-'+s+'" oninput="onSumXInput('+s+',this)"></div>';
   }
   return '<div class="'+blockCls+'" id="serie-'+s+'"><div class="serie-title"><span>Serie '+(s+1)+'</span>'+summaryHtml+'</div>'+bodyHtml+'</div>';
 }
@@ -1188,6 +1289,9 @@ function sparaResultat(){
   var xInp2=document.getElementById('summa-x-inp');if(xInp2)xInp2.value='';
   if(!isTr)document.getElementById('tavlingsnamn').value='';
   renderSerier();
+// Permanent change listener for historik checkboxes
+
+
 // Apply saved theme on startup
 (function(){
   var saved = localStorage.getItem('app_theme') || 'auto';
@@ -1221,7 +1325,10 @@ function grenBadge(gren){
 function renderHistorik(){
   var el=document.getElementById('historik-list');
   el.innerHTML='<div class="loading">Hämtar från molnet...</div>';
+  var uid = localStorage.getItem('skytte_uid');
+  var adminMode = (localStorage.getItem('skytte_namn') === ADMIN_NAMN);
   var q='resultat?select=*&order=datum.desc,id.desc';
+  if(!adminMode && uid) q+='&anvandare_id=eq.'+uid;
   if(filterTyp==='gast'){
     q+='&typ=eq.gast';
   } else if(filterTyp==='traning'){
@@ -1236,6 +1343,7 @@ function renderHistorik(){
   }
   sb(q,{extraHeaders:{'Prefer':''}}).then(function(r){return r.json();}).then(function(data){
     if(!data||data.length===0){el.innerHTML='<div class="empty">Inga resultat än.</div>';return;}
+    window.histResultater = {}; data.forEach(function(r){ window.histResultater[""+r.id]=r; });
     el.innerHTML=data.map(function(r){
       var gastNamnDisplay=r.typ==='gast'?r.vapen:'';
 if(r.typ==='gast') gastResultatCache[r.id]=r;
@@ -1243,7 +1351,7 @@ var badge=r.typ==='gast'?'<span class="badge" style="background:rgba(147,51,234,
       var gb=grenBadge(r.gren||'precision');
       var k=GRENKONFIG[r.gren||'precision']||GRENKONFIG.precision;
       var meta=[r.vapengrupp,r.klass,r.vapen].filter(Boolean).join(' · ')+(r.tavlingsnamn?' · '+r.tavlingsnamn:'');
-      var snabbTabell=r.gren==='snabb'&&(r.serier||[]).length>0?byggSnabbTabell(r.serier):null;
+      var snabbTabell=(r.gren==='snabb'&&(r.serier||[]).length>0)?byggSnabbTabell(r.serier):((r.gren==='helmatch'&&(r.serier||[]).length>0)?byggHelmatchTabell(r.serier):null);
 var sh=(r.serier||[]).map(function(s,i){
         var xs=(s.shots||[]).filter(function(v){return v==='X';}).length;
         var isPerfekt=s.sum===k.maxPerSerie&&s.shots&&s.shots.filter(function(v){return v!==null;}).length===k.skottPerSerie;
@@ -1253,16 +1361,33 @@ var sh=(r.serier||[]).map(function(s,i){
       var seriesHtml = snabbTabell || ('<div class="series-row" style="margin-top:10px;">'+sh+'</div>');
       var noterHtml = (r.noter&&r.typ!=='gast') ? '<div style="font-size:13px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border);">'+r.noter+'</div>' : '';
       var gastHtml = r.typ==='gast' ? '<div style="display:flex;gap:8px;margin-top:10px;"><button data-rid="'+r.id+'" data-k="mail" onclick="handleGastExp(this)" style="flex:1;padding:8px;font-size:13px;font-weight:600;background:#378ADD;color:#fff;border:none;border-radius:var(--rad-sm);cursor:pointer;">✉️ Mail</button><button data-rid="'+r.id+'" data-k="wa" onclick="handleGastExp(this)" style="flex:1;padding:8px;font-size:13px;font-weight:600;background:#25D366;color:#fff;border:none;border-radius:var(--rad-sm);cursor:pointer;">💬 WhatsApp</button></div>' : '';
-      return '<div class="card" style="margin-bottom:10px;">'
-        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">'+badge+gb+'<div style="display:flex;align-items:center;gap:6px;"><span class="hist-date">'+r.datum+'</span><button onclick="taBortKort('+r.id+',event)" style="background:none;border:0.5px solid var(--border2);border-radius:6px;cursor:pointer;color:var(--muted);font-size:16px;padding:3px 7px;opacity:0.8;line-height:1;">🗑</button></div></div>'
+      return '<div class="hist-card-wrap" id="wrap-'+r.id+'">'
+        + '<div class="card">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">'
+        + '<div>'+badge+gb+'</div>'
+        + '<div style="display:flex;align-items:center;gap:4px;">'
+        + '<span class="hist-date" style="font-size:14px;font-weight:600;color:var(--ink);">'+r.datum+'</span>'
+        + '<button onclick="oppnaRedigera('+r.id+')" style="background:none;border:0.5px solid var(--border2);border-radius:6px;cursor:pointer;color:var(--muted);font-size:14px;padding:3px 7px;opacity:0.8;line-height:1;">✏️</button>'
+        + '<button onclick="taBortKort('+r.id+',event)" style="background:none;border:0.5px solid var(--border2);border-radius:6px;cursor:pointer;color:var(--muted);font-size:16px;padding:3px 7px;opacity:0.8;line-height:1;">🗑</button>'
+        + '<div class="hist-cb-btn" data-id="'+r.id+'" ontouchend="event.preventDefault();event.stopPropagation();onHistCbClick(this)" onclick="event.stopPropagation();onHistCbClick(this)" style="width:22px;height:22px;border:2px solid var(--border2);border-radius:5px;background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--blue);flex-shrink:0;user-select:none;-webkit-user-select:none;"></div>'
+        + '</div></div>'
         + '<div style="display:flex;align-items:baseline;gap:2px;margin-top:10px;"><span class="hist-score">'+r.total+'p</span><span class="hist-denom">/ '+k.maxTotal+'p</span></div>'
         + '<div style="display:flex;gap:10px;align-items:center;margin-top:4px;"><span class="hist-xs">'+r.xs+'X</span><span class="hist-meta">'+meta+'</span></div>'
         + medalChips(r)
         + seriesHtml
         + noterHtml
         + gastHtml
-        + '</div>';
+        + '</div></div>';
     }).join('');
+
+
+
+
+
+
+
+
+
   }).catch(function(){el.innerHTML='<div class="empty">Kunde inte hämta data.</div>';});
 }
 
@@ -1279,52 +1404,72 @@ function editStdPoang(id,current,e){
 }
 
 
-function byggSnabbTabell(serier){
-  // serier = array av {shots, sum, medal} från r.serier
-  // Moment: 10sek (0-3), 8sek (4-7), 6sek (8-11)
+function byggHelmatchTabell(serier){
   var moment = [
-    {namn:'10 Sekunder', idx:[0,1,2,3]},
-    {namn:'8 Sekunder',  idx:[4,5,6,7]},
-    {namn:'6 Sekunder',  idx:[8,9,10,11]}
+    {namn:'Precision', idx:[0,1,2,3], harX:true},
+    {namn:'Duell', idx:[4,5,6,7], harX:true},
+    {namn:'Figurskjutning', idx:[8,9,10,11], harX:false}
   ];
-  var tbl = '<div class="excel-wrap" style="margin-top:10px;"><table class="excel-table"><thead><tr>';
-
-  // Header: moment-block
+  var tbl = '<div style="font-size:11px;margin-top:8px;">';
   moment.forEach(function(m){
-    tbl += '<th colspan="'+(m.idx.length*2+1)+'" style="text-align:left;padding:4px 6px;">'+m.namn+'</th>';
-  });
-  tbl += '<th>Total</th><th>X</th></tr>';
-
-  // Sub-header: S1 X S2 X ... Tot
-  tbl += '<tr>';
-  moment.forEach(function(m){
-    m.idx.forEach(function(si){
-      tbl += '<th>'+(si+1)+'</th><th style="color:var(--blue)">X</th>';
-    });
-    tbl += '<th>Tot</th>';
-  });
-  tbl += '<th>Tot</th><th style="color:var(--blue)">X</th></tr></thead><tbody><tr>';
-
-  var grandTotal = 0, grandX = 0;
-  moment.forEach(function(m){
-    var momTot = 0, momX = 0;
+    tbl += '<div style="font-weight:700;color:var(--muted);font-size:10px;margin:6px 0 2px;">'+m.namn+'</div>';
+    tbl += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:2px;">';
     m.idx.forEach(function(si){
       var s = serier[si] || {sum:0, shots:[]};
-      var xs = (s.shots||[]).filter(function(v){return v==='X';}).length;
-      var sum = s.sum || 0;
-      momTot += sum; momX += xs; grandTotal += sum; grandX += xs;
-      tbl += '<td class="c-sum">'+sum+'</td><td class="c-x">'+(xs||'')+'</td>';
+      var xs = m.harX ? (s.shots||[]).filter(function(v){return v==='X';}).length : null;
+      tbl += '<div style="background:var(--raised);border-radius:4px;padding:4px 6px;text-align:center;">'
+        +'<div style="font-weight:700;font-size:13px;">'+s.sum+'p</div>'
+        +(xs!==null?'<div style="font-size:10px;color:var(--blue);">'+(xs?xs+'X':'')+'</div>':'')
+        +'</div>';
     });
-    tbl += '<td class="c-sum" style="font-weight:800;">'+momTot+'p</td>';
+    var momTot = m.idx.reduce(function(a,si){ return a+(serier[si]?serier[si].sum:0); },0);
+    var momX   = m.harX ? m.idx.reduce(function(a,si){ return a+(serier[si]?(serier[si].shots||[]).filter(function(v){return v==='X';}).length:0); },0) : null;
+    tbl += '<div style="background:var(--card);border-radius:4px;padding:4px 6px;text-align:center;border:0.5px solid var(--border2);">'
+      +'<div style="font-weight:800;font-size:13px;">'+momTot+'p</div>'
+      +(momX!==null?'<div style="font-size:10px;color:var(--blue);">'+(momX?momX+'X':'')+'</div>':'')
+      +'</div>';
+    tbl += '</div>';
   });
-  tbl += '<td class="c-sum" style="font-weight:800;font-size:13px;">'+grandTotal+'p</td>';
-  tbl += '<td class="c-x" style="font-weight:700;">'+grandX+'</td>';
-  tbl += '</tr></tbody></table></div>';
+  var tot = serier.reduce(function(a,s){ return a+(s?s.sum:0); },0);
+  var totX = serier.reduce(function(a,s){ return a+(s?(s.shots||[]).filter(function(v){return v==='X';}).length:0); },0);
+  tbl += '<div style="text-align:right;font-size:12px;font-weight:800;color:var(--ink);margin-top:4px;">Totalt: '+tot+'p · '+totX+'X</div>';
+  tbl += '</div>';
   return tbl;
 }
 
-// Cache för gäst-resultat (fylls på i renderHistorik)
-var gastResultatCache = {};
+function byggSnabbTabell(serier){
+  var moment = [
+    {namn:'10 sek', idx:[0,1,2,3]},
+    {namn:'8 sek',  idx:[4,5,6,7]},
+    {namn:'6 sek',  idx:[8,9,10,11]}
+  ];
+  var tbl = '<div style="font-size:11px;margin-top:8px;">';
+  moment.forEach(function(m){
+    tbl += '<div style="font-weight:700;color:var(--muted);font-size:10px;margin:6px 0 2px;">'+m.namn+'</div>';
+    tbl += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:2px;">';
+    m.idx.forEach(function(si){
+      var s = serier[si] || {sum:0, shots:[]};
+      var xs = (s.shots||[]).filter(function(v){return v==='X';}).length;
+      tbl += '<div style="background:var(--raised);border-radius:4px;padding:4px 6px;text-align:center;">'
+        +'<div style="font-weight:700;font-size:13px;">'+s.sum+'p</div>'
+        +'<div style="font-size:10px;color:var(--blue);">'+(xs?xs+'X':'')+'</div>'
+        +'</div>';
+    });
+    var momTot = m.idx.reduce(function(a,si){ return a+(serier[si]?serier[si].sum:0); },0);
+    var momX   = m.idx.reduce(function(a,si){ return a+(serier[si]?(serier[si].shots||[]).filter(function(v){return v==='X';}).length:0); },0);
+    tbl += '<div style="background:var(--card);border-radius:4px;padding:4px 6px;text-align:center;border:0.5px solid var(--border2);">'
+      +'<div style="font-weight:800;font-size:13px;">'+momTot+'p</div>'
+      +'<div style="font-size:10px;color:var(--blue);">'+(momX?momX+'X':'')+'</div>'
+      +'</div>';
+    tbl += '</div>';
+  });
+  var tot = serier.reduce(function(a,s){ return a+(s?s.sum:0); },0);
+  var totX = serier.reduce(function(a,s){ return a+(s?(s.shots||[]).filter(function(v){return v==='X';}).length:0); },0);
+  tbl += '<div style="text-align:right;font-size:12px;font-weight:800;color:var(--ink);margin-top:4px;">Totalt: '+tot+'p'+(totX?' · '+totX+'X':'')+'</div>';
+  tbl += '</div>';
+  return tbl;
+}
+
 
 function handleGastExp(btn){
   var rid = btn.getAttribute('data-rid');
@@ -1382,7 +1527,7 @@ function setStatFilter(f, btn){
 function renderStatistik(){
   var el=document.getElementById('statistik-content');
   el.innerHTML='<div class="loading">Hämtar statistik...</div>';
-  sb('resultat?select=*&order=datum.asc&typ=neq.gast',{extraHeaders:{'Prefer':''}}).then(function(r){return r.json();}).then(function(data){
+  sb('resultat?select=*&order=datum.asc&typ=neq.gast'+((!( localStorage.getItem('skytte_namn')===ADMIN_NAMN) && localStorage.getItem('skytte_uid')) ? '&anvandare_id=eq.'+localStorage.getItem('skytte_uid') : ''),{extraHeaders:{'Prefer':''}}).then(function(r){return r.json();}).then(function(data){
     if(!data||data.length===0){el.innerHTML='<div class="empty">Logga resultat för att se statistik.</div>';return;}
 
     // Filtrera per vald gren
@@ -1401,7 +1546,7 @@ function renderStatistik(){
       function avgX(a){return a.length?(a.reduce(function(x,b){return x+(b.xs||0);},0)/a.length).toFixed(1):'-';}
 
       html+='<div class="section-title" style="margin-top:16px;">'+grenNamn[gren]+'</div>';
-      html+='<div class="stat-grid"><div class="stat-card"><div class="stat-label">Snitt träning</div><div class="stat-val">'+avg(tr)+'</div><div class="stat-sub">'+tr.length+' pass</div></div><div class="stat-card"><div class="stat-label">Bästa träning</div><div class="stat-val">'+maxv(tr)+'</div><div class="stat-sub">/ '+k.maxTotal+'</div></div><div class="stat-card"><div class="stat-label">Snitt tävling</div><div class="stat-val">'+avg(tv)+'</div><div class="stat-sub">'+tv.length+' tävlingar</div></div><div class="stat-card"><div class="stat-label">Bästa tävling</div><div class="stat-val">'+maxv(tv)+'</div><div class="stat-sub">/ '+k.maxTotal+'</div></div></div>';
+      html+='<div class="stat-grid"><div class="stat-card"><div class="stat-label">Snitt träning</div><div class="stat-val">'+avg(tr)+'p</div><div class="stat-sub">'+tr.length+' pass</div></div><div class="stat-card"><div class="stat-label">Bästa träning</div><div class="stat-val">'+maxv(tr)+'p</div><div class="stat-sub">/ '+k.maxTotal+'p</div></div><div class="stat-card"><div class="stat-label">Snitt tävling</div><div class="stat-val">'+avg(tv)+'p</div><div class="stat-sub">'+tv.length+' tävlingar</div></div><div class="stat-card"><div class="stat-label">Bästa tävling</div><div class="stat-val">'+maxv(tv)+'p</div><div class="stat-sub">/ '+k.maxTotal+'p</div></div></div>';
 
       if(k.harX){
         html+='<div class="stat-grid"><div class="stat-card"><div class="stat-label">Snitt X träning</div><div class="stat-val">'+avgX(tr)+'</div></div><div class="stat-card"><div class="stat-label">Snitt X tävling</div><div class="stat-val">'+avgX(tv)+'</div></div></div>';
@@ -1790,7 +1935,9 @@ function visaNamnScreen(){
   document.getElementById('gren-valj').style.display='none';
   document.getElementById('app').style.display='none';
 }
-function doljNamnScreen(){ document.getElementById('namn-screen').classList.add('dold'); }
+function doljNamnScreen(){
+  document.getElementById('namn-screen').classList.add('dold');
+}
 
 function namnStatus(msg, typ){
   var el = document.getElementById('namn-status');
@@ -1881,16 +2028,9 @@ function aktiveraNamn(namn, uid){
 }
 
 function kollaLagraNamn(){
-  // Version check — clear old sessions without PIN
-  var appVersion = '2';
-  if(localStorage.getItem('skytte_version') !== appVersion){
-    localStorage.removeItem('skytte_namn');
-    localStorage.removeItem('skytte_uid');
-    localStorage.setItem('skytte_version', appVersion);
-  }
   var sparat = localStorage.getItem('skytte_namn');
   if(sparat){
-    // Redan inloggad på denna enhet
+    // Redan inloggad — visa grenväljaren
     aktivtNamn = sparat;
     var chip = document.getElementById('anvandare-chip');
     var isAdm = sparat === ADMIN_NAMN;
@@ -1900,8 +2040,10 @@ function kollaLagraNamn(){
       if(abw) abw.style.display='block';
     }
     doljNamnScreen();
+    document.getElementById('gren-valj').style.display='flex';
+    document.getElementById('bottom-nav').style.display='flex';
   } else {
-    // Ny enhet — visa login-skärm
+    // Ej inloggad — visa namnvals-skärm
     visaNamnScreen();
     visaNamnLage('register');
   }
@@ -1927,6 +2069,35 @@ function tilldelaGamlaResultat(){
       if(r.ok){toast('Klart! Gamla resultat tilldelade.','ok');laddaAdminData();}
       else{toast('Fel vid tilldelning.','err');}
     }).catch(function(){toast('Ingen anslutning.','err');});
+}
+
+function adminLaggTillAnvandare(){
+  var namn = (prompt('Namn på ny användare:')||'').trim();
+  if(!namn){ return; }
+  if(namn.length < 2){ toast('Minst 2 tecken.','err'); return; }
+  var pin = (prompt('PIN-kod (4 siffror) för '+namn+':')||'').trim();
+  if(!pin || !/^\d{4}$/.test(pin)){ toast('PIN måste vara 4 siffror.','err'); return; }
+
+  var pinHash = hashPin(namn, pin);
+
+  // Kolla om namnet redan finns
+  sb('anvandare?namn=eq.'+encodeURIComponent(namn),{extraHeaders:{'Prefer':''}})
+    .then(function(r){return r.json();}).then(function(data){
+      if(data && data.length > 0){
+        toast(namn+' finns redan.','err');
+        return;
+      }
+      // Skapa användaren
+      sb('anvandare',{method:'POST',body:JSON.stringify({namn:namn, pin_hash:pinHash})})
+        .then(function(r2){
+          if(r2.ok){
+            toast(namn+' skapad med PIN '+pin,'ok');
+            laddaAdminData();
+          } else {
+            r2.text().then(function(t){ toast('Fel: '+t.slice(0,60),'err'); });
+          }
+        });
+    }).catch(function(){ toast('Ingen anslutning.','err'); });
 }
 
 function laddaAdminData(){
@@ -1998,6 +2169,146 @@ function adminTaBortAnvandare(uid, namn){
   }).catch(function(){ toast('Fel vid borttagning.','err'); });
 }
 
+
+
+// ══════════════════════════════════
+// HISTORIK MULTI-SELECT & REDIGERA
+// ══════════════════════════════════
+var selectLage = false;
+var markerade = {}; // id -> result object
+
+
+
+function avslutaSelectLage(){
+  document.querySelectorAll('.hist-cb-btn').forEach(function(el){
+    el.textContent = '';
+    el.style.borderColor = '';
+    el.style.background = 'var(--card)';
+  });
+  document.querySelectorAll('.hist-card-wrap.markerad').forEach(function(w){ w.classList.remove('markerad'); });
+  markerade = {};
+  document.getElementById('hist-action-bar').classList.remove('synlig');
+}
+
+
+function onHistCbClick(el){
+  var id = ''+el.getAttribute('data-id');
+  var wrap = document.getElementById('wrap-'+id);
+  if(markerade[id]){
+    delete markerade[id];
+    el.textContent = '';
+    el.style.borderColor = '';
+    el.style.background = 'var(--card)';
+    if(wrap) wrap.classList.remove('markerad');
+  } else {
+    markerade[id] = (window.histResultater && window.histResultater[id]) || {id:id};
+    el.textContent = '✕';
+    el.style.borderColor = 'var(--blue)';
+    el.style.background = 'rgba(55,138,221,0.12)';
+    if(wrap) wrap.classList.add('markerad');
+  }
+  var antal = Object.keys(markerade).length;
+  var bar = document.getElementById('hist-action-bar');
+  if(antal > 0){ bar.classList.add('synlig'); document.getElementById('hist-action-count').textContent = antal + ' valda'; }
+  else { bar.classList.remove('synlig'); }
+}
+
+function onHistCb(id, cb){
+  id = ""+id;
+  var wrap = document.getElementById("wrap-"+id);
+  var isChecked = cb ? cb.checked : !markerade[id];
+  if(isChecked){
+    markerade[id] = (window.histResultater && window.histResultater[id]) || {id:id};
+    if(wrap) wrap.classList.add("markerad");
+  } else {
+    delete markerade[id];
+    if(wrap) wrap.classList.remove("markerad");
+  }
+  var antal = Object.keys(markerade).length;
+  var bar = document.getElementById("hist-action-bar");
+  if(antal > 0){ bar.classList.add("synlig"); document.getElementById("hist-action-count").textContent = antal + " valda"; }
+  else { bar.classList.remove("synlig"); }
+}
+
+function exporteraMarkerade(kanal){
+  var ids = Object.keys(markerade);
+  if(!ids.length) return;
+  var rader = ids.map(function(id){
+    var r = markerade[id];
+    var k = GRENKONFIG[r.gren||'precision']||GRENKONFIG.precision;
+    return r.datum+' · '+(r.vapen||'')+' · '+k.namn+'\n'
+      + 'Totalt: '+r.total+'p · '+(r.xs||0)+'X';
+  }).join('\n\n');
+  var txt = '🎯 Skyttresultat\n\n'+rader;
+  var enc = encodeURIComponent(txt);
+  if(kanal==='mail') window.open('mailto:?subject=Skyttresultat&body='+enc);
+  else window.open('https://wa.me/?text='+enc);
+}
+
+function raderaMarkerade(){
+  var ids = Object.keys(markerade);
+  if(!ids.length) return;
+  if(!confirm('Radera '+ids.length+' resultat?')) return;
+  var promises = ids.map(function(id){
+    return sb('resultat?id=eq.'+id,{method:'DELETE',extraHeaders:{'Prefer':''}});
+  });
+  Promise.all(promises).then(function(){
+    toast('Raderade '+ids.length+' resultat','ok');
+    avslutaSelectLage();
+    renderHistorik();
+  }).catch(function(){ toast('Fel vid radering','err'); });
+}
+
+// ── Redigera
+var redigeraCache = {};
+
+function oppnaRedigera(id){
+  document.body.style.overflow = 'hidden';
+  if(window.histResultater && window.histResultater[""+id]) redigeraCache[""+id] = window.histResultater[""+id];
+  var r = redigeraCache[id];
+  if(!r){ toast('Kunde inte hitta resultat','err'); return; }
+  document.getElementById('red-id').value = id;
+  document.getElementById('red-typ').value = r.typ||'traning';
+  document.getElementById('red-datum').value = r.datum||'';
+  document.getElementById('red-vg').value = r.vapengrupp||'A';
+  document.getElementById('red-vapen').value = r.vapen||'';
+  document.getElementById('red-klass').value = r.klass||'Öppen';
+  document.getElementById('red-tavlingsnamn').value = r.tavlingsnamn||'';
+  document.getElementById('red-noter').value = r.noter||'';
+  document.getElementById('red-tavling-falt').style.display = r.typ==='tavling'?'block':'none';
+  document.getElementById('red-typ').onchange = function(){
+    document.getElementById('red-tavling-falt').style.display = this.value==='tavling'?'block':'none';
+  };
+  document.getElementById('redigera-modal').classList.add('open');
+}
+
+function stangRedigera(e){
+  if(e && e.target !== document.getElementById('redigera-modal')) return;
+  document.getElementById('redigera-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function sparaRedigering(){
+  var id = document.getElementById('red-id').value;
+  var upd = {
+    typ: document.getElementById('red-typ').value,
+    datum: document.getElementById('red-datum').value,
+    vapengrupp: document.getElementById('red-vg').value,
+    vapen: document.getElementById('red-vapen').value,
+    klass: document.getElementById('red-klass').value,
+    tavlingsnamn: document.getElementById('red-tavlingsnamn').value,
+    noter: document.getElementById('red-noter').value
+  };
+  sb('resultat?id=eq.'+id,{method:'PATCH',extraHeaders:{'Prefer':''},body:JSON.stringify(upd)})
+    .then(function(r){
+      if(r.ok){
+        toast('Sparat!','ok');
+        document.getElementById('redigera-modal').classList.remove('open');
+        document.body.style.overflow = '';
+        renderHistorik();
+      } else { toast('Fel vid sparande','err'); }
+    }).catch(function(){ toast('Ingen anslutning','err'); });
+}
 
 // Splash gun animation
 (function(){
