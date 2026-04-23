@@ -319,6 +319,28 @@
     .gast-exp-btn { flex: 1; padding: 10px; font-size: 13px; font-weight: 600; border-radius: var(--rad-sm); border: none; cursor: pointer; }
     .btn-mail { background: #378ADD; color: #fff; }
     .btn-wa   { background: #25D366; color: #fff; }
+
+
+    /* Namnval-skärm */
+    #namn-screen { position: fixed; inset: 0; z-index: 9999; background: var(--raised); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; gap: 16px; }
+    #namn-screen.dold { display: none; }
+    .namn-titel { font-size: 22px; font-weight: 800; letter-spacing: 1px; color: var(--ink); text-align: center; }
+    .namn-sub { font-size: 13px; color: var(--muted); text-align: center; max-width: 300px; line-height: 1.5; }
+    .namn-status { font-size: 13px; text-align: center; min-height: 18px; }
+    .namn-status.ok { color: var(--green); }
+    .namn-status.err { color: #C0392B; }
+    /* Användarchip i header */
+    #anvandare-chip { font-size: 11px; color: var(--muted); padding: 2px 8px; border: 0.5px solid var(--border2); border-radius: 20px; display: none; margin-left: auto; }
+
+    /* Admin-panel */
+    #admin-panel { position: fixed; inset: 0; z-index: 9998; background: var(--raised); display: none; flex-direction: column; overflow-y: auto; }
+    #admin-panel.open { display: flex; }
+    .admin-header { padding: 20px 16px 12px; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; gap: 12px; }
+    .admin-header h2 { font-size: 18px; font-weight: 700; color: var(--ink); margin: 0; flex: 1; }
+    .admin-user-card { background: var(--card); border-radius: var(--rad-sm); padding: 12px 16px; margin: 8px 16px 0; border: 0.5px solid var(--border); display: flex; align-items: center; gap: 12px; }
+    .admin-user-namn { font-size: 15px; font-weight: 600; color: var(--ink); flex: 1; }
+    .admin-user-info { font-size: 12px; color: var(--muted); }
+    .admin-del-btn { background: none; border: 0.5px solid #C0392B; border-radius: 6px; color: #C0392B; font-size: 12px; padding: 4px 10px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -373,6 +395,41 @@
 
   <div id="gast-export-lista"></div>
 </div>
+</div>
+
+    <div class="login-sub">Logga in med din email — du får en länk att klicka på.</div>
+  </div>
+  <div class="login-box">
+    <div><label style="margin-top:0;">Email</label>
+      <input type="email" id="login-email" placeholder="din@email.com" autocomplete="email">
+    </div>
+    <button class="btn" onclick="skickaLoginLank()">Skicka inloggningslänk →</button>
+    <div class="login-status" id="login-status"></div>
+  </div>
+</div>
+
+<!-- Namnval-skärm -->
+<div id="namn-screen">
+  <div style="margin-bottom:8px;">
+    <div class="namn-titel">🎯 Pistolskytteappen</div>
+  </div>
+  <div class="namn-sub">Välj ditt namn. Det är din identitet i appen och kan inte ändras.</div>
+  <div style="width:100%;max-width:380px;display:flex;flex-direction:column;gap:10px;">
+    <div><label style="margin-top:0;">Ditt namn</label>
+      <input type="text" id="namn-input" placeholder="Ex: Fredrik" maxlength="30" autocomplete="off">
+    </div>
+    <button class="btn" onclick="valjNamn()">Välj namn och börja →</button>
+    <div class="namn-status" id="namn-status"></div>
+  </div>
+</div>
+
+<!-- Admin-panel -->
+<div id="admin-panel">
+  <div class="admin-header">
+    <h2>👑 Admin</h2>
+    <button class="btn btn-secondary" style="margin-top:0;padding:6px 14px;font-size:13px;" onclick="stangAdmin()">Stäng</button>
+  </div>
+  <div id="admin-content" style="padding-bottom:40px;"></div>
 </div>
 
 <!-- Gäst-modal -->
@@ -533,6 +590,7 @@
   <!-- INSTÄLLNINGAR -->
   <div id="view-installningar" class="view">
     <h2 style="margin-top:8px;">Inställningar</h2>
+    <div id="admin-btn-wrap" style="display:none;margin-bottom:8px;"><button class="btn" style="background:linear-gradient(135deg,#9333EA,#C026D3);color:#fff;" onclick="oppnaAdmin()">👑 Admin-panel</button></div>
 
     <div class="export-section">
       <h3>Tema</h3>
@@ -549,12 +607,6 @@
       <p>Data sparas automatiskt i molnet på alla enheter.</p>
       <button class="btn btn-secondary" onclick="testSupabase()">Testa anslutning</button>
       <div id="supabase-test" style="margin-top:8px;font-size:13px;"></div>
-    </div>
-    <div class="export-section">
-      <h3>Google Sheets-synk</h3>
-      <label>Apps Script URL</label>
-      <input type="url" id="sheets-url-input" placeholder="https://script.google.com/macros/s/...">
-      <button class="btn btn-secondary" onclick="sparaUrl()">Spara URL</button>
     </div>
     <div class="export-section">
       <h3>Exportera data</h3>
@@ -590,7 +642,6 @@
 <script>
 var SB_URL='https://hpwkipddtgbwnaqhxulp.supabase.co';
 var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhwd2tpcGRkdGdid25hcWh4dWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3NjQzNzYsImV4cCI6MjA5MjM0MDM3Nn0.lgDgZFH_212DHs4hiAoXP5LB6W7yy_uRTtcoR_dFkQk';
-var SHEETS_URL='https://script.google.com/macros/s/AKfycbz8RCGbfprLEGDRYCBpne2mBVO4i6IaFHeB0txLkA2JUhX5rEWN1CIolzyxl1hvJ4ZMYQ/exec';
 
 // Gren-konfiguration
 var GRENKONFIG = {
@@ -631,8 +682,7 @@ function sortVal(v){return v===null?-1:v==='X'?11:v;}
 function sortShots(arr){return[...arr].sort(function(a,b){return sortVal(b)-sortVal(a);});}
 function shotNumeric(v){return v===null?0:v==='X'?10:v;}
 function shotDisplay(v){return v===null?'':v==='X'?'X':String(v);}
-function getSheetsUrl(){return localStorage.getItem('sheets_url')||SHEETS_URL;}
-function sparaUrl(){var u=document.getElementById('sheets-url-input').value.trim();if(u){localStorage.setItem('sheets_url',u);toast('URL sparad!','ok');}}
+
 
 var aktGren='precision';
 var filterTyp='alla';
@@ -669,7 +719,6 @@ function valjGren(gren){
     sessions[aktivSessIdx].sumVals=null;
   }
   document.getElementById('datum').value=new Date().toISOString().split('T')[0];
-  document.getElementById('sheets-url-input').value=getSheetsUrl();
   renderTabbbar();
   renderSerier();
 }
@@ -1073,7 +1122,7 @@ function sparaResultat(){
   if(k.harMedalj==='total'){totalMedal=getMedalj(total,vg,aktGren);}
 
   var r={
-    id:Date.now(),typ:typ,gren:aktGren,
+    id:Date.now(),typ:typ,gren:aktGren,anvandare_id:localStorage.getItem('skytte_uid')||null,
     datum:document.getElementById('datum').value,
     vapengrupp:vg,
     vapen:isTr?document.getElementById('vapen-tr').value:document.getElementById('vapen-tv').value,
@@ -1711,6 +1760,143 @@ function exporteraGast(btn){
 function stangGastExport(){
   document.getElementById('gast-export').classList.remove('open');
 }
+
+
+
+
+// ══════════════════════════════════════
+// NAMN-BASERAD IDENTITET
+// ══════════════════════════════════════
+var ADMIN_NAMN = 'Fredrik';  // Ditt admin-namn
+var aktivtNamn = null;
+
+function visaNamnScreen(){ document.getElementById('namn-screen').classList.remove('dold'); }
+function doljNamnScreen(){ document.getElementById('namn-screen').classList.add('dold'); }
+
+function namnStatus(msg, typ){
+  var el = document.getElementById('namn-status');
+  el.textContent = msg;
+  el.className = 'namn-status' + (typ ? ' '+typ : '');
+}
+
+function valjNamn(){
+  var namn = (document.getElementById('namn-input').value||'').trim();
+  if(!namn){ namnStatus('Ange ett namn.','err'); return; }
+  if(namn.length < 2){ namnStatus('Minst 2 tecken.','err'); return; }
+
+  namnStatus('Kollar...');
+  // Kolla om namnet redan är taget
+  sb('anvandare?namn=eq.'+encodeURIComponent(namn),{extraHeaders:{'Prefer':''}}).then(function(r){
+    return r.json();
+  }).then(function(data){
+    if(data && data.length > 0){
+      // Namnet finns — logga in som denna användare
+      namnStatus('Välkommen tillbaka, '+namn+'! ✓','ok');
+      setTimeout(function(){ aktiveraNamn(namn, data[0].id); }, 800);
+    } else {
+      // Nytt namn — skapa användare
+      sb('anvandare',{method:'POST',body:JSON.stringify({namn:namn})}).then(function(r2){
+        if(r2.ok){
+          namnStatus('Välkommen, '+namn+'! ✓','ok');
+          // Hämta den nya användarens id
+          setTimeout(function(){
+            sb('anvandare?namn=eq.'+encodeURIComponent(namn),{extraHeaders:{'Prefer':''}}).then(function(r3){return r3.json();}).then(function(d){
+              aktiveraNamn(namn, d&&d[0]?d[0].id:null);
+            });
+          }, 600);
+        } else {
+          r2.text().then(function(t){ namnStatus('Fel: '+t.slice(0,60),'err'); });
+        }
+      });
+    }
+  }).catch(function(){ namnStatus('Ingen anslutning.','err'); });
+}
+
+function aktiveraNamn(namn, uid){
+  aktivtNamn = namn;
+  localStorage.setItem('skytte_namn', namn);
+  localStorage.setItem('skytte_uid', uid||'');
+  doljNamnScreen();
+  // Uppdatera chip
+  var chip = document.getElementById('anvandare-chip');
+  if(chip){ chip.textContent = '👤 '+namn; chip.style.display='inline'; }
+  // Visa admin-knapp om admin
+  if(namn === ADMIN_NAMN){
+    var abw = document.getElementById('admin-btn-wrap');
+    if(abw) abw.style.display='block';
+  }
+}
+
+function kollaLagraNamn(){
+  var sparat = localStorage.getItem('skytte_namn');
+  if(sparat){
+    aktivtNamn = sparat;
+    var chip = document.getElementById('anvandare-chip');
+    if(chip){ chip.textContent = '👤 '+sparat; chip.style.display='inline'; }
+    if(sparat === ADMIN_NAMN){
+      var abw = document.getElementById('admin-btn-wrap');
+      if(abw) abw.style.display='block';
+    }
+    doljNamnScreen();
+  } else {
+    visaNamnScreen();
+  }
+}
+
+// ── Admin
+function oppnaAdmin(){
+  var panel = document.getElementById('admin-panel');
+  panel.classList.add('open');
+  laddaAdminData();
+}
+
+function stangAdmin(){
+  document.getElementById('admin-panel').classList.remove('open');
+}
+
+function laddaAdminData(){
+  var content = document.getElementById('admin-content');
+  content.innerHTML = '<div class="loading" style="padding:20px;">Hämtar användare...</div>';
+  // Hämta alla användare
+  sb('anvandare?select=*&order=namn.asc',{extraHeaders:{'Prefer':''}}).then(function(r){return r.json();}).then(function(anvandare){
+    if(!anvandare||anvandare.length===0){
+      content.innerHTML='<div class="empty" style="padding:20px;">Inga användare.</div>';return;
+    }
+    // Hämta antal resultat per användare
+    sb('resultat?select=anvandare_id,typ&typ=neq.gast',{extraHeaders:{'Prefer':''}}).then(function(r2){return r2.json();}).then(function(res){
+      var raknare={};
+      (res||[]).forEach(function(r){ raknare[r.anvandare_id]=(raknare[r.anvandare_id]||0)+1; });
+      content.innerHTML = '<div style="padding:8px 0;">'
+        + anvandare.map(function(a){
+          var ant = raknare[a.id]||0;
+          return '<div class="admin-user-card">'
+            +'<div><div class="admin-user-namn">'+a.namn+(a.namn===ADMIN_NAMN?' 👑':'')+'</div>'
+            +'<div class="admin-user-info">'+ant+' resultat</div></div>'
+            +'<button class="admin-del-btn" data-uid="'+a.id+'" data-namn="'+a.namn+'" onclick="handleAdminDel(this)">Ta bort</button>'
+            +'</div>';
+        }).join('')
+        +'</div>';
+    });
+  }).catch(function(){
+    content.innerHTML='<div class="empty" style="padding:20px;">Kunde inte hämta data.</div>';
+  });
+}
+
+function handleAdminDel(btn){ adminTaBortAnvandare(btn.getAttribute("data-uid"), btn.getAttribute("data-namn")); }
+function adminTaBortAnvandare(uid, namn){
+  if(!confirm('Ta bort '+namn+' och ALL deras data? Det går inte att ångra!')) return;
+  // Ta bort resultat först
+  sb('resultat?anvandare_id=eq.'+uid,{method:'DELETE',extraHeaders:{'Prefer':''}}).then(function(){
+    // Sen ta bort användaren
+    sb('anvandare?id=eq.'+uid,{method:'DELETE',extraHeaders:{'Prefer':''}}).then(function(){
+      toast('Borttaget!','ok');
+      laddaAdminData();
+    });
+  }).catch(function(){ toast('Fel vid borttagning.','err'); });
+}
+
+// Kör vid start
+kollaLagraNamn();
 
 // Splash gun animation
 (function(){
