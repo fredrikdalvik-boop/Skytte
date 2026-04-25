@@ -334,7 +334,7 @@
     .namn-status.ok { color: var(--green); }
     .namn-status.err { color: #C0392B; }
     /* Användarchip i header */
-    #anvandare-chip { font-size: 11px; color: var(--muted); padding: 2px 8px; border: 0.5px solid var(--border2); border-radius: 20px; display: none; margin-left: auto; }
+    #anvandare-chip { font-size: 12px; color: var(--blue); padding: 2px 10px; background: rgba(55,138,221,0.1); border: 1px solid rgba(55,138,221,0.3); border-radius: 20px; font-weight: 600; margin-top: 2px; display: inline-block; }
 
     /* Admin-panel */
     #admin-panel { position: fixed; inset: 0; z-index: 9998; background: var(--raised); display: none; flex-direction: column; overflow-y: auto; }
@@ -349,7 +349,7 @@
     /* Multi-select historik */
     .hist-card-wrap { position: relative; margin-bottom: 10px; }
     .hist-card-wrap .card { margin-bottom: 0; cursor: pointer; transition: box-shadow 0.15s; }
-    .hist-card-wrap.markerad .card { border: 2px solid var(--blue) !important; background: rgba(55,138,221,0.06) !important; box-shadow: none !important; }
+    .hist-card-wrap.markerad .hist-card-new { border-color: var(--blue) !important; background: rgba(55,138,221,0.06) !important; }
     .hist-checkmark { position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border2); background: var(--surface); display: none; align-items: center; justify-content: center; font-size: 13px; z-index: 10; }
     .hist-select-lage .hist-checkmark { display: flex; }
     .hist-card-wrap.markerad .hist-checkmark { background: var(--blue); border-color: var(--blue); color: #fff; }
@@ -386,6 +386,58 @@
     @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(8px)} }
     #ios-install-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 10000; display: none; }
     #ios-install-overlay.synlig { display: block; }
+
+    /* Historik ny design */
+    .hist-card-new { background: var(--surface); border: 2.5px solid var(--ink); border-radius: var(--radius); overflow: hidden; margin-bottom: 14px; }
+    .hist-card-top { display: flex; align-items: center; gap: 6px; padding: 7px 10px; border-bottom: 1.5px solid var(--ink); flex-wrap: wrap; }
+    .hist-card-meta { font-size: 11px; color: var(--muted); }
+    .hist-card-score { font-size: 15px; font-weight: 700; margin-left: auto; white-space: nowrap; }
+    .hist-card-score span { font-size: 11px; color: var(--muted); font-weight: 400; }
+    .hist-serie-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .hist-serie-table th { font-size: 10px; color: var(--muted); padding: 2px 1px; text-align: center; background: var(--raised); border-right: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); }
+    .hist-serie-table th:last-child { border-right: none; }
+    .hist-serie-table td { text-align: center; border-right: 0.5px solid var(--border); padding: 0; background: var(--raised); }
+    .hist-serie-table td:last-child { border-right: none; }
+    .hist-mom-row td { background: var(--card); border-top: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); padding: 2px 6px; text-align: left; font-size: 9px; font-weight: 700; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+    .hist-sc { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3px 1px; gap: 0; }
+    .hist-sc-p { font-size: 16px; font-weight: 700; color: var(--ink); line-height: 1.2; }
+    .hist-sc-x { font-size: 11px; color: var(--muted); line-height: 1.2; }
+    .hist-sc-noX { font-size: 9px; color: var(--hint); font-style: italic; line-height: 1.2; }
+    .hist-badge { display: inline-block; font-size: 8px; font-weight: 700; padding: 0px 4px; border-radius: 6px; margin-bottom: 1px; white-space: nowrap; line-height: 1.5; }
+    .hb-guld  { background: #E8910A; color: #fff; }
+    .hb-silver { background: #8A9BA8; color: #fff; }
+    .hb-brons  { background: #C87941; color: #fff; }
+    .hb-perfekt { background: #7F77DD; color: #fff; }
+    .hist-mom-tot { background: var(--surface) !important; border-left: 1.5px solid var(--border2) !important; }
+    .hist-mom-tot .hist-sc-p { font-size: 16px; font-weight: 700; }
+    .hist-grand-row td { background: var(--surface); border-top: 1.5px solid var(--border2); }
+    .hist-grand-row td:first-child { text-align: right; padding: 3px 8px; font-size: 10px; color: var(--muted); }
+
+    /* Statistik ny design */
+    .stat-vg-head { font-size: 11px; font-weight: 700; color: var(--ink); padding: 5px 8px; background: var(--raised); border: 1px solid var(--border2); border-radius: var(--radius) var(--radius) 0 0; border-bottom: none; margin-top: 10px; }
+    .stat-xt-wrap { border: 1px solid var(--border2); border-radius: 0 0 var(--radius) var(--radius); overflow: hidden; margin-bottom: 14px; }
+    .stat-xt { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .stat-xt th { padding: 3px 2px; text-align: center; font-size: 9px; font-weight: 500; color: var(--muted); border-right: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); background: var(--surface); }
+    .stat-xt th.lft { text-align: left; padding-left: 5px; }
+    .stat-xt th:last-child { border-right: none; }
+    .stat-xt td { padding: 2px 2px; border-right: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); text-align: center; background: var(--surface); color: var(--ink); font-variant-numeric: tabular-nums; }
+    .stat-xt td.lft { text-align: left; padding-left: 5px; color: var(--muted); font-size: 9px; }
+    .stat-xt td.mom-lbl { text-align: left; padding-left: 5px; font-size: 9px; font-weight: 700; color: var(--muted); background: var(--raised); }
+    .stat-xt td.tot-lbl { font-size: 10px; font-weight: 700; color: var(--ink); text-align: left; padding-left: 5px; }
+    .stat-xt td:last-child { border-right: none; }
+    .stat-xt tr:last-child td { border-bottom: none; }
+    .stat-spacer td { height: 5px !important; background: var(--raised) !important; padding: 0 !important; }
+    .stat-sc { display: flex; flex-direction: column; align-items: center; padding: 2px 0; gap: 0; }
+    .stat-sc-p { font-size: 11px; font-weight: 600; line-height: 1.2; }
+    .stat-sc-x { font-size: 9px; line-height: 1.2; }
+    .stat-sc-nx { font-size: 8px; color: var(--muted); font-style: italic; line-height: 1.2; }
+    .stat-sep { border-left: 2px solid var(--border2) !important; }
+    .stat-g  { background: #E8910A !important; color: #fff !important; }
+    .stat-s  { background: #8A9BA8 !important; color: #fff !important; }
+    .stat-br { background: #C87941 !important; color: #fff !important; }
+    .stat-pf { background: #7F77DD !important; color: #fff !important; }
+    .stat-hi { background: #2D7D0A !important; color: #fff !important; }
+    .stat-lo { background: #C0392B !important; color: #fff !important; }
   </style>
 </head>
 <body>
@@ -420,7 +472,8 @@
 <div id="gren-valj" style="display:none;">
   <div class="app-logo-header" style="margin-bottom:4px;">
       <img src="data:image/png;base64,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" style="width:48px;height:auto;" class="app-gun-logo" id="app-gun-logo"/>
-      <div><div class="logo-name">Pistolskytteappen</div></div>
+      <div><div class="logo-name">Pistolskytteappen</div>
+      <span id="anvandare-chip" style="display:none;"></span></div>
     </div>
   <div class="gren-valj-sub">Välj gren</div>
   <div class="gren-card" onclick="valjGren('precision')">
@@ -713,6 +766,11 @@
   <!-- INSTÄLLNINGAR -->
   <div id="view-installningar" class="view">
     <h2 style="margin-top:8px;">Inställningar</h2>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <span id="inloggad-chip" style="font-size:13px;color:var(--muted);"></span>
+      <button class="btn btn-secondary" style="padding:6px 14px;font-size:13px;margin-top:0;" onclick="loggaUt()">Logga ut</button>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:-4px;margin-bottom:8px;">Version 1.2.0</div>
 
     <div class="export-section" id="install-section">
       <h3>📱 Installera appen</h3>
@@ -840,28 +898,31 @@ function initShots(){
 }
 
 function valjGren(gren){
-  aktGren=gren;
+  aktGren = gren;
+  localStorage.setItem('skytte_gren', gren);
+  var k = GRENKONFIG[gren];
   document.getElementById('gren-valj').style.display='none';
   document.getElementById('app').style.display='block';
   document.getElementById('bottom-nav').style.display='flex';
-  var k=GRENKONFIG[gren];
-  document.getElementById('gren-sub-label').textContent=k.sub;
-  document.getElementById('tot-sum').textContent='0 / '+k.maxTotal;
+  document.getElementById('gren-sub-label').textContent = k.sub;
+  document.getElementById('tot-sum').textContent = '0 / '+k.maxTotal;
   initShots();
-  // Initialisera session för "mig" om sessions är tomma
   if(sessions.length===0){
     sessions=[nySess('Mig','A','traning','','','')];
     aktivSessIdx=0;
   } else {
-    // Återställ shots-state för aktiv session vid grenbyte
     sessions[aktivSessIdx].shots=null;
     sessions[aktivSessIdx].sumVals=null;
   }
   document.getElementById('datum').value=new Date().toISOString().split('T')[0];
+  // Visa logga-vyn
+  document.querySelectorAll('.view').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('view-logga').classList.add('active');
+  document.querySelectorAll('.bottom-nav button').forEach(function(el){el.classList.remove('active');});
+  document.querySelector('.bottom-nav button:first-child').classList.add('active');
   renderTabbbar();
   renderSerier();
 }
-
 function byttGren(){
   document.getElementById('app').style.display='none';
   document.getElementById('gren-valj').style.display='flex';
@@ -887,18 +948,17 @@ function navLogga(btn){
   if(btn) btn.classList.add('active');
   document.getElementById('namn-screen').classList.add('dold');
   if(aktGren){
-    // Gren vald — visa logga-vyn
-    document.getElementById('app').style.display='block';
+    // Gren redan vald — gå till loggvyn
     document.getElementById('gren-valj').style.display='none';
+    document.getElementById('app').style.display='block';
     document.querySelectorAll('.view').forEach(function(el){el.classList.remove('active');});
     document.getElementById('view-logga').classList.add('active');
   } else {
-    // Ingen gren — visa grenväljaren
+    // Ingen gren vald — visa grenväljaren
     document.getElementById('app').style.display='none';
     document.getElementById('gren-valj').style.display='flex';
   }
 }
-
 function switchView(v,btn){
   document.getElementById('namn-screen').classList.add('dold');
   document.getElementById('gren-valj').style.display='none';
@@ -911,6 +971,10 @@ function switchView(v,btn){
   if(v !== 'historik') avslutaSelectLage();
   if(v==='historik') renderHistorik();
   if(v==='statistik') renderStatistik();
+  if(v==='installningar'){
+    var ic = document.getElementById('inloggad-chip');
+    if(ic) ic.textContent = 'Inloggad som: ' + (aktivtNamn||'—');
+  }
 }
 function setFilter(f,el){filterTyp=f;document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});el.classList.add('active');renderHistorik();}
 
@@ -1427,26 +1491,41 @@ var sh=(r.serier||[]).map(function(s,i){
         var cls='series-chip'+(isPerfekt?' perfekt':(s.medal&&s.medal!=='perfekt'?' '+s.medal:''));
         return'<span class="'+cls+'">S'+(i+1)+': '+s.sum+'p'+(xs?' +'+xs+'X':'')+(isPerfekt?' ★':'')+'</span>';
       }).join('');
-      var seriesHtml = snabbTabell || ('<div class="series-row" style="margin-top:10px;">'+sh+'</div>');
-      var noterHtml = (r.noter&&r.typ!=='gast') ? '<div style="font-size:13px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border);">'+r.noter+'</div>' : '';
+      // Bygg serietabell ny design
+      var serieTabell='';
+      if(r.typ!=='gast' && r.serier && r.serier.length>0){
+        if(r.gren==='snabb'){
+          serieTabell=byggMomentTabell(r.serier,[
+            {namn:'10 sekunder',idx:[0,1,2,3],harX:true},
+            {namn:'8 sekunder',idx:[4,5,6,7],harX:true},
+            {namn:'6 sekunder',idx:[8,9,10,11],harX:true}
+          ]);
+        } else if(r.gren==='helmatch'){
+          serieTabell=byggMomentTabell(r.serier,[
+            {namn:'Precision – 5 min',idx:[0,1,2,3],harX:true},
+            {namn:'Duell – 5×3 sek',idx:[4,5,6,7],harX:true},
+            {namn:'Figurskjutning',idx:[8,9,10,11],harX:false}
+          ]);
+        } else {
+          serieTabell=byggSerieTabell(r.serier,k);
+        }
+      }
       var gastHtml = r.typ==='gast' ? '<div style="display:flex;gap:8px;margin-top:10px;"><button data-rid="'+r.id+'" data-k="mail" onclick="handleGastExp(this)" style="flex:1;padding:8px;font-size:13px;font-weight:600;background:#378ADD;color:#fff;border:none;border-radius:var(--rad-sm);cursor:pointer;">✉️ Mail</button><button data-rid="'+r.id+'" data-k="wa" onclick="handleGastExp(this)" style="flex:1;padding:8px;font-size:13px;font-weight:600;background:#25D366;color:#fff;border:none;border-radius:var(--rad-sm);cursor:pointer;">💬 WhatsApp</button></div>' : '';
       return '<div class="hist-card-wrap" id="wrap-'+r.id+'">'
-        + '<div class="card">'
-        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">'
-        + '<div>'+badge+gb+'</div>'
-        + '<div style="display:flex;align-items:center;gap:4px;">'
-        + '<span class="hist-date" style="font-size:14px;font-weight:600;color:var(--ink);">'+r.datum+'</span>'
-        + '<button onclick="oppnaRedigera('+r.id+')" style="background:none;border:0.5px solid var(--border2);border-radius:6px;cursor:pointer;color:var(--muted);font-size:14px;padding:3px 7px;opacity:0.8;line-height:1;">✏️</button>'
-        + '<button onclick="taBortKort('+r.id+',event)" style="background:none;border:0.5px solid var(--border2);border-radius:6px;cursor:pointer;color:var(--muted);font-size:16px;padding:3px 7px;opacity:0.8;line-height:1;">🗑</button>'
-        + '<div class="hist-cb-btn" data-id="'+r.id+'" ontouchend="event.preventDefault();event.stopPropagation();onHistCbClick(this)" onclick="event.stopPropagation();onHistCbClick(this)" style="width:22px;height:22px;border:2px solid var(--border2);border-radius:5px;background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--blue);flex-shrink:0;user-select:none;-webkit-user-select:none;"></div>'
-        + '</div></div>'
-        + '<div style="display:flex;align-items:baseline;gap:2px;margin-top:10px;"><span class="hist-score">'+r.total+'p</span><span class="hist-denom">/ '+k.maxTotal+'p</span></div>'
-        + '<div style="display:flex;gap:10px;align-items:center;margin-top:4px;"><span class="hist-xs">'+r.xs+'X</span><span class="hist-meta">'+meta+'</span></div>'
-        + medalChips(r)
-        + seriesHtml
-        + noterHtml
+        + '<div class="hist-card-new">'
+        + '<div class="hist-card-top">'
+        + badge+gb
+        + '<span class="hist-card-meta">'+meta+'</span>'
+        + '<div class="hist-card-score">'+r.total+'p <span>· '+(r.xs||0)+'X · '+r.datum+'</span></div>'
+        + '<button onclick="oppnaRedigera('+r.id+')" style="background:none;border:0.5px solid var(--border2);border-radius:6px;cursor:pointer;color:var(--muted);font-size:13px;padding:2px 6px;line-height:1;">✏️</button>'
+        + '<button onclick="taBortKort('+r.id+',event)" style="background:none;border:0.5px solid var(--border2);border-radius:6px;cursor:pointer;color:var(--muted);font-size:14px;padding:2px 6px;line-height:1;">🗑</button>'
+        + '<div class="hist-cb-btn" id="cb-'+r.id+'" onclick="onHistCbClick('+r.id+',this);event.stopPropagation();" style="width:20px;height:20px;border:2px solid var(--border2);border-radius:4px;background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--blue);flex-shrink:0;user-select:none;"></div>'
+        + '</div>'
+        + serieTabell
+        + (r.noter&&r.typ!=='gast'?'<div style="padding:6px 10px;font-size:12px;color:var(--muted);border-top:0.5px solid var(--border);">'+r.noter+'</div>':'')
         + gastHtml
-        + '</div></div>';
+        + '</div>'
+        + '</div>';
     }).join('');
 
 
@@ -1458,6 +1537,18 @@ var sh=(r.serier||[]).map(function(s,i){
 
 
   }).catch(function(){el.innerHTML='<div class="empty">Kunde inte hämta data.</div>';});
+}
+
+function laggTillStdBatch(){
+  // Hitta alla tävlingsresultat utan std-poäng
+  var saknar = Object.values(window.histResultater||{}).filter(function(r){
+    return r.typ==='tavling' && (r.std_poang===null||r.std_poang===undefined);
+  });
+  if(!saknar.length){ toast('Alla tävlingsresultat har redan std-poäng!','ok'); return; }
+  toast(saknar.length+' resultat saknar std-poäng. Välj dem i historiken.','ok');
+  // Filtrera till tävling
+  var tavBtn = document.querySelector('.filter-btn[onclick*="tavling"]');
+  if(tavBtn) setFilter('tavling', tavBtn);
 }
 
 function editStdPoang(id,current,e){
@@ -1504,6 +1595,66 @@ function byggHelmatchTabell(serier){
   tbl += '<div style="text-align:right;font-size:12px;font-weight:800;color:var(--ink);margin-top:4px;">Totalt: '+tot+'p · '+totX+'X</div>';
   tbl += '</div>';
   return tbl;
+}
+
+function byggSerieTabell(serier, k){
+  var cols = k.antalSerier;
+  var harX = k.harX;
+  var ths = '';
+  for(var i=0;i<cols;i++) ths+='<th>S'+(i+1)+'</th>';
+  ths+='<th>Tot</th>';
+  var totP=0, totX=0;
+  var tds='';
+  for(var i=0;i<cols;i++){
+    var s=serier[i]||{sum:0,shots:[]};
+    var xs=harX?(s.shots||[]).filter(function(v){return v==='X';}).length:null;
+    var medal=s.medal;
+    var badgeCls=medal==='perfekt'?'hb-perfekt':medal==='guld'?'hb-guld':medal==='silver'?'hb-silver':medal==='brons'?'hb-brons':'';
+    var badgeText=medal==='perfekt'?'Perfekt':medal==='guld'?'Guld':medal==='silver'?'Silver':medal==='brons'?'Brons':'';
+    totP+=s.sum||0;
+    if(xs!==null) totX+=xs;
+    tds+='<td><div class="hist-sc">'
+      +(badgeCls?'<span class="hist-badge '+badgeCls+'">'+badgeText+'</span>':'<span style="font-size:9px;color:transparent;">—</span>')
+      +'<div class="hist-sc-p">'+(s.sum||0)+'</div>'
+      +(harX?'<div class="hist-sc-x">'+(xs?xs+'X':'—')+'</div>':'')
+      +'</div></td>';
+  }
+  tds+='<td class="hist-mom-tot"><div class="hist-sc"><div class="hist-sc-p">'+totP+'</div>'+(harX?'<div class="hist-sc-x">'+totX+'X</div>':'')+'</div></td>';
+  return '<table class="hist-serie-table"><thead><tr>'+ths+'</tr></thead><tbody><tr>'+tds+'</tr></tbody></table>';
+}
+
+function byggMomentTabell(serier, moment){
+  var ths='<th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>&#x3A3;</th>';
+  var rows='';
+  var grandP=0, grandX=0, harNagotX=false;
+  moment.forEach(function(m){
+    rows+='<tr class="hist-mom-row"><td colspan="5">'+m.namn+'</td></tr><tr>';
+    var momP=0,momX=0;
+    m.idx.forEach(function(si){
+      var s=serier[si]||{sum:0,shots:[]};
+      var xs=m.harX?(s.shots||[]).filter(function(v){return v==='X';}).length:null;
+      var medal=s.medal;
+      var badgeCls=medal==='perfekt'?'hb-perfekt':medal==='guld'?'hb-guld':medal==='silver'?'hb-silver':medal==='brons'?'hb-brons':'';
+      var badgeText=medal==='perfekt'?'Perfekt':medal==='guld'?'Guld':medal==='silver'?'Silver':medal==='brons'?'Brons':'';
+      momP+=s.sum||0;
+      if(xs!==null){ momX+=xs; harNagotX=true; }
+      rows+='<td><div class="hist-sc">'
+        +(badgeCls?'<span class="hist-badge '+badgeCls+'">'+badgeText+'</span>':'<span style="font-size:9px;color:transparent;">—</span>')
+        +'<div class="hist-sc-p">'+(s.sum||0)+'</div>'
+        +(m.harX?'<div class="hist-sc-x">'+(xs?xs+'X':'—')+'</div>':'<div class="hist-sc-noX">ej X</div>')
+        +'</div></td>';
+    });
+    grandP+=momP;
+    grandX+=momX;
+    rows+='<td class="hist-mom-tot"><div class="hist-sc"><div class="hist-sc-p">'+momP+'</div>'
+      +(m.harX?'<div class="hist-sc-x">'+momX+'X</div>':'<div class="hist-sc-noX">ej X</div>')
+      +'</div></td></tr>';
+  });
+  rows+='<tr class="hist-grand-row"><td colspan="4">Totalt</td>'
+    +'<td class="hist-mom-tot"><div class="hist-sc"><div class="hist-sc-p">'+grandP+'</div>'
+    +(harNagotX?'<div class="hist-sc-x">'+grandX+'X</div>':'')
+    +'</div></td></tr>';
+  return '<table class="hist-serie-table"><thead><tr>'+ths+'</tr></thead><tbody>'+rows+'</tbody></table>';
 }
 
 function byggSnabbTabell(serier){
@@ -1593,6 +1744,162 @@ function setStatFilter(f, btn){
   renderStatistik();
 }
 
+
+function statSerieCls(s, k){
+  if(!s) return '';
+  if(s.sum === k.maxPerSerie) return 'stat-pf';
+  if(s.medal === 'guld') return 'stat-g';
+  if(s.medal === 'silver') return 'stat-s';
+  if(s.medal === 'brons') return 'stat-br';
+  return '';
+}
+
+function statSerieCell(s, harX){
+  if(!s) return '<td>—</td>';
+  var cls = statSerieCls(s, {maxPerSerie: s.sum === 50 && s.medal !== 'guld' && s.medal !== 'silver' && s.medal !== 'brons' ? 50 : -1});
+  // Use medal directly
+  if(s.sum === 50 && !s.medal) cls = 'stat-pf';
+  else if(s.medal === 'perfekt') cls = 'stat-pf';
+  else if(s.medal === 'guld') cls = 'stat-g';
+  else if(s.medal === 'silver') cls = 'stat-s';
+  else if(s.medal === 'brons') cls = 'stat-br';
+  var xs = harX ? (s.shots||[]).filter(function(v){return v==='X';}).length : null;
+  return '<td class="'+cls+'">'
+    + '<div class="stat-sc">'
+    + '<div class="stat-sc-p">'+(s.sum||0)+'</div>'
+    + (harX ? '<div class="stat-sc-x">'+(xs ? xs+'X' : '—')+'</div>' : '')
+    + '</div></td>';
+}
+
+function byggStatTabellPrecision(data, k){
+  // Gruppera per vapengrupp
+  var vgMap = {};
+  data.forEach(function(r){
+    var vg = r.vapengrupp || '?';
+    if(!vgMap[vg]) vgMap[vg] = [];
+    vgMap[vg].push(r);
+  });
+
+  var allTot = data.map(function(r){return r.total;});
+  var maxTot = allTot.length ? Math.max.apply(null,allTot) : null;
+  var minTot = allTot.length ? Math.min.apply(null,allTot) : null;
+  var allX = data.map(function(r){return r.xs||0;});
+  var maxX = allX.length ? Math.max.apply(null,allX) : null;
+  var minX = allX.length ? Math.min.apply(null,allX) : null;
+
+  var sHeaders = '';
+  for(var i=0;i<k.antalSerier;i++) sHeaders += '<th>S'+(i+1)+'</th>';
+
+  var html = '';
+  Object.keys(vgMap).sort().forEach(function(vg){
+    var rows = vgMap[vg];
+    html += '<div class="stat-vg-head">Vapengrupp '+vg+'</div>';
+    html += '<div class="stat-xt-wrap"><table class="stat-xt">';
+    html += '<thead><tr><th class="lft" style="width:45px;">Datum</th>'+sHeaders;
+    if(k.harX) html += '<th class="stat-sep" style="width:24px;">X</th>';
+    html += '<th class="stat-sep" style="width:32px;">Tot</th></tr></thead><tbody>';
+
+    var sorted = ([...rows]).reverse();
+    sorted.forEach(function(r, ri){
+      var serier = r.serier || [];
+      var dateFmt = r.datum ? r.datum.slice(5) : '—';
+      var totCls = r.total===maxTot ? 'stat-hi' : r.total===minTot&&allTot.length>1 ? 'stat-lo' : '';
+      var xCls = k.harX ? ((r.xs||0)===maxX&&maxX>0 ? 'stat-hi' : (r.xs||0)===minX&&minX<maxX&&allX.length>1 ? 'stat-lo' : '') : '';
+
+      var row = '<tr>';
+      row += '<td class="lft">'+dateFmt+'</td>';
+      for(var i=0;i<k.antalSerier;i++){
+        var s = serier[i];
+        if(!s){ row += '<td>—</td>'; continue; }
+        var cls = s.medal==='perfekt'?'stat-pf':s.medal==='guld'?'stat-g':s.medal==='silver'?'stat-s':s.medal==='brons'?'stat-br':'';
+        var xs = k.harX ? (s.shots||[]).filter(function(v){return v==='X';}).length : null;
+        row += '<td class="'+cls+'"><div class="stat-sc">'
+          + '<div class="stat-sc-p">'+(s.sum||0)+'</div>'
+          + (k.harX ? '<div class="stat-sc-x">'+(xs ? xs+'X' : '—')+'</div>' : '')
+          + '</div></td>';
+      }
+      if(k.harX) row += '<td class="stat-sep '+ xCls+'"><div class="stat-sc"><div class="stat-sc-p">'+(r.xs||0)+'</div><div class="stat-sc-x">X</div></div></td>';
+      row += '<td class="stat-sep '+ totCls+'" style="font-size:13px;font-weight:700;">'+(r.total||0)+'</td>';
+      row += '</tr>';
+      html += row;
+    });
+    html += '</tbody></table></div>';
+  });
+  return html;
+}
+
+function byggStatTabellMoment(data, moment, k){
+  // Gruppera per vapengrupp
+  var vgMap = {};
+  data.forEach(function(r){
+    var vg = r.vapengrupp || '?';
+    if(!vgMap[vg]) vgMap[vg] = [];
+    vgMap[vg].push(r);
+  });
+
+  var allTot = data.map(function(r){return r.total;});
+  var maxTot = allTot.length ? Math.max.apply(null,allTot) : null;
+  var minTot = allTot.length ? Math.min.apply(null,allTot) : null;
+
+  var html = '';
+  Object.keys(vgMap).sort().forEach(function(vg){
+    var rows = vgMap[vg];
+    html += '<div class="stat-vg-head">Vapengrupp '+vg+'</div>';
+    html += '<div class="stat-xt-wrap"><table class="stat-xt">';
+    html += '<thead><tr><th class="lft" style="width:55px;">Datum/Mom.</th>';
+    html += '<th>S1</th><th>S2</th><th>S3</th><th>S4</th>';
+    html += '<th class="stat-sep" style="width:24px;">X</th>';
+    html += '<th class="stat-sep" style="width:32px;">Tot</th>';
+    html += '</tr></thead><tbody>';
+
+    var sorted = ([...rows]).reverse();
+    sorted.forEach(function(r, ri){
+      var serier = r.serier || [];
+      var dateFmt = r.datum ? r.datum.slice(5) : '—';
+      var totCls = r.total===maxTot ? 'stat-hi' : r.total===minTot&&allTot.length>1 ? 'stat-lo' : '';
+
+      // Spacer between results
+      if(ri > 0) html += '<tr class="stat-spacer"><td colspan="7"></td></tr>';
+      html += '<tr><td class="mom-lbl" colspan="7">'+dateFmt+'</td></tr>';
+
+      var grandX = 0, grandP = 0;
+      moment.forEach(function(m){
+        var momP = 0, momX = 0;
+        var row = '<tr><td class="lft">'+m.namn+'</td>';
+        m.idx.forEach(function(si){
+          var s = serier[si];
+          if(!s){ row += '<td>—</td>'; momP += 0; return; }
+          var cls = s.medal==='perfekt'?'stat-pf':s.medal==='guld'?'stat-g':s.medal==='silver'?'stat-s':s.medal==='brons'?'stat-br':'';
+          var xs = m.harX ? (s.shots||[]).filter(function(v){return v==='X';}).length : null;
+          if(xs !== null) momX += xs;
+          momP += s.sum || 0;
+          row += '<td class="'+cls+'"><div class="stat-sc">'
+            + '<div class="stat-sc-p">'+(s.sum||0)+'</div>'
+            + (m.harX ? '<div class="stat-sc-x">'+(xs ? xs+'X' : '—')+'</div>' : '<div class="stat-sc-nx">ej X</div>')
+            + '</div></td>';
+        });
+        grandP += momP;
+        grandX += momX;
+        row += '<td class="stat-sep"><div class="stat-sc">'
+          + (m.harX ? '<div class="stat-sc-p">'+momX+'</div><div class="stat-sc-x">X</div>' : '<div class="stat-sc-nx">ej X</div>')
+          + '</div></td>';
+        row += '<td class="stat-sep"><div class="stat-sc"><div class="stat-sc-p">'+momP+'</div></div></td>';
+        row += '</tr>';
+        html += row;
+      });
+
+      // Total row
+      html += '<tr><td class="tot-lbl">Totalt</td><td colspan="4"></td>';
+      html += '<td class="stat-sep stat-hi"><div class="stat-sc"><div class="stat-sc-p">'+grandX+'</div><div class="stat-sc-x">X</div></div></td>';
+      html += '<td class="stat-sep '+totCls+'" style="font-size:13px;font-weight:700;">'+(r.total||0)+'</td>';
+      html += '</tr>';
+    });
+
+    html += '</tbody></table></div>';
+  });
+  return html;
+}
+
 function renderStatistik(){
   var el=document.getElementById('statistik-content');
   el.innerHTML='<div class="loading">Hämtar statistik...</div>';
@@ -1602,23 +1909,35 @@ function renderStatistik(){
     // Filtrera per vald gren
     var grenNamn={precision:'Precision nationellt',snabb:'Militär snabbmatch',helmatch:'Nationell helmatch'};
     var html='';
-    var visaGrenar = statFilter==='alla' ? ['precision','snabb','helmatch'] : [statFilter];
+    var grenarIData = ['precision','snabb','helmatch'].filter(function(g){ return data.some(function(r){return (r.gren||'precision')===g;}); });
+    var visaGrenar = statFilter==='alla' ? grenarIData : [statFilter];
+    var grenNamn={precision:'Precision nationellt',snabb:'Militär snabbmatch',helmatch:'Nationell helmatch'};
 
     visaGrenar.forEach(function(gren){
       var gdata=data.filter(function(r){return(r.gren||'precision')===gren;});
       if(gdata.length===0)return;
-      var k=GRENKONFIG[gren];
+      var k=GRENKONFIG[gren]||GRENKONFIG['precision'];
+      if(!GRENKONFIG[gren]) return;
       var tr=gdata.filter(function(r){return r.typ==='traning';});
       var tv=gdata.filter(function(r){return r.typ==='tavling';});
       function avg(a){return a.length?Math.round(a.reduce(function(x,b){return x+b.total;},0)/a.length):'-';}
       function maxv(a){return a.length?Math.max.apply(null,a.map(function(r){return r.total;})):'-';}
       function avgX(a){return a.length?(a.reduce(function(x,b){return x+(b.xs||0);},0)/a.length).toFixed(1):'-';}
+      function avgSerie(a){
+        if(!a.length) return '-';
+        var totalSerier = 0, totalPoang = 0;
+        a.forEach(function(r){
+          var serier = r.serier||[];
+          serier.forEach(function(s){ if(s && s.sum>0){ totalPoang += s.sum; totalSerier++; } });
+        });
+        return totalSerier ? (totalPoang/totalSerier).toFixed(1) : '-';
+      }
 
-      html+='<div class="section-title" style="margin-top:16px;">'+grenNamn[gren]+'</div>';
+      html+='<div class="section-title" style="margin-top:16px;">'+k.namn+'</div>';
       html+='<div class="stat-grid"><div class="stat-card"><div class="stat-label">Snitt träning</div><div class="stat-val">'+avg(tr)+'p</div><div class="stat-sub">'+tr.length+' pass</div></div><div class="stat-card"><div class="stat-label">Bästa träning</div><div class="stat-val">'+maxv(tr)+'p</div><div class="stat-sub">/ '+k.maxTotal+'p</div></div><div class="stat-card"><div class="stat-label">Snitt tävling</div><div class="stat-val">'+avg(tv)+'p</div><div class="stat-sub">'+tv.length+' tävlingar</div></div><div class="stat-card"><div class="stat-label">Bästa tävling</div><div class="stat-val">'+maxv(tv)+'p</div><div class="stat-sub">/ '+k.maxTotal+'p</div></div></div>';
 
       if(k.harX){
-        html+='<div class="stat-grid"><div class="stat-card"><div class="stat-label">Snitt X träning</div><div class="stat-val">'+avgX(tr)+'</div></div><div class="stat-card"><div class="stat-label">Snitt X tävling</div><div class="stat-val">'+avgX(tv)+'</div></div></div>';
+        html+='<div class="stat-grid"><div class="stat-card"><div class="stat-label">Snitt serie träning</div><div class="stat-val">'+avgSerie(tr)+'</div></div><div class="stat-card"><div class="stat-label">Snitt serie tävling</div><div class="stat-val">'+avgSerie(tv)+'</div></div></div>';
       }
 
       // Medaljer per serie / total
@@ -1666,42 +1985,50 @@ function renderStatistik(){
 
       // Excel-tabell
       html+='<div class="section-title" style="font-size:12px;">Resultatlogg</div>';
-      var tableRows=([...gdata]).reverse().map(function(r){
-        var dateFmt=r.datum?r.datum.slice(5):'—';
-        var vg2=r.vapengrupp||'—';
-        var serier=r.serier||[];
-        var serierTd='';
-        for(var i2=0;i2<k.antalSerier;i2++){
-          var s2=serier[i2];
-          if(!s2){serierTd+='<td>—</td>';continue;}
-          var isPerfektCell=s2.sum===k.maxPerSerie;
-          var mc=isPerfektCell?'c-perfekt':(s2.medal==='guld'?'c-guld':(s2.medal==='silver'?'c-silver':(s2.medal==='brons'?'c-brons':'')));
-          serierTd+='<td class="'+mc+'">'+(s2.sum>0?s2.sum+'p':'—')+'</td>';
-        }
-        var xCell=k.harX?'<td class="c-x">'+(r.xs||0)+'</td>':'';
-        var medalCell=r.total_medal?'<td class="ms-'+r.total_medal+'" style="font-weight:700;">'+r.total_medal.charAt(0).toUpperCase()+'</td>':'';
-        return'<tr><td>'+dateFmt+'</td><td class="vg">'+vg2+'</td>'+serierTd+xCell+'<td class="c-sum">'+r.total+'p</td>'+medalCell+'</tr>';
-      }).join('');
-      var sHeaders='';for(var si2=0;si2<k.antalSerier;si2++)sHeaders+='<th>S'+(si2+1)+'</th>';
-      var xHeader=k.harX?'<th>X</th>':'';
-      var medalHeader=k.harMedalj==='total'?'<th>M</th>':'';
-      html+='<div class="excel-wrap" style="margin-bottom:20px;"><table class="excel-table"><thead><tr><th>Datum</th><th>Gr.</th>'+sHeaders+xHeader+'<th>Tot</th>'+medalHeader+'</tr></thead><tbody>'+tableRows+'</tbody></table></div>';
+      // Ny statistik-tabell per vapengrupp
+      if(k.moment){
+        var momentDef = gren==='snabb' ? [
+          {namn:'10 sek', idx:[0,1,2,3], harX:true},
+          {namn:'8 sek',  idx:[4,5,6,7], harX:true},
+          {namn:'6 sek',  idx:[8,9,10,11], harX:true}
+        ] : [
+          {namn:'Precision', idx:[0,1,2,3], harX:true},
+          {namn:'Duell',     idx:[4,5,6,7], harX:true},
+          {namn:'Figurskj.', idx:[8,9,10,11], harX:false}
+        ];
+        html += byggStatTabellMoment(gdata, momentDef, k);
+      } else {
+        html += byggStatTabellPrecision(gdata, k);
+      }
 
       // Std-poäng sammanfattning per år
       var tavlMedStd=tv.filter(function(r){return r.std_poang!==null&&r.std_poang!==undefined;});
       if(tavlMedStd.length>0){
-        html+='<div class="section-title" style="font-size:12px;margin-top:8px;">Standardpoäng per år</div>';
-        var arMap={};
+        html+='<div class="section-title" style="font-size:12px;margin-top:8px;">Standardpoäng</div>';
+        // Grenvis + årsvis
+        var grenMap = {};
         tavlMedStd.forEach(function(r){
-          var ar=r.datum?r.datum.slice(0,4):'?';
-          if(!arMap[ar])arMap[ar]={n:0,sum:0,best:0};
-          arMap[ar].n++;arMap[ar].sum+=r.std_poang;
-          if(r.std_poang>arMap[ar].best)arMap[ar].best=r.std_poang;
+          var gren = r.gren||'precision';
+          var ar = r.datum?r.datum.slice(0,4):'?';
+          if(!grenMap[gren]) grenMap[gren]={};
+          if(!grenMap[gren][ar]) grenMap[gren][ar]={n:0,sum:0,best:0,vals:[]};
+          grenMap[gren][ar].n++;
+          grenMap[gren][ar].sum+=r.std_poang;
+          grenMap[gren][ar].vals.push(r.std_poang);
+          if(r.std_poang>grenMap[gren][ar].best) grenMap[gren][ar].best=r.std_poang;
         });
-        html+='<div class="excel-wrap" style="margin-bottom:8px;"><table class="excel-table"><thead><tr><th>År</th><th>Antal</th><th>Snitt</th><th>Bäst</th></tr></thead><tbody>';
-        Object.keys(arMap).sort().forEach(function(ar){
-          var d=arMap[ar];
-          html+='<tr><td>'+ar+'</td><td>'+d.n+'</td><td class="c-sum">'+Math.round(d.sum/d.n)+'p</td><td class="c-sum">'+d.best+'p</td></tr>';
+        var grenNamn={precision:'Precision',snabb:'Milsnabb',helmatch:'Helmatch'};
+        Object.keys(grenMap).sort().forEach(function(gren){
+          var arData = grenMap[gren];
+          var ars = Object.keys(arData).sort();
+          html+='<div style="font-size:11px;font-weight:700;color:var(--muted);margin:8px 0 4px;">'+( grenNamn[gren]||gren)+'</div>';
+          html+='<div class="excel-wrap" style="margin-bottom:8px;"><table class="excel-table"><thead><tr><th>År</th><th>Antal</th><th>Snitt</th><th>Bäst</th></tr></thead><tbody>';
+          ars.forEach(function(ar){
+            var d=arData[ar];
+            var snitt=Math.round(d.sum/d.n);
+            html+='<tr><td>'+ar+'</td><td>'+d.n+'</td><td>'+snitt+'p</td><td>'+d.best+'p</td></tr>';
+          });
+          html+='</tbody></table></div>';
         });
         html+='</tbody></table></div>';
       }
@@ -2087,7 +2414,7 @@ function aktiveraNamn(namn, uid){
   localStorage.setItem('skytte_uid', uid||'');
   localStorage.setItem('skytte_version', '2');
   doljNamnScreen();
-  // Visa grenväljaren och menyn
+  aktGren = null;
   document.getElementById('gren-valj').style.display='flex';
   document.getElementById('bottom-nav').style.display='flex';
   // Uppdatera chip
@@ -2114,6 +2441,7 @@ function kollaLagraNamn(){
       if(abw) abw.style.display='block';
     }
     doljNamnScreen();
+    aktGren = null;
     document.getElementById('gren-valj').style.display='flex';
     document.getElementById('bottom-nav').style.display='flex';
   } else {
@@ -2128,6 +2456,25 @@ function oppnaAdmin(){
   var panel = document.getElementById('admin-panel');
   panel.classList.add('open');
   laddaAdminData();
+}
+
+function loggaUt(){
+  if(!confirm('Logga ut från ' + aktivtNamn + '?')) return;
+  localStorage.removeItem('skytte_namn');
+  localStorage.removeItem('skytte_uid');
+  localStorage.removeItem('skytte_gren');
+  aktivtNamn = '';
+  aktGren = null;
+  // Dölj chip och admin
+  var chip = document.getElementById('anvandare-chip');
+  if(chip){ chip.textContent=''; chip.style.display='none'; }
+  var abw = document.getElementById('admin-btn-wrap');
+  if(abw) abw.style.display='none';
+  // Visa namnvals-skärm
+  document.getElementById('app').style.display='none';
+  document.getElementById('gren-valj').style.display='none';
+  visaNamnScreen();
+  visaNamnLage('register');
 }
 
 function stangAdmin(){
@@ -2287,6 +2634,24 @@ function onHistCbClick(el){
   else { bar.classList.remove('synlig'); }
 }
 
+function onHistCbClick(id, el){
+  id = ""+id;
+  var wrap = document.getElementById("wrap-"+id);
+  if(markerade[id]){
+    delete markerade[id];
+    if(wrap) wrap.classList.remove("markerad");
+    if(el){ el.textContent=''; el.style.borderColor=''; el.style.background='var(--surface)'; }
+  } else {
+    markerade[id] = (window.histResultater && window.histResultater[id]) || {id:id};
+    if(wrap) wrap.classList.add("markerad");
+    if(el){ el.textContent='✕'; el.style.borderColor='var(--blue)'; el.style.background='rgba(55,138,221,0.12)'; }
+  }
+  var antal = Object.keys(markerade).length;
+  var bar = document.getElementById("hist-action-bar");
+  if(antal > 0){ bar.classList.add("synlig"); document.getElementById("hist-action-count").textContent = antal + " valda"; }
+  else { bar.classList.remove("synlig"); }
+}
+
 function onHistCb(id, cb){
   id = ""+id;
   var wrap = document.getElementById("wrap-"+id);
@@ -2294,9 +2659,11 @@ function onHistCb(id, cb){
   if(isChecked){
     markerade[id] = (window.histResultater && window.histResultater[id]) || {id:id};
     if(wrap) wrap.classList.add("markerad");
+    if(cb){ cb.checked = true; }
   } else {
     delete markerade[id];
     if(wrap) wrap.classList.remove("markerad");
+    if(cb){ cb.checked = false; }
   }
   var antal = Object.keys(markerade).length;
   var bar = document.getElementById("hist-action-bar");
